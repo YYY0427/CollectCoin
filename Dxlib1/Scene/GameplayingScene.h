@@ -5,7 +5,6 @@
 
 //プロトタイプ宣言
 class Player;	//プレイヤークラス
-class Shot;		//自機の弾
 class Field;
 
 /// <summary>

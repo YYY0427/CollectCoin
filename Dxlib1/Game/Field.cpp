@@ -34,6 +34,8 @@ namespace
 Field::Field() :
 	drawTimer_(0),
 	noDrawTimer_(0),
+	isWorp_(true),
+	isWorp2_(false),
 	isDraw_(true)
 {
 	
@@ -59,7 +61,6 @@ void Field::Updata()
 			drawTimer_ = 0;
 		}
 	}
-	
 }
 
 void Field::Draw()
@@ -90,6 +91,21 @@ void Field::Draw()
 	}
 }
 
+bool Field::IsGameClearCheck()
+{
+	for (int y = 0; y < kMapHeight; y++)
+	{
+		for (int x = 0; x < kMapWidth; x++)
+		{
+			if (mapData[y][x] == 1 || mapData[y][x] == 3)
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 // ƒuƒƒbƒN‚ª‚ ‚é‚©‚Ç‚¤‚©
 bool Field::IsBlock(int y, int x)
 {
@@ -103,7 +119,10 @@ bool Field::IsBlock(int y, int x)
 bool Field::IsFeed(int y, int x)
 {
 	if (mapData[y][x] == 1)
+	{
+		mapData[y][x] = 0;
 		return true;
+	}
 
 	return false;
 }
@@ -112,7 +131,24 @@ bool Field::IsFeed(int y, int x)
 bool Field::IsPowerFeed(int y, int x)
 {
 	if (mapData[y][x] == 3)
+	{
+		mapData[y][x] = 0;
 		return true;
-
+	}
 	return false;
+}
+
+int  Field::PlayerWorp(int ky, int kx, int indexY, int indexX)
+{
+	if (ky == 10 && kx == 1 && indexY == 10 && indexX == 0)
+	{
+		indexY = 10;
+		indexX = 18;
+	}
+	if (ky == 10 && kx == 17 && indexY == 10 && indexX == 18)
+	{
+		indexY = 10;
+		indexX = 0;
+	}
+	return (indexY, indexX);
 }

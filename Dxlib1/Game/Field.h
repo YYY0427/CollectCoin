@@ -11,11 +11,20 @@ public:
 	// ブロックの大きさ
 	static constexpr int kBlockSize = 32;
 
+	// コンストラクタ
 	Field();
+	 
+	// デストラクタ
 	~Field(){}
 
+	// 更新処理
 	void Updata();
+
+	// 描画処理
 	void Draw();
+
+	// ゲームクリアチェック判定
+	bool IsGameClearCheck();
 
 	// ブロックがあるかどうか
 	bool IsBlock(int y, int x );
@@ -25,13 +34,22 @@ public:
 
 	// パワーエサがあるかどうか
 	bool IsPowerFeed(int y, int x);
+
+	// 指定の位置にプレイヤーがいる場合
+	// 指定の位置にワープさせる
+	int  PlayerWorp(int ky, int kx, int x, int y);
 private:
 	// 表示用タイマー
 	int drawTimer_;
+
 	// 表示をさせない用タイマー
 	int noDrawTimer_;
 
 	// 表示するかどうか
 	bool isDraw_;
+
+	// ワープさせるかどうか
+	bool isWorp_;
+	bool isWorp2_;
 };
 

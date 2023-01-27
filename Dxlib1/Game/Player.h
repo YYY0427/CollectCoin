@@ -1,7 +1,8 @@
 #pragma once
+//「スマートポインタ」を使うためのinclude
+#include <memory>	
 #include "../Geometry.h"
 
-class Enemy;
 class Field;
 class InputState;
 
@@ -12,7 +13,7 @@ public:
 	Player();
 
 	//デストラクタ
-	~Player();
+	~Player(){};
 
 	// 処理
 	void Update(const InputState& input);
@@ -23,8 +24,8 @@ public:
 	// アニメーション
 	void Animation();
 private:
-	Enemy* pEnemy_ = nullptr;
-	Field* pField_ = nullptr;
+	//フィールド
+	std::shared_ptr<Field> pField_;
 
 	// 自機の現在の座標
 	Position2 pos_;	
@@ -57,4 +58,10 @@ private:
 
 	//プレイヤーがどの方向に移動しているか
 	int moveDirection;
+
+	// 取得したエサの数
+	int feedGetNum_;
+
+	// 取得したパワーエサの数
+	int powerFeedGetNum_;
 };

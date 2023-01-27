@@ -15,7 +15,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		return -1;
 	}
 
-	
 	// ウインドウ名設定
 	SetMainWindowText(L"パックマン");
 	// 画面サイズの設定

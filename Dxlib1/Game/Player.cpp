@@ -11,19 +11,18 @@ Player::Player() :
 	indexX_(1), indexY_(1),
 	moveTimer_(0),
 	moveDirection(0),
+	feedGetNum_(0),
 	isMoveDownOrRight(false)
 {
-	pField_ = new Field;
+	pField_ = std::make_shared<Field>();
 	handle_ = my::MyLoadGraph(L"Data/img/game/pacman.png");
-}
-
-Player::~Player()
-{
-	delete pField_;
 }
 
 void Player::Update(const InputState& input)
 {
+	//移動のインターバルのカウント
+	moveTimer_++;
+
 	//現在の座標を仮座標で保存
 	kX_ = indexX_;
 	kY_ = indexY_;
@@ -61,8 +60,10 @@ void Player::Update(const InputState& input)
 		moveDirection = 4;
 	}
 
+	//移動のインターバル
 	if (moveTimer_ % 30 == 0)
 	{
+		//移動処理
 		switch (moveDirection)
 		{
 		case 1:
@@ -83,19 +84,32 @@ void Player::Update(const InputState& input)
 		moveTimer_ = 0;
 	}
 	
+	//壁との当たり判定
 	if(pField_->IsBlock(indexY_, indexX_))
 	{
+		//進んだ先の座標に壁があった場合1フレーム前の座標に戻す
 		indexX_ = kX_;
 		indexY_ = kY_;
 
 		moveDirection = 0;
 	}
+	//エサとの当たり判定
+	if (pField_->IsFeed(indexY_, indexX_))
+	{
+		//エサの数のカウント
+		feedGetNum_++;
+	}
+	//パワーエサとの当たり判定
+	if (pField_->IsPowerFeed(indexY_, indexX_))
+	{
+		//エサの数のカウント
+		powerFeedGetNum_++;
+	}
 
-	
+	indexY_, indexX_ = pField_->PlayerWorp(kY_, kX_, indexY_, indexX_);
 
+	//アニメーション処理
 	Animation();
-
-	moveTimer_++;
 }
 
 void Player::Draw()

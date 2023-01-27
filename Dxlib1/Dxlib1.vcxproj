@@ -155,7 +155,6 @@
     <ClCompile Include="Game\Enemy.cpp" />
     <ClCompile Include="Game\Field.cpp" />
     <ClCompile Include="Game\Player.cpp" />
-    <ClCompile Include="Game\Shot.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="InputState.cpp" />
     <ClCompile Include="main.cpp" />
@@ -175,7 +174,6 @@
     <ClInclude Include="Game\Enemy.h" />
     <ClInclude Include="Game\Field.h" />
     <ClInclude Include="Game\Player.h" />
-    <ClInclude Include="Game\Shot.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="InputState.h" />
     <ClInclude Include="Scene\GameoverScene.h" />

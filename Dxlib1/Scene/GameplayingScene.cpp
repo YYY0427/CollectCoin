@@ -6,7 +6,6 @@
 #include "../DrawFunctions.h"
 #include "PauseScene.h"
 #include"../Game/Player.h"
-#include "../Game/Shot.h"
 #include "../Game/Field.h"
 #include <DxLib.h>
 
@@ -24,6 +23,11 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 
 	pPlayer_->Update(input);
 
+	if (pField_->IsGameClearCheck())
+	{
+		updateFunc_ = &GameplayingScene::FadeOutUpdate;
+		fadeColor_ = 0xff0000;
+	}
 	if (input.IsTriggered(InputType::next))
 	{
 		updateFunc_ = &GameplayingScene::FadeOutUpdate;
@@ -58,7 +62,6 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	pPlayer_ = std::make_shared<Player>();
 }
 
-
 void GameplayingScene::Update(const InputState& input)
 {
 	(this->*updateFunc_)(input);
@@ -66,11 +69,11 @@ void GameplayingScene::Update(const InputState& input)
 
 void GameplayingScene::Draw()
 {
-	DrawString(0, 0, L"GamePlayingScene", 0xffffff, true);
-
 	pField_->Draw();
 
 	pPlayer_->Draw();
+
+	DrawString(0, 0, L"GamePlayingScene", 0xffffff, true);
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
 	DrawBox(0, 0, 640, 480, fadeColor_, true);
