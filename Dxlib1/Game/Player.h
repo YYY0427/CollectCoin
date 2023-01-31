@@ -51,13 +51,13 @@ private:
 	int animeTimer_;
 
 	// 表示する画像のインデックス
-	int imgIdx = 0;	
+	int imgIdx_;	
 
 	// 画像の方向の切り替え
 	float angle_;
 
 	//プレイヤーがどの方向に移動しているか
-	int moveDirection;
+	int moveDirection_;
 
 	// 取得したエサの数
 	int feedGetNum_;
@@ -68,9 +68,6 @@ private:
 	// パワーエサを取得したかどうか
 	bool isPowerFeed_;
 	
-	// パワーエサを取得している状態でパワーエサを取得したか
-	bool isGetPowerFeed_;
-
 	// パワーエサを取得した状態でどのくらい経ったか
 	int powerFeedTimer_;
 };
