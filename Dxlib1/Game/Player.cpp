@@ -4,6 +4,11 @@
 #include "../InputState.h"
 #include <DxLib.h>
 
+namespace
+{
+	
+}
+
 Player::Player() :
 	animeTimer_(0),
 	angle_(0.0f),
