@@ -24,7 +24,7 @@ Player::Player() :
 	isMoveDownOrRight(false)
 {
 	pField_ = std::make_shared<Field>();
-	handle_ = my::MyLoadGraph(L"Data/img/game/pacman.png");
+	handle_ = my::MyLoadGraph(L"Data/img/game/Pacman16.png");
 }
 
 void Player::Update(const InputState& input)
@@ -149,23 +149,30 @@ void Player::Draw()
 	DrawRectRotaGraph(
 		(indexX_ * Field::kBlockSize) + (Field::kBlockSize / 2) ,
 		(indexY_ * Field::kBlockSize) + (Field::kBlockSize / 2) ,
-		imgIdx * 32, 0,			// 切り取り左上
-		32, 32,					// 幅、高さ
-		1.0f, angle_,			// 拡大率、回転角度
+		imgIdx * 16, 0,			// 切り取り左上
+		16, 16,					// 幅、高さ
+		2.0f, angle_,			// 拡大率、回転角度
 		handle_, true);
 }
 
 void Player::Animation()
 {
 	animeTimer_++;
-	if (animeTimer_ % 30 == 0 && moveDirection != 0)
+	if (animeTimer_ % 5 == 0 && moveDirection != 0)
 	{
 		// アニメーションの切り替え
 		if (imgIdx == 0)
 			imgIdx = 1;
-		else
+		else if(imgIdx == 1)
+			imgIdx = 2;
+		else if (imgIdx == 2)
+			imgIdx = 3;
+		else if (imgIdx == 3)
+			imgIdx = 4;
+		else if (imgIdx == 4)
+			imgIdx = 5;
+		else if (imgIdx == 5)
 			imgIdx = 0;
-
 		animeTimer_ = 0;
 	}
 }
