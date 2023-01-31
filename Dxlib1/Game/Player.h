@@ -62,6 +62,15 @@ private:
 	// 取得したエサの数
 	int feedGetNum_;
 
-	// 取得したパワーエサの数
-	int powerFeedGetNum_;
+	// プレイヤーの移動速度
+	int moveSpeed_;
+
+	// パワーエサを取得したかどうか
+	bool isPowerFeed_;
+	
+	// パワーエサを取得している状態でパワーエサを取得したか
+	bool isGetPowerFeed_;
+
+	// パワーエサを取得した状態でどのくらい経ったか
+	int powerFeedTimer_;
 };

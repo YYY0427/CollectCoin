@@ -46,7 +46,7 @@ void Field::Updata()
 	if (!isDraw_)
 	{
 		noDrawTimer_++;
-		if (noDrawTimer_ % 100 == 0)
+		if (noDrawTimer_ % 50 == 0)
 		{
 			isDraw_ = true;
 			noDrawTimer_ = 0;
@@ -55,7 +55,7 @@ void Field::Updata()
 	else
 	{
 		drawTimer_++;
-		if (drawTimer_ % 100 == 0)
+		if (drawTimer_ % 50 == 0)
 		{
 			isDraw_ = false;
 			drawTimer_ = 0;
@@ -140,6 +140,7 @@ bool Field::IsPowerFeed(int y, int x)
 
 int  Field::PlayerWorp(int ky, int kx, int indexY, int indexX)
 {
+	//前の座標が特定の位置かつ現在の座標が特定の位置ならワープ
 	if (ky == 10 && kx == 1 && indexY == 10 && indexX == 0)
 	{
 		indexY = 10;
