@@ -21,16 +21,40 @@ public:
 	// 描画
 	void Draw();
 
+	// 当たり判定
+	bool Colision(int direction);
+
+	// パワーエサを取得した場合の速度計算
+	void SpeedCalculation();
+
+	// インデックス座標を座標に変換
+	void PosCalculation();
+
 	// アニメーション
 	void Animation();
+
+	enum Direction
+	{
+		up,
+		down,
+		left,
+		right,
+		directNum
+	};
+
 private:
+
 	//フィールド
 	std::shared_ptr<Field> pField_;
 
 	// 自機の現在の座標
 	Position2 pos_;	
 
-	//プレイヤーの座標
+	// プレイヤーの座標
+	int posX_;
+	int posY_;
+
+	//プレイヤーのインデックス座標
 	int indexX_;
 	int indexY_;
 
@@ -47,17 +71,17 @@ private:
 	// 移動インターバル用タイマー
 	int moveTimer_;
 
-	// 画像の切り替え用タイマー
-	int animeTimer_;
-
 	// 表示する画像のインデックス
-	int imgIdx_;	
+	int imgIdX_;	
 
 	// 画像の方向の切り替え
 	float angle_;
 
-	//プレイヤーがどの方向に移動しているか
+	// プレイヤーがどの方向に進んでいるか
 	int moveDirection_;
+
+	// プレイヤーがどの方向に進みたいか
+	int wantMoveDirection_;
 
 	// 取得したエサの数
 	int feedGetNum_;
@@ -70,4 +94,6 @@ private:
 	
 	// パワーエサを取得した状態でどのくらい経ったか
 	int powerFeedTimer_;
+
+	float powerFeedSpeed_;
 };

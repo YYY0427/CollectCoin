@@ -34,8 +34,6 @@ namespace
 Field::Field() :
 	drawTimer_(0),
 	noDrawTimer_(0),
-	isWorp_(true),
-	isWorp2_(false),
 	isDraw_(true)
 {
 	

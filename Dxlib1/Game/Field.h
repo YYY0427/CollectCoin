@@ -47,9 +47,5 @@ private:
 
 	// ï\é¶Ç∑ÇÈÇ©Ç«Ç§Ç©
 	bool isDraw_;
-
-	// ÉèÅ[ÉvÇ≥ÇπÇÈÇ©Ç«Ç§Ç©
-	bool isWorp_;
-	bool isWorp2_;
 };
 
