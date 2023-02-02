@@ -33,7 +33,7 @@ Player::Player() :
 	moveSpeed_(normal_speed),
 	powerFeedTimer_(0),
 	powerFeedSpeed_(1.0f),
-	imgIdX_(3),
+	imgIdX_(10),
 	wantMoveDirection_(0),
 	isPowerFeed_(false)
 {
@@ -73,12 +73,6 @@ void Player::Update(const InputState& input)
 	{
 		wantMoveDirection_ = right;
 	}
-
-	if (moveDirection_ == up)
-	{
-		
-	}
-
 
 	// 移動のインターバル				// 移動する方向に壁がない場合移動
 	if (moveTimer_ % moveSpeed_ == 0 && !Colision(moveDirection_))

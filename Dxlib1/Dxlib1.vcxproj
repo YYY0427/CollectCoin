@@ -151,8 +151,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\ChasingEnemy.cpp" />
     <ClCompile Include="DrawFunctions.cpp" />
-    <ClCompile Include="Game\Enemy.cpp" />
+    <ClCompile Include="Game\EnemyBase.cpp" />
     <ClCompile Include="Game\Field.cpp" />
     <ClCompile Include="Game\Player.cpp" />
     <ClCompile Include="Geometry.cpp" />
@@ -169,9 +170,10 @@
     <ClCompile Include="vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\ChasingEnemy.h" />
     <ClInclude Include="DrawFunctions.h" />
     <ClInclude Include="game.h" />
-    <ClInclude Include="Game\Enemy.h" />
+    <ClInclude Include="Game\EnemyBase.h" />
     <ClInclude Include="Game\Field.h" />
     <ClInclude Include="Game\Player.h" />
     <ClInclude Include="Geometry.h" />

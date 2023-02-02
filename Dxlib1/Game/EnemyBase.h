@@ -7,10 +7,10 @@ class Player;
 /// <summary>
 /// 敵の基底クラス
 /// </summary>
-class Enemy
+class EnemyBase
 {
 public:
-	Enemy(std::shared_ptr<Player> player);
+	EnemyBase(std::shared_ptr<Player> player);
 
 	/// <summary>
 	/// 敵オブジェクトの更新
