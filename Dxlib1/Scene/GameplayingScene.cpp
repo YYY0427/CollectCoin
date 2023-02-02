@@ -23,6 +23,7 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 
 	pPlayer_->Update(input);
 
+	// ƒQ[ƒ€ƒNƒŠƒA”»’è
 	if (pField_->IsGameClearCheck())
 	{
 		updateFunc_ = &GameplayingScene::FadeOutUpdate;

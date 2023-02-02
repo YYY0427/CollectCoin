@@ -141,13 +141,12 @@ int  Field::PlayerWorp(int ky, int kx, int indexY, int indexX)
 	//前の座標が特定の位置かつ現在の座標が特定の位置ならワープ
 	if (ky == 10 && kx == 1 && indexY == 10 && indexX == 0)
 	{
-		indexY = 10;
 		indexX = 18;
+		
 	}
 	if (ky == 10 && kx == 17 && indexY == 10 && indexX == 18)
 	{
-		indexY = 10;
 		indexX = 0;
 	}
-	return (indexY, indexX);
+	return (indexX);
 }

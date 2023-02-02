@@ -3,7 +3,6 @@
 class Field
 {
 public:
-
 	// マップの横幅
 	static constexpr int kMapWidth = 19;
 	// マップの縦幅
@@ -48,4 +47,3 @@ private:
 	// 表示するかどうか
 	bool isDraw_;
 };
-

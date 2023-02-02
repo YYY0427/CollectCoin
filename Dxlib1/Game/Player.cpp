@@ -11,12 +11,16 @@ namespace
 
 	// パワーエサを取得した場合の移動スピード(何倍か)
 	constexpr float get_feed_speed = 1.3f;
+	
+	// パワーエサを取得した場合持続時間(何秒か)
+	constexpr int feed_duration = 10;
 
 	// 1枚に必要なフレーム数
 	constexpr int anime_frame_speed = 5;
 
 	// アニメーション枚数
 	constexpr int anime_frame_num = 5;
+
 }
 
 Player::Player() :
@@ -30,6 +34,7 @@ Player::Player() :
 	powerFeedTimer_(0),
 	powerFeedSpeed_(1.0f),
 	imgIdX_(3),
+	wantMoveDirection_(0),
 	isPowerFeed_(false)
 {
 	pField_ = std::make_shared<Field>();
@@ -47,83 +52,109 @@ void Player::Update(const InputState& input)
 	kX_ = indexX_;
 	kY_ = indexY_;
 
-	
-
+	// プレイヤーが移動したい方向を記憶
 	// 上 1
 	if (input.IsTriggered(InputType::up))
 	{
-		//方向の切り替え
-		angle_ = 4.65f;
-
-		moveDirection_ = 1;
+		wantMoveDirection_ = up;
 	} 
 	// 下 2
 	if (input.IsTriggered(InputType::down))
 	{
-		//方向の切り替え
-		angle_ = 1.55f;
-
-		moveDirection_ = 2;
+		wantMoveDirection_ = down;
 	}
 	// 左 3
 	if (input.IsTriggered(InputType::left))
 	{
-		//方向の切り替え
-		angle_ = 3.1f;
-
-		moveDirection_ = 3;
+		wantMoveDirection_ = left;
 	}
 	// 右 4
 	if (input.IsTriggered(InputType::right))
 	{
-		// 方向の切り替え
-		angle_ = 0.0f;
-
-		moveDirection_ = 4;
+		wantMoveDirection_ = right;
 	}
 
-	// 移動のインターバル
+	if (moveDirection_ == up)
+	{
+		
+	}
+
+
+	// 移動のインターバル				// 移動する方向に壁がない場合移動
 	if (moveTimer_ % moveSpeed_ == 0 && !Colision(moveDirection_))
 	{
 		// 移動処理
 		switch (moveDirection_)
 		{
-		case 1:
+		case up:
 			indexY_--;
 			break;
-		case 2:
+		case down:
 			indexY_++;
 			break;
-		case 3:
+		case left:
 			indexX_--;
 			break;
-		case 4:
+		case right:
 			indexX_++;
 			break;
 		default:
 			break;
 		};
+
+		// プレイヤーが移動したい方向に壁がない場合移動を実行
+		if (wantMoveDirection_ == up)
+		{
+			if (!pField_->IsBlock(indexY_ - 1, indexX_))
+			{
+				// 方向の切り替え
+				angle_ = 4.65f;
+				moveDirection_ = wantMoveDirection_;
+			}
+		}
+		else if (wantMoveDirection_ == down)
+		{
+			if (!pField_->IsBlock(indexY_ + 1, indexX_))
+			{
+				//方向の切り替え
+				angle_ = 1.55f;
+				moveDirection_ = wantMoveDirection_;
+			}
+		}
+		else if (wantMoveDirection_ == left)
+		{
+			if (!pField_->IsBlock(indexY_, indexX_ - 1))
+			{
+				//方向の切り替え
+				angle_ = 3.1f;
+				moveDirection_ = wantMoveDirection_;
+			}
+		}
+		else if (wantMoveDirection_ == right)
+		{
+			if (!pField_->IsBlock(indexY_, indexX_ + 1))
+			{
+				// 方向の切り替え
+				angle_ = 0.0f;
+				moveDirection_ = wantMoveDirection_;
+			}
+		}
+
 		moveTimer_ = 0;
 	}
 	
+	// 壁に当たっていない場合
 	if (!Colision(moveDirection_))
 	{
+		// 座標計算
 		PosCalculation();
 	}
 	else
 	{
+		// 壁に当たっているので移動を行わない
 		moveDirection_ = 0;
 	}
 
-	// 壁との当たり判定
-	//if(pField_->IsBlock(indexY_, indexX_))
-	//{
-	//	//進んだ先の座標に壁があった場合前の座標に戻す
-	//	indexX_ = kX_;
-	//	indexY_ = kY_;
-
-	//	moveDirection_ = 0;
-	//}
 	// エサとの当たり判定
 	if (pField_->IsFeed(indexY_, indexX_))
 	{
@@ -135,12 +166,13 @@ void Player::Update(const InputState& input)
 	SpeedCalculation();
 
 	// ワープチェック
-	indexY_, indexX_ = pField_->PlayerWorp(kY_, kX_, indexY_, indexX_);
+	indexX_ = pField_->PlayerWorp(kY_, kX_, indexY_, indexX_);
 
+	// 移動している場合処理を行う
 	if (moveDirection_)
 	{
 		// アニメーション処理
-		Animation();
+		imgIdX_ = (imgIdX_ + 1) % (anime_frame_speed * anime_frame_num);
 	}
 }
 
@@ -150,26 +182,26 @@ void Player::Draw()
 
 	// プレイヤー画像の表示
 	DrawRectRotaGraph(posX_, posY_,		// 座標
-					imgX, 0,	// 切り取り左上
+					imgX, 0,			// 切り取り左上
 					16, 16,				// 幅、高さ
 					2.0f, angle_,		// 拡大率、回転角度
-					handle_, true); 
+					handle_, true);		// 画像のハンドル、透過するか
 }
 
 bool Player::Colision(int direction)
 {
 	switch (direction)
 	{
-	case 1:
+	case up:
 		if (pField_->IsBlock(indexY_ - 1, indexX_))	return true;
 		break;
-	case 2:
+	case down:
 		if (pField_->IsBlock(indexY_ + 1, indexX_))	return true;
 		break;
-	case 3:
+	case left:
 		if (pField_->IsBlock(indexY_, indexX_ - 1))	return true;
 		break;
-	case 4:
+	case right:
 		if (pField_->IsBlock(indexY_, indexX_ + 1)) return true;
 		break;
 	}
@@ -192,46 +224,42 @@ void Player::SpeedCalculation()
 		moveSpeed_ = normal_speed / get_feed_speed;
 		powerFeedSpeed_ = get_feed_speed;
 
-		if (powerFeedTimer_ % (60 * 10) == 0)
+		// 指定した時間が経過した場合
+		if (powerFeedTimer_ % (60 * feed_duration) == 0)
 		{
+			// 初期化
 			isPowerFeed_ = false;
 			powerFeedTimer_ = 0;
+
+			// 元の移動速度に戻す
 			moveSpeed_ = normal_speed;
 			powerFeedSpeed_ = 1.0f;
-		}
-		// パワーエサを取得している状態でパワーエサを取得した場合
-		if (pField_->IsPowerFeed(indexY_, indexX_))
-		{
-			powerFeedTimer_ = 0;
 		}
 	}
 }
 
 void Player::PosCalculation()
 {
+	// インデックス座標を計算
 	posX_ = (indexX_ * Field::kBlockSize) + (Field::kBlockSize / 2);
 	posY_ = (indexY_ * Field::kBlockSize) + (Field::kBlockSize / 2);
 
+	// 向いている方向によって座標を計算
 	switch (moveDirection_) 
 	{
-	case 1:
+	case up:
 		posY_ -= (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
 		break;
-	case 2:
+	case down:
 		posY_ += (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
 		break;
-	case 3:
+	case left:
 		posX_ -= (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
 		break;
-	case 4:
+	case right:
 		posX_ += (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
 		break;
 	default:
 		break;
 	};
-}
-
-void Player::Animation()
-{
-	imgIdX_ = (imgIdX_ + 1) % (anime_frame_speed * anime_frame_num);
 }

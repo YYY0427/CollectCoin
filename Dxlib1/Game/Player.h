@@ -30,12 +30,10 @@ public:
 	// インデックス座標を座標に変換
 	void PosCalculation();
 
-	// アニメーション
-	void Animation();
-
-	enum Direction
+	enum Direct
 	{
-		up,
+		// 1からカウント
+		up = 1,
 		down,
 		left,
 		right,
@@ -61,9 +59,6 @@ private:
 	// プレイヤーの仮の座標
 	int kX_;
 	int kY_;
-
-	//プレイヤーが右もしくは下に移動しているか
-	bool isMoveDownOrRight;
 
 	//プレイヤーの画像
 	int handle_;
