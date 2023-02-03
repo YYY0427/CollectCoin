@@ -4,11 +4,11 @@ class Field
 {
 public:
 	// マップの横幅
-	static constexpr int kMapWidth = 19;
+	static constexpr int MAP_WIDTH = 19;
 	// マップの縦幅
-	static constexpr int kMapHeight = 22;
+	static constexpr int MAP_HEIGHT = 22;
 	// ブロックの大きさ
-	static constexpr int kBlockSize = 32;
+	static constexpr int BLOCK_SIZE = 32;
 
 	// コンストラクタ
 	Field();
@@ -21,6 +21,10 @@ public:
 
 	// 描画処理
 	void Draw();
+	void PowerFeedFlash(int y, int x);
+
+	// パワーエサの点滅
+	void Flash();
 
 	// ゲームクリアチェック判定
 	bool IsGameClearCheck();
@@ -38,12 +42,13 @@ public:
 	// 指定の位置にワープさせる
 	int  PlayerWorp(int ky, int kx, int x, int y);
 private:
-	// 表示用タイマー
-	int drawTimer_;
-
-	// 表示をさせない用タイマー
-	int noDrawTimer_;
+	// パワーエサの点滅
+	int blendCount_;
+	bool blendLimitMax_;
 
 	// 表示するかどうか
 	bool isDraw_;
+
+	// パワーエサのハンドル
+	int handle_;
 };

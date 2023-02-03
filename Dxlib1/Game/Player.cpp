@@ -39,8 +39,8 @@ Player::Player() :
 {
 	pField_ = std::make_shared<Field>();
 	handle_ = my::MyLoadGraph(L"Data/img/game/Pacman16.png");
-	posX_ = (indexX_ * Field::kBlockSize) + (Field::kBlockSize / 2);
-	posY_ = (indexY_ * Field::kBlockSize) + (Field::kBlockSize / 2);
+	posX_ = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
+	posY_ = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
 }
 
 void Player::Update(const InputState& input)
@@ -235,8 +235,8 @@ void Player::SpeedCalculation()
 void Player::PosCalculation()
 {
 	// インデックス座標を計算
-	posX_ = (indexX_ * Field::kBlockSize) + (Field::kBlockSize / 2);
-	posY_ = (indexY_ * Field::kBlockSize) + (Field::kBlockSize / 2);
+	posX_ = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
+	posY_ = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
 
 	// 向いている方向によって座標を計算
 	switch (moveDirection_) 

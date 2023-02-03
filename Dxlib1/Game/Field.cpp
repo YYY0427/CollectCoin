@@ -1,10 +1,11 @@
 #include "Field.h"
+#include "../DrawFunctions.h"
 #include <DxLib.h>
 
 namespace
 {
 	//マップデータ
-	int mapData[Field::kMapHeight][Field::kMapWidth] =
+	int mapData[Field::MAP_HEIGHT][Field::MAP_WIDTH] =
 	{
 		{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
 		{ 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
@@ -29,71 +30,85 @@ namespace
 		{ 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
 		{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
 	};
+
+	// 点滅スピード
+	constexpr int FLASH_SPEED = 20;
 }
 
 Field::Field() :
-	drawTimer_(0),
-	noDrawTimer_(0),
+	blendCount_(0),
+	blendLimitMax_(false),
 	isDraw_(true)
 {
-	
+	handle_ = my::MyLoadGraph(L"Data/img/game/powerpacdot.png");
 }
 
 void Field::Updata()
 {
-	if (!isDraw_)
-	{
-		noDrawTimer_++;
-		if (noDrawTimer_ % 50 == 0)
-		{
-			isDraw_ = true;
-			noDrawTimer_ = 0;
-		}
-	}
-	else
-	{
-		drawTimer_++;
-		if (drawTimer_ % 50 == 0)
-		{
-			isDraw_ = false;
-			drawTimer_ = 0;
-		}
-	}
+	// パワーエサの点滅更新処理
+	Flash();
 }
 
 void Field::Draw()
 {
-	for (int y = 0; y < kMapHeight; y++)
+	for (int y = 0; y < MAP_HEIGHT; y++)
 	{
-		for (int x = 0; x < kMapWidth; x++)
+		for (int x = 0; x < MAP_WIDTH; x++)
 		{
-			// エサの表示
+			// エサの描画
 			if (mapData[y][x] == 1)
 			{
-				DrawFormatString(x * kBlockSize + 10, y * kBlockSize + 10, 0xffffff, L"・", true);
+				DrawFormatString(x * BLOCK_SIZE + 10, y * BLOCK_SIZE + 10, 0xffffff, L"・", true);
 			}
-			// 壁の表示
+			// 壁の描画
 			if (mapData[y][x] == 2)
 			{
 				DrawBox(
-					x * kBlockSize, y * kBlockSize,
-					x * kBlockSize + kBlockSize, y * kBlockSize + kBlockSize,
+					x * BLOCK_SIZE, y * BLOCK_SIZE,
+					x * BLOCK_SIZE + BLOCK_SIZE, y * BLOCK_SIZE + BLOCK_SIZE,
 					GetColor(0, 0, 255), false);
 			}
-			// パワー餌の表示
-			if (mapData[y][x] == 3 && isDraw_)
+			// パワーエサの描画
+			if (mapData[y][x] == 3)
 			{
-				DrawFormatString(x * kBlockSize + 10, y * kBlockSize + 10, 0xffff00, L"■", true);
+				PowerFeedFlash(y, x);
 			}
 		}
 	}
 }
 
+// パワーエサの描画
+void Field::PowerFeedFlash(int y, int x)
+{
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, blendCount_);
+	DrawRotaGraph(x * BLOCK_SIZE + 16, y * BLOCK_SIZE + 16, 1, 0, handle_, true);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+}
+
+// パワーエサの点滅処理
+void Field::Flash()
+{
+	//点滅
+	if (blendLimitMax_)
+	{
+		blendCount_ += FLASH_SPEED;
+		if (blendCount_ > 255)
+			blendLimitMax_ = false;
+	}
+	else
+	{
+		blendCount_ -= FLASH_SPEED;
+		if (blendCount_ < 0)
+			blendLimitMax_ = true;
+	}
+}
+
+// ゲームクリア判定
 bool Field::IsGameClearCheck()
 {
-	for (int y = 0; y < kMapHeight; y++)
+	for (int y = 0; y < MAP_HEIGHT; y++)
 	{
-		for (int x = 0; x < kMapWidth; x++)
+		for (int x = 0; x < MAP_WIDTH; x++)
 		{
 			if (mapData[y][x] == 1 || mapData[y][x] == 3)
 			{
