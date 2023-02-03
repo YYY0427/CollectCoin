@@ -90,5 +90,6 @@ private:
 	// パワーエサを取得した状態でどのくらい経ったか
 	int powerFeedTimer_;
 
+	// パワーエサを取得した場合のスピード
 	float powerFeedSpeed_;
 };

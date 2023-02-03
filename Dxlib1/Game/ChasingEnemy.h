@@ -1,5 +1,8 @@
 #pragma once
 #include "EnemyBase.h"
+#include <memory>
+
+class Field;
 
 /// <summary>
 /// 粘着タイプ敵
@@ -7,7 +10,7 @@
 class ChasingEnemy : public EnemyBase
 {
 public:
-	ChasingEnemy(std::shared_ptr<Player> player);
+	ChasingEnemy();
 
 	/// <summary>
 	/// 更新
@@ -18,11 +21,46 @@ public:
 	/// 描画
 	/// </summary>
 	virtual void Draw()override;
+
+	// 当たり判定
+	bool Colision(int direction);
+
+	// パワーエサを取得した場合の速度計算
+	void SpeedCalculation();
+
+	// インデックス座標を座標に変換
+	void PosCalculation();
+
+	/// <summary>
+	/// 向いている方向によって値を返す
+	/// </summary>
+	/// <returns>画像のy座標</returns>
+	virtual int DirectReturnNum();
 private:
-	// 画像のハンドル
-	int handle_;
+	std::shared_ptr<Field> pField_;
 
+	// プレイヤーの仮の座標
+	int kX_;
+	int kY_;
 
-	int idX_;
+	// 移動インターバル用タイマー
+	int moveTimer_;
+
+	// プレイヤーがどの方向に進みたいか
+	int wantMoveDirection_;
+
+	// プレイヤーの移動速度
+	int moveSpeed_;
+
+	// パワーエサを取得した場合のスピード
+	float powerFeedSpeed_;
+
+	// パワーエサを取得したかどうか
+	bool isPowerFeed_;
+
+	// パワーエサを取得した状態でどのくらい経ったか
+	int powerFeedTimer_;
+
+	int a;
 };
 

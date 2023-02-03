@@ -5,7 +5,8 @@
 
 //プロトタイプ宣言
 class Player;	//プレイヤークラス
-class Field;
+class Field;	
+class ChasingEnemy;
 
 /// <summary>
 /// ゲーム中シーン
@@ -21,6 +22,9 @@ public:
 private:
 	//プレイヤー
 	std::shared_ptr<Player> pPlayer_;
+
+	// 敵①
+	std::shared_ptr<ChasingEnemy> pChasingEnemy_;
 
 	//フィールド
 	std::shared_ptr<Field> pField_;

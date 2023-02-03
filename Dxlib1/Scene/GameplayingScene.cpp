@@ -7,6 +7,7 @@
 #include "PauseScene.h"
 #include"../Game/Player.h"
 #include "../Game/Field.h"
+#include "../Game/ChasingEnemy.h"
 #include <DxLib.h>
 
 void GameplayingScene::FadeInUpdate(const InputState& input)
@@ -20,6 +21,8 @@ void GameplayingScene::FadeInUpdate(const InputState& input)
 void GameplayingScene::NormalUpdate(const InputState& input)
 {
 	pField_->Updata();
+
+	pChasingEnemy_->Update();
 
 	pPlayer_->Update(input);
 
@@ -61,6 +64,7 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 {
 	pField_ = std::make_shared<Field>();
 	pPlayer_ = std::make_shared<Player>();
+	pChasingEnemy_ = std::make_shared<ChasingEnemy>();
 }
 
 void GameplayingScene::Update(const InputState& input)
@@ -71,6 +75,8 @@ void GameplayingScene::Update(const InputState& input)
 void GameplayingScene::Draw()
 {
 	pField_->Draw();
+
+	pChasingEnemy_->Draw();
 
 	pPlayer_->Draw();
 

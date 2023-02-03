@@ -7,30 +7,30 @@
 namespace
 {
 	// 通常のプレイヤーの移動スピード
-	constexpr int normal_speed = 32;
+	constexpr int NORMAL_SPEED = 32;
 
 	// パワーエサを取得した場合の移動スピード(何倍か)
-	constexpr float get_feed_speed = 1.3f;
+	constexpr float GET_FEED_SPEED = 1.3f;
 	
 	// パワーエサを取得した場合持続時間(何秒か)
-	constexpr int feed_duration = 10;
+	constexpr int FEED_DURATION = 10;
 
 	// 1枚に必要なフレーム数
-	constexpr int anime_frame_speed = 5;
+	constexpr int ANIME_FRAME_SPEED = 5;
 
 	// アニメーション枚数
-	constexpr int anime_frame_num = 5;
+	constexpr int ANIME_FRAME_NUM = 5;
 
 }
 
 Player::Player() :
 	angle_(0.0f),
 	kX_(0), kY_(0),
-	indexX_(1), indexY_(1),
+	indexX_(9), indexY_(16),
 	moveTimer_(0),
 	moveDirection_(0),
 	feedGetNum_(0),
-	moveSpeed_(normal_speed),
+	moveSpeed_(NORMAL_SPEED),
 	powerFeedTimer_(0),
 	powerFeedSpeed_(1.0f),
 	imgIdX_(10),
@@ -166,13 +166,13 @@ void Player::Update(const InputState& input)
 	if (moveDirection_)
 	{
 		// アニメーション処理
-		imgIdX_ = (imgIdX_ + 1) % (anime_frame_speed * anime_frame_num);
+		imgIdX_ = (imgIdX_ + 1) % (ANIME_FRAME_SPEED * ANIME_FRAME_NUM);
 	}
 }
 
 void Player::Draw()
 {
-	int imgX = (imgIdX_ / anime_frame_speed) * 16;
+	int imgX = (imgIdX_ / ANIME_FRAME_SPEED) * 16;
 
 	// プレイヤー画像の表示
 	DrawRectRotaGraph(posX_, posY_,		// 座標
@@ -215,18 +215,18 @@ void Player::SpeedCalculation()
 	if (isPowerFeed_)
 	{
 		powerFeedTimer_++;
-		moveSpeed_ = normal_speed / get_feed_speed;
-		powerFeedSpeed_ = get_feed_speed;
+		moveSpeed_ = NORMAL_SPEED / GET_FEED_SPEED;
+		powerFeedSpeed_ = GET_FEED_SPEED;
 
 		// 指定した時間が経過した場合
-		if (powerFeedTimer_ % (60 * feed_duration) == 0)
+		if (powerFeedTimer_ % (60 * FEED_DURATION) == 0)
 		{
 			// 初期化
 			isPowerFeed_ = false;
 			powerFeedTimer_ = 0;
 
 			// 元の移動速度に戻す
-			moveSpeed_ = normal_speed;
+			moveSpeed_ = NORMAL_SPEED;
 			powerFeedSpeed_ = 1.0f;
 		}
 	}
