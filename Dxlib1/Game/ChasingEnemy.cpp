@@ -56,59 +56,33 @@ void ChasingEnemy::Update()
 	kX_ = indexX_;
 	kY_ = indexY_;
 
-	wantMoveDirection_ = GetRand(3) + 1;
-
-	// 移動のインターバル				// 移動する方向に壁がない場合移動
-	if (moveTimer_ % moveSpeed_ == 0 && !Colision(moveDirection_))
+	// 移動のインターバル
+	if (moveTimer_ % moveSpeed_ == 0)
 	{
-		// 移動処理
-		switch (moveDirection_)
+		if (!Colision(moveDirection_))
 		{
-		case up:
-			indexY_--;
-			break;
-		case down:
-			indexY_++;
-			break;
-		case left:
-			indexX_--;
-			break;
-		case right:
-			indexX_++;
-			break;
-		default:
-			break;
-		};
-
-		// プレイヤーが移動したい方向に壁がない場合移動を実行
-		if (wantMoveDirection_ == up)
-		{
-			if (!pField_->IsBlock(indexY_ - 1, indexX_))
+			// 移動処理
+			switch (moveDirection_)
 			{
-				moveDirection_ = wantMoveDirection_;
-			}
+			case up:
+				indexY_--;
+				break;
+			case down:
+				indexY_++;
+				break;
+			case left:
+				indexX_--;
+				break;
+			case right:
+				indexX_++;
+				break;
+			default:
+				break;
+			};
 		}
-		else if (wantMoveDirection_ == down)
-		{
-			if (!pField_->IsBlock(indexY_ + 1, indexX_))
-			{
-				moveDirection_ = wantMoveDirection_;
-			}
-		}
-		else if (wantMoveDirection_ == left)
-		{
-			if (!pField_->IsBlock(indexY_, indexX_ - 1))
-			{
-				moveDirection_ = wantMoveDirection_;
-			}
-		}
-		else if (wantMoveDirection_ == right)
-		{
-			if (!pField_->IsBlock(indexY_, indexX_ + 1))
-			{
-				moveDirection_ = wantMoveDirection_;
-			}
-		}
+		
+		// ランダムに敵の方向を変える
+		moveDirection_ = GetRand(3) + 1;
 
 		moveTimer_ = 0;
 	}
