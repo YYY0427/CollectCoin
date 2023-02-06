@@ -18,7 +18,10 @@ public:
 	~GameplayingScene() {}
 
 	void Update(const InputState& input);
+
 	void Draw();
+
+	bool Colision();
 private:
 	//ÉvÉåÉCÉÑÅ[
 	std::shared_ptr<Player> pPlayer_;
@@ -38,9 +41,9 @@ private:
 
 	void FadeInUpdate(const InputState& input);
 	void NormalUpdate(const InputState& input);
-	void FadeOutUpdate(const InputState& input);
+	void GameClearFadeOutUpdate(const InputState& input);
+	void GameOverFadeOutUpdate(const InputState& input);
 
 	using UpdateFunc_t = void (GameplayingScene::*) (const InputState& input);
 	UpdateFunc_t updateFunc_ = nullptr;
 };
-

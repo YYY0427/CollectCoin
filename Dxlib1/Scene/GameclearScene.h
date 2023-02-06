@@ -1,14 +1,11 @@
 #pragma once
 #include "Scene.h"
 
-/// <summary>
-/// ゲームオーバーシーン
-/// </summary>
-class GameoverScene : public Scene
+class GameclearScene : public Scene
 {
 public:
-	GameoverScene(SceneManager& manager);
-	~GameoverScene() {}
+	GameclearScene(SceneManager& manager);
+	~GameclearScene() {}
 
 	void Update(const InputState& input);
 	void Draw();
@@ -26,6 +23,6 @@ private:
 	void NormalUpdate(const InputState& input);
 	void FadeOutUpdate(const InputState& input);
 
-	using UpdateFucn_t = void (GameoverScene::*)(const InputState&);
+	using UpdateFucn_t = void (GameclearScene::*)(const InputState&);
 	UpdateFucn_t updateFunc_;
 };

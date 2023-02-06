@@ -1,6 +1,7 @@
 #include "GameplayingScene.h"
 #include "../InputState.h"
 #include "GameoverScene.h"
+#include "GameclearScene.h"
 #include "TitleScene.h"
 #include "SceneManager.h"
 #include "../DrawFunctions.h"
@@ -29,12 +30,13 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 	// ゲームクリア判定
 	if (pField_->IsGameClearCheck())
 	{
-		updateFunc_ = &GameplayingScene::FadeOutUpdate;
+		updateFunc_ = &GameplayingScene::GameClearFadeOutUpdate;
 		fadeColor_ = 0xff0000;
 	}
-	if (input.IsTriggered(InputType::next))
+	// ゲームオーバー判定
+	if (Colision())
 	{
-		updateFunc_ = &GameplayingScene::FadeOutUpdate;
+		updateFunc_ = &GameplayingScene::GameOverFadeOutUpdate;
 		fadeColor_ = 0xff0000;
 	}
 	if (input.IsTriggered(InputType::prev))
@@ -48,7 +50,17 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 	}
 }
 
-void GameplayingScene::FadeOutUpdate(const InputState& input)
+void GameplayingScene::GameClearFadeOutUpdate(const InputState& input)
+{
+	fadeValue_ = 255 * static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval);
+	if (++fadeTimer_ == fade_interval)
+	{
+		manager_.ChangeScene(new GameclearScene(manager_));
+		return;
+	}
+}
+
+void GameplayingScene::GameOverFadeOutUpdate(const InputState& input)
 {
 	fadeValue_ = 255 * static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval);
 	if (++fadeTimer_ == fade_interval)
@@ -85,4 +97,24 @@ void GameplayingScene::Draw()
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
 	DrawBox(0, 0, 640, 480, fadeColor_, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
+
+bool GameplayingScene::Colision()
+{
+	float playerLeft = pPlayer_->GetPos().x;
+	float playerRight = pPlayer_->GetPos().x + 16;
+	float playerTop = pPlayer_->GetPos().y;
+	float playerBottom = pPlayer_->GetPos().y + 16;
+
+	float enemyLeft = pChasingEnemy_->GetPos().x;
+	float enemyRight = pChasingEnemy_->GetPos().x + 16;
+	float enemyTop = pChasingEnemy_->GetPos().y;
+	float enemyBottom = pChasingEnemy_->GetPos().y + 16;
+
+	if (playerLeft > enemyRight)	return false;
+	if (playerRight < enemyLeft)	return false;
+	if (playerTop > enemyBottom)	return false;
+	if (playerBottom < enemyTop)	return false;
+
+	return true;
 }

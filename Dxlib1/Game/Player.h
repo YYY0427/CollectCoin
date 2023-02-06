@@ -2,6 +2,7 @@
 //「スマートポインタ」を使うためのinclude
 #include <memory>	
 #include "../Geometry.h"
+#include "../vec2.h"
 
 class Field;
 class InputState;
@@ -30,6 +31,10 @@ public:
 	// インデックス座標を座標に変換
 	void PosCalculation();
 
+	// プレイヤーの座標の取得
+	Vec2 GetSize() const { return size_; }
+	Vec2 GetPos() const { return pos_; }
+
 	enum Direct
 	{
 		// 1からカウント
@@ -45,8 +50,9 @@ private:
 	//フィールド
 	std::shared_ptr<Field> pField_;
 
-	// 自機の現在の座標
-	Position2 pos_;	
+	Vec2 size_;
+
+	Vec2 pos_;
 
 	// プレイヤーの座標
 	int posX_;

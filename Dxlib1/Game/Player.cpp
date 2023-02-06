@@ -39,8 +39,10 @@ Player::Player() :
 {
 	pField_ = std::make_shared<Field>();
 	handle_ = my::MyLoadGraph(L"Data/img/game/Pacman16.png");
-	posX_ = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
-	posY_ = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
+	GetGraphSizeF(handle_, &size_.x, &size_.y);
+	size_ = size_ / 2;
+	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
+	pos_.y= (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
 }
 
 void Player::Update(const InputState& input)
@@ -175,7 +177,7 @@ void Player::Draw()
 	int imgX = (imgIdX_ / ANIME_FRAME_SPEED) * 16;
 
 	// プレイヤー画像の表示
-	DrawRectRotaGraph(posX_, posY_,		// 座標
+	DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
 					imgX, 0,			// 切り取り左上
 					16, 16,				// 幅、高さ
 					2.0f, angle_,		// 拡大率、回転角度
@@ -235,23 +237,23 @@ void Player::SpeedCalculation()
 void Player::PosCalculation()
 {
 	// インデックス座標を計算
-	posX_ = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
-	posY_ = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
+	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
+	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
 
 	// 向いている方向によって座標を計算
 	switch (moveDirection_) 
 	{
 	case up:
-		posY_ -= (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.y -= (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
 		break;
 	case down:
-		posY_ += (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.y += (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
 		break;
 	case left:
-		posX_ -= (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.x -= (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
 		break;
 	case right:
-		posX_ += (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.x += (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
 		break;
 	default:
 		break;

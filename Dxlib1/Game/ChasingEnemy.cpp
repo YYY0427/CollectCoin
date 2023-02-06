@@ -29,6 +29,8 @@ ChasingEnemy::ChasingEnemy()
 
 	handle_ = my::MyLoadGraph(L"Data/img/game/blinky.png");
 
+	GetGraphSizeF(handle_, &size_.x, &size_.y);
+
 	indexX_ = 9;
 	indexY_ = 8;
 
@@ -43,8 +45,8 @@ ChasingEnemy::ChasingEnemy()
 
 	powerFeedSpeed_ = 1.0f;
 
-	posX_ = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
-	posY_ = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
+	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
+	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
 }
 
 void ChasingEnemy::Update()
@@ -108,7 +110,7 @@ void ChasingEnemy::Draw()
 	int imgY = DirectReturnNum();
 
 	// プレイヤー画像の表示
-	DrawRectRotaGraph(posX_, posY_,		// 座標
+	DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
 					imgX, imgY,			// 切り取り左上
 					16, 16,				// 幅、高さ
 					2.0f, 0,			// 拡大率、回転角度
@@ -144,47 +146,33 @@ void ChasingEnemy::SpeedCalculation()
 	}
 
 	// パワーエサを取得していた場合
-	// 一定時間プレイヤーの移動を速くする
+	// 画像を変えて、プレイヤーから逃げる挙動に変える
 	if (isPowerFeed_)
 	{
-		powerFeedTimer_++;
-		moveSpeed_ = NORMAL_SPEED / GET_FEED_SPEED;
-		powerFeedSpeed_ = GET_FEED_SPEED;
-
-		// 指定した時間が経過した場合
-		if (powerFeedTimer_ % (60 * FEED_DURATION) == 0)
-		{
-			// 初期化
-			isPowerFeed_ = false;
-			powerFeedTimer_ = 0;
-
-			// 元の移動速度に戻す
-			moveSpeed_ = NORMAL_SPEED;
-			powerFeedSpeed_ = 1.0f;
-		}
+		
 	}
 }
 
 void ChasingEnemy::PosCalculation()
 {
 	// インデックス座標を計算
-	posX_ = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
-	posY_ = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
+	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
+	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
 
 	// 向いている方向によって座標を計算
 	switch (moveDirection_)
 	{
 	case up:
-		posY_ -= (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.y -= (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
 		break;
 	case down:
-		posY_ += (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.y += (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
 		break;
 	case left:
-		posX_ -= (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.x -= (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
 		break;
 	case right:
-		posX_ += (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.x += (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
 		break;
 	default:
 		break;

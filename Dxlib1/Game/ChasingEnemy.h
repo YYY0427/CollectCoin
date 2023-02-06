@@ -1,5 +1,6 @@
 #pragma once
 #include "EnemyBase.h"
+#include "../vec2.h"
 #include <memory>
 
 class Field;
@@ -31,6 +32,10 @@ public:
 	// インデックス座標を座標に変換
 	void PosCalculation();
 
+	// 敵の座標の取得
+	Vec2 GetSize()const { return size_; }
+	Vec2 GetPos() const { return pos_; }
+
 	/// <summary>
 	/// 向いている方向によって値を返す
 	/// </summary>
@@ -38,6 +43,9 @@ public:
 	virtual int DirectReturnNum();
 private:
 	std::shared_ptr<Field> pField_;
+
+	Vec2 size_;
+	Vec2 pos_;
 
 	// プレイヤーの仮の座標
 	int kX_;
@@ -60,7 +68,5 @@ private:
 
 	// パワーエサを取得した状態でどのくらい経ったか
 	int powerFeedTimer_;
-
-	int a;
 };
 
