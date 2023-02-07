@@ -13,7 +13,7 @@ class GameplayingScene;
 class ChasingEnemy : public EnemyBase
 {
 public:
-	ChasingEnemy();
+	ChasingEnemy(std::shared_ptr<Field>field, std::shared_ptr<Player>player);
 
 	/// <summary>
 	/// 更新
@@ -48,10 +48,13 @@ public:
 private:
 	std::shared_ptr<Field> pField_ = nullptr;
 	std::shared_ptr<Player> pPlayer_ = nullptr;
-	std::shared_ptr<GameplayingScene> pPlayScenen_ = nullptr;
 
 	Vec2 size_;
 	Vec2 pos_;
+
+	int idY_;
+
+	int izikeHandle_;
 
 	// プレイヤーの仮の座標
 	int kX_;
@@ -76,5 +79,7 @@ private:
 	int powerFeedTimer_;
 
 	bool isEnabled_;
+
+	int flashingImgY_;
 };
 

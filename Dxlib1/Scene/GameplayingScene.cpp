@@ -17,8 +17,8 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	updateFunc_(&GameplayingScene::FadeInUpdate)
 {
 	pField_ = std::make_shared<Field>();
-	pPlayer_ = std::make_shared<Player>();
-	pChasingEnemy_ = std::make_shared<ChasingEnemy>();
+	pPlayer_ = std::make_shared<Player>(pField_, pChasingEnemy_);
+	pChasingEnemy_ = std::make_shared<ChasingEnemy>(pField_, pPlayer_);
 }
 
 
@@ -59,6 +59,7 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 		// プレイヤーの死亡フラグを立てる
 		pPlayer_->SetDead(true);
 
+		// 敵を消すフラグを立てる
 		pChasingEnemy_->SetEnabled(true);
 
 		// ゲームオーバー演出に移行

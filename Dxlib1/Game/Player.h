@@ -5,13 +5,14 @@
 #include "../vec2.h"
 
 class Field;
+class ChasingEnemy;
 class InputState;
 
 class Player
 {
 public:
 	// コンストラクタ
-	Player();
+	Player(std::shared_ptr<Field>field, std::shared_ptr<ChasingEnemy>chasingEnemy);
 
 	//デストラクタ
 	~Player(){};
@@ -34,14 +35,20 @@ public:
 	// インデックス座標を座標に変換
 	void PosCalculation();
 
-	// 死亡設定
-	void SetDead(bool isDead) { isDead_ = isDead; }
-
 	// プレイヤーの座標の取得
 	Vec2 GetSize() const { return size_; }
 	Vec2 GetPos() const { return pos_; }
 
-	bool GetEnd() const { return animeEnd_; }
+	// パワーエサを取得したかどうか
+	bool GetPowerFeed() const { return isPowerFeed_; }
+
+	bool GetEnemyFlashing()const { return isEnemyFlashing_; }
+
+	// 死亡設定
+	void SetDead(bool isDead) { isDead_ = isDead; }
+
+	// 死亡時のアニメーションインデックスの取得
+	bool GetEnd() const { return isAnimeEnd_; }
 
 	enum Direct
 	{
@@ -57,6 +64,8 @@ private:
 
 	//フィールド
 	std::shared_ptr<Field> pField_;
+	
+	std::shared_ptr<ChasingEnemy> pChasingEnemy_;
 
 	Vec2 size_;
 
@@ -113,5 +122,7 @@ private:
 	bool isDead_;
 
 	// 
-	bool animeEnd_;
+	bool isAnimeEnd_;
+
+	bool isEnemyFlashing_;
 };

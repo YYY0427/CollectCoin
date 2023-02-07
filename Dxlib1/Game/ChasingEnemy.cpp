@@ -19,21 +19,25 @@ namespace
 	constexpr int FEED_DURATION = 10;
 
 	// 1枚に必要なフレーム数
-	constexpr int ANIME_FRAME_SPEED = 5;
+	constexpr int ANIME_FRAME_SPEED = 10;
+	constexpr int IZIKE_ANIME_FRAME_SPEED = 30;
 
 	// アニメーション枚数
 	constexpr int ANIME_FRAME_NUM = 2;
+	constexpr int IZIKE_ANIME_FRAME_NUM = 2;
 }
 
-ChasingEnemy::ChasingEnemy()
+ChasingEnemy::ChasingEnemy(std::shared_ptr<Field>field, std::shared_ptr<Player>player):
+	pPlayer_(player),
+	pField_(field),
+	powerFeedTimer_(0),
+	isPowerFeed_(false),
+	isEnabled_(false)
 {
-	pField_ = std::make_shared<Field>();
-
 	handle_ = my::MyLoadGraph(L"Data/img/game/blinky.png");
+	izikeHandle_ = my::MyLoadGraph(L"Data/img/game/izike.png");
 
 	GetGraphSizeF(handle_, &size_.x, &size_.y);
-
-	isEnabled_ = false;
 
 	indexX_ = 9;
 	indexY_ = 8;
@@ -104,23 +108,45 @@ void ChasingEnemy::Update()
 	indexX_ = pField_->PlayerWorp(kY_, kX_, indexY_, indexX_);
 
 	// アニメーション処理
-	idX_ = (idX_ + 1) % (ANIME_FRAME_SPEED * ANIME_FRAME_NUM);
+	idX_ = (idX_ + 1) % (ANIME_FRAME_SPEED * ANIME_FRAME_NUM);	// 通常処理
+	idY_ = (idY_ + 1) % (IZIKE_ANIME_FRAME_SPEED * IZIKE_ANIME_FRAME_NUM);	//イジケ用処理
 }
 
 void ChasingEnemy::Draw()
 {
-	if (!isEnabled_)
-	{
-		int imgX = (idX_ / ANIME_FRAME_SPEED) * 16;
+	int imgX = (idX_ / ANIME_FRAME_SPEED) * 16;
 
+	// 通常時の表示
+	if (!isEnabled_ && !pPlayer_->GetPowerFeed())
+	{
+		
 		int imgY = DirectReturnNum();
 
-		// プレイヤー画像の表示
 		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
-			imgX, imgY,			// 切り取り左上
-			16, 16,				// 幅、高さ
-			2.0f, 0,			// 拡大率、回転角度
-			handle_, true);		// 画像のハンドル、透過するか
+						  imgX, imgY,			// 切り取り左上
+						  16, 16,				// 幅、高さ
+						  2.0f, 0,				// 拡大率、回転角度
+						  handle_, true);		// 画像のハンドル、透過するか
+	}
+	// プレイヤーがパワーエサを取得した時の表示
+	if (!isEnabled_ && pPlayer_->GetPowerFeed())
+	{
+		if (!pPlayer_->GetEnemyFlashing())
+		{
+			flashingImgY_ = 0;
+		}
+		else
+		{
+			flashingImgY_ = (idY_ / IZIKE_ANIME_FRAME_SPEED) * 16;
+		}
+
+		int imgY = flashingImgY_;
+
+		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
+						  imgX, imgY,			// 切り取り左上
+						  16, 16,				// 幅、高さ
+						  2.0f, 0,				// 拡大率、回転角度
+						  izikeHandle_, true);	// 画像のハンドル、透過するか
 	}
 }
 
@@ -154,7 +180,7 @@ void ChasingEnemy::SpeedCalculation()
 
 	// パワーエサを取得していた場合
 	// 画像を変えて、プレイヤーから逃げる挙動に変える
-	if (isPowerFeed_)
+	if (pPlayer_->GetPowerFeed())
 	{
 		
 	}

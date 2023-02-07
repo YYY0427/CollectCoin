@@ -13,20 +13,20 @@ namespace
 	constexpr float GET_FEED_SPEED = 1.3f;
 
 	// パワーエサを取得した場合持続時間(何秒か)
-	constexpr int FEED_DURATION = 10;
+	constexpr int FEED_DURATION = 60 * 9;
 
 	// 1枚に必要なフレーム数
-	constexpr int ANIME_FRAME_SPEED = 5;
+	constexpr int ANIME_FRAME_SPEED = 3;
 	constexpr int DEAD_ANIME_FRAME_SPEED = 10;
 
 	// アニメーション枚数
 	constexpr int ANIME_FRAME_NUM = 5;
 	constexpr int DEAD_ANIME_FRAME_NUM = 12;
-	
-
 }
 
-Player::Player() :
+Player::Player(std::shared_ptr<Field>field, std::shared_ptr<ChasingEnemy>charsingEnemy) :
+	pField_(field),
+	pChasingEnemy_(charsingEnemy),
 	angle_(0.0f),
 	kX_(0), kY_(0),
 	indexX_(9), indexY_(16),
@@ -41,10 +41,9 @@ Player::Player() :
 	wantMoveDirection_(0),
 	isPowerFeed_(false),
 	isDead_(false),
-	animeEnd_(false)
+	isAnimeEnd_(false),
+	isEnemyFlashing_(false)
 {
-	pField_ = std::make_shared<Field>();
-
 	// 画像のロード
 	handle_ = my::MyLoadGraph(L"Data/img/game/Pacman16.png");
 	deathHandle_ = my::MyLoadGraph(L"Data/img/game/PacmanDeath16.png");
@@ -204,7 +203,7 @@ void Player::Draw()
 
 		if (imgX >= 192 - 16)
 		{
-			animeEnd_ = true;
+			isAnimeEnd_ = true;
 		}
 
 		// ゲームオーバー時の画像を表示
@@ -262,11 +261,18 @@ void Player::SpeedCalculation()
 		moveSpeed_ = NORMAL_SPEED / GET_FEED_SPEED;
 		powerFeedSpeed_ = GET_FEED_SPEED;
 
-		// 指定した時間が経過した場合
-		if (powerFeedTimer_ % (60 * FEED_DURATION) == 0)
+		// 
+		if ((FEED_DURATION * 0.6) < powerFeedTimer_)
+		{
+			isEnemyFlashing_ = true;
+		}
+
+		// 指定した時間が経過した場合元の速度に戻す
+		if (powerFeedTimer_ % FEED_DURATION == 0)
 		{
 			// 初期化
 			isPowerFeed_ = false;
+			isEnemyFlashing_ = false;
 			powerFeedTimer_ = 0;
 
 			// 元の移動速度に戻す
