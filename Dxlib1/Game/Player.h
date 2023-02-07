@@ -22,6 +22,9 @@ public:
 	// 描画
 	void Draw();
 
+	// 
+	void DeadUpdate();
+
 	// 当たり判定
 	bool Colision(int direction);
 
@@ -31,9 +34,14 @@ public:
 	// インデックス座標を座標に変換
 	void PosCalculation();
 
+	// 死亡設定
+	void SetDead(bool isDead) { isDead_ = isDead; }
+
 	// プレイヤーの座標の取得
 	Vec2 GetSize() const { return size_; }
 	Vec2 GetPos() const { return pos_; }
+
+	bool GetEnd() const { return animeEnd_; }
 
 	enum Direct
 	{
@@ -68,12 +76,14 @@ private:
 
 	//プレイヤーの画像
 	int handle_;
+	int deathHandle_;
 
 	// 移動インターバル用タイマー
 	int moveTimer_;
 
 	// 表示する画像のインデックス
-	int imgIdX_;	
+	int imgIdX_;
+	int deadImgIdx_;
 
 	// 画像の方向の切り替え
 	float angle_;
@@ -98,4 +108,10 @@ private:
 
 	// パワーエサを取得した場合のスピード
 	float powerFeedSpeed_;
+
+	// プレイヤーが敵と当たったか
+	bool isDead_;
+
+	// 
+	bool animeEnd_;
 };

@@ -3,6 +3,8 @@
 #include "Player.h"
 #include "Field.h"
 #include "EnemyBase.h"
+#include "../Scene/GameplayingScene.h"
+#include "../Scene/SceneManager.h"
 #include <DxLib.h>
 
 namespace
@@ -30,6 +32,8 @@ ChasingEnemy::ChasingEnemy()
 	handle_ = my::MyLoadGraph(L"Data/img/game/blinky.png");
 
 	GetGraphSizeF(handle_, &size_.x, &size_.y);
+
+	isEnabled_ = false;
 
 	indexX_ = 9;
 	indexY_ = 8;
@@ -105,16 +109,19 @@ void ChasingEnemy::Update()
 
 void ChasingEnemy::Draw()
 {
-	int imgX = (idX_ / ANIME_FRAME_SPEED) * 16;
+	if (!isEnabled_)
+	{
+		int imgX = (idX_ / ANIME_FRAME_SPEED) * 16;
 
-	int imgY = DirectReturnNum();
+		int imgY = DirectReturnNum();
 
-	// プレイヤー画像の表示
-	DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
-					imgX, imgY,			// 切り取り左上
-					16, 16,				// 幅、高さ
-					2.0f, 0,			// 拡大率、回転角度
-					handle_, true);		// 画像のハンドル、透過するか
+		// プレイヤー画像の表示
+		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
+			imgX, imgY,			// 切り取り左上
+			16, 16,				// 幅、高さ
+			2.0f, 0,			// 拡大率、回転角度
+			handle_, true);		// 画像のハンドル、透過するか
+	}
 }
 
 bool ChasingEnemy::Colision(int direction)

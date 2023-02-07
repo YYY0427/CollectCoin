@@ -11,15 +11,18 @@ namespace
 
 	// パワーエサを取得した場合の移動スピード(何倍か)
 	constexpr float GET_FEED_SPEED = 1.3f;
-	
+
 	// パワーエサを取得した場合持続時間(何秒か)
 	constexpr int FEED_DURATION = 10;
 
 	// 1枚に必要なフレーム数
 	constexpr int ANIME_FRAME_SPEED = 5;
+	constexpr int DEAD_ANIME_FRAME_SPEED = 10;
 
 	// アニメーション枚数
 	constexpr int ANIME_FRAME_NUM = 5;
+	constexpr int DEAD_ANIME_FRAME_NUM = 12;
+	
 
 }
 
@@ -33,14 +36,23 @@ Player::Player() :
 	moveSpeed_(NORMAL_SPEED),
 	powerFeedTimer_(0),
 	powerFeedSpeed_(1.0f),
-	imgIdX_(10),
+	imgIdX_(0),
+	deadImgIdx_(0),
 	wantMoveDirection_(0),
-	isPowerFeed_(false)
+	isPowerFeed_(false),
+	isDead_(false),
+	animeEnd_(false)
 {
 	pField_ = std::make_shared<Field>();
+
+	// 画像のロード
 	handle_ = my::MyLoadGraph(L"Data/img/game/Pacman16.png");
+	deathHandle_ = my::MyLoadGraph(L"Data/img/game/PacmanDeath16.png");
+
+	// 画像サイズの取得
 	GetGraphSizeF(handle_, &size_.x, &size_.y);
-	size_ = size_ / 2;
+
+	// インデックスの座標から初期座標を求める
 	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
 	pos_.y= (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
 }
@@ -174,14 +186,44 @@ void Player::Update(const InputState& input)
 
 void Player::Draw()
 {
-	int imgX = (imgIdX_ / ANIME_FRAME_SPEED) * 16;
+	// プレイヤーが敵と当たったか
+	if (!isDead_)
+	{
+		int imgX = (imgIdX_ / ANIME_FRAME_SPEED) * 16;
 
-	// プレイヤー画像の表示
-	DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
-					imgX, 0,			// 切り取り左上
-					16, 16,				// 幅、高さ
-					2.0f, angle_,		// 拡大率、回転角度
-					handle_, true);		// 画像のハンドル、透過するか
+		// プレイヤー画像の表示
+		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
+						imgX, 0,				// 切り取り左上
+						16, 16,					// 幅、高さ
+						2.0f, angle_,			// 拡大率、回転角度
+						handle_, true);			// 画像のハンドル、透過するか
+	}
+	else
+	{
+		int imgX = (deadImgIdx_ / DEAD_ANIME_FRAME_SPEED) * 16;
+
+		if (imgX >= 192 - 16)
+		{
+			animeEnd_ = true;
+		}
+
+		// ゲームオーバー時の画像を表示
+		DrawRectRotaGraph(Game::kScreenWidth / 2 - 16,	// 座標
+						  Game::kScreenHeight / 2 - 16,
+						  imgX, 0,						// 切り取り左上
+						  16, 16,						// 幅、高さ
+						  2.0f, 0,						// 拡大率、回転角度
+						  deathHandle_, true);			// 画像のハンドル、透過するか
+	}
+}
+
+void Player::DeadUpdate()
+{
+	if (isDead_)
+	{
+		// アニメーション処理
+		deadImgIdx_ = (deadImgIdx_ + 1) % (DEAD_ANIME_FRAME_SPEED * DEAD_ANIME_FRAME_NUM);
+	}
 }
 
 bool Player::Colision(int direction)

@@ -3,6 +3,7 @@
 
 // プロトタイプ宣言
 class Player;
+class GameplayingScene;
 
 /// <summary>
 /// 敵の基底クラス
@@ -31,8 +32,6 @@ protected:	// 子クラスには見せたい情報
 		direct_num
 	};
 
-	std::shared_ptr<Player> player_= nullptr;
-
 	// 画像のハンドル
 	int handle_;
 
@@ -41,10 +40,6 @@ protected:	// 子クラスには見せたい情報
 
 	// 動いている方向
 	int moveDirection_;
-
-	// 座標　
-	int posX_;
-	int posY_;
 
 	// インデックス座標
 	int indexX_;

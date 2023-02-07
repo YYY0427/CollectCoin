@@ -4,6 +4,8 @@
 #include <memory>
 
 class Field;
+class Player;
+class GameplayingScene;
 
 /// <summary>
 /// 粘着タイプ敵
@@ -36,13 +38,17 @@ public:
 	Vec2 GetSize()const { return size_; }
 	Vec2 GetPos() const { return pos_; }
 
+	void SetEnabled(bool isEnabled) { isEnabled_ = isEnabled; }
+
 	/// <summary>
 	/// 向いている方向によって値を返す
 	/// </summary>
 	/// <returns>画像のy座標</returns>
 	virtual int DirectReturnNum();
 private:
-	std::shared_ptr<Field> pField_;
+	std::shared_ptr<Field> pField_ = nullptr;
+	std::shared_ptr<Player> pPlayer_ = nullptr;
+	std::shared_ptr<GameplayingScene> pPlayScenen_ = nullptr;
 
 	Vec2 size_;
 	Vec2 pos_;
@@ -68,5 +74,7 @@ private:
 
 	// パワーエサを取得した状態でどのくらい経ったか
 	int powerFeedTimer_;
+
+	bool isEnabled_;
 };
 

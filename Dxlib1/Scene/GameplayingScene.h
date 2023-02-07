@@ -22,6 +22,7 @@ public:
 	void Draw();
 
 	bool Colision();
+
 private:
 	//ÉvÉåÉCÉÑÅ[
 	std::shared_ptr<Player> pPlayer_;
@@ -41,6 +42,8 @@ private:
 
 	void FadeInUpdate(const InputState& input);
 	void NormalUpdate(const InputState& input);
+	void GameClearDraw(const InputState& input);
+	void GameOverDraw(const InputState& input);
 	void GameClearFadeOutUpdate(const InputState& input);
 	void GameOverFadeOutUpdate(const InputState& input);
 
