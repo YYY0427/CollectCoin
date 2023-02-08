@@ -2,6 +2,7 @@
 #include "Field.h"
 #include "../DrawFunctions.h"
 #include "../InputState.h"
+#include "ChasingEnemy.h"
 #include <DxLib.h>
 
 namespace
@@ -10,10 +11,13 @@ namespace
 	constexpr int NORMAL_SPEED = 32;
 
 	// パワーエサを取得した場合の移動スピード(何倍か)
-	constexpr float GET_FEED_SPEED = 1.3f;
+	constexpr float GET_FEED_SPEED = 2.0f;
 
 	// パワーエサを取得した場合持続時間(何秒か)
 	constexpr int FEED_DURATION = 60 * 9;
+
+	// 敵をフラッシュさせる割合
+	constexpr float RATIO = 0.6f;
 
 	// 1枚に必要なフレーム数
 	constexpr int ANIME_FRAME_SPEED = 3;
@@ -24,9 +28,7 @@ namespace
 	constexpr int DEAD_ANIME_FRAME_NUM = 12;
 }
 
-Player::Player(std::shared_ptr<Field>field, std::shared_ptr<ChasingEnemy>charsingEnemy) :
-	pField_(field),
-	pChasingEnemy_(charsingEnemy),
+Player::Player() :
 	angle_(0.0f),
 	kX_(0), kY_(0),
 	indexX_(9), indexY_(16),
@@ -41,8 +43,7 @@ Player::Player(std::shared_ptr<Field>field, std::shared_ptr<ChasingEnemy>charsin
 	wantMoveDirection_(0),
 	isPowerFeed_(false),
 	isDead_(false),
-	isAnimeEnd_(false),
-	isEnemyFlashing_(false)
+	isAnimeEnd_(false)
 {
 	// 画像のロード
 	handle_ = my::MyLoadGraph(L"Data/img/game/Pacman16.png");
@@ -173,7 +174,7 @@ void Player::Update(const InputState& input)
 	SpeedCalculation();
 
 	// ワープチェック
-	indexX_ = pField_->PlayerWorp(kY_, kX_, indexY_, indexX_);
+	indexX_ = pField_->Worp(kY_, kX_, indexY_, indexX_);
 
 	// 移動している場合処理を行う
 	if (moveDirection_)
@@ -251,6 +252,7 @@ void Player::SpeedCalculation()
 	if (pField_->IsPowerFeed(indexY_, indexX_))
 	{
 		isPowerFeed_ = true;
+		pChasingEnemy_->SetIzike(true);
 	}
 
 	// パワーエサを取得していた場合
@@ -261,19 +263,20 @@ void Player::SpeedCalculation()
 		moveSpeed_ = NORMAL_SPEED / GET_FEED_SPEED;
 		powerFeedSpeed_ = GET_FEED_SPEED;
 
-		// 
-		if ((FEED_DURATION * 0.6) < powerFeedTimer_)
+		// powerFeedTimerがFEED_DURATIONの特定の割合に達したら敵のアニメーションを変更
+		if ((FEED_DURATION * RATIO) < powerFeedTimer_)
 		{
-			isEnemyFlashing_ = true;
+			pChasingEnemy_->SetFlash(true);	// 敵の点滅を開始
 		}
 
 		// 指定した時間が経過した場合元の速度に戻す
 		if (powerFeedTimer_ % FEED_DURATION == 0)
 		{
 			// 初期化
-			isPowerFeed_ = false;
-			isEnemyFlashing_ = false;
 			powerFeedTimer_ = 0;
+			isPowerFeed_ = false;
+			pChasingEnemy_->SetFlash(false);
+			pChasingEnemy_->SetIzike(false);
 
 			// 元の移動速度に戻す
 			moveSpeed_ = NORMAL_SPEED;

@@ -17,8 +17,14 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	updateFunc_(&GameplayingScene::FadeInUpdate)
 {
 	pField_ = std::make_shared<Field>();
-	pPlayer_ = std::make_shared<Player>(pField_, pChasingEnemy_);
-	pChasingEnemy_ = std::make_shared<ChasingEnemy>(pField_, pPlayer_);
+	pPlayer_ = std::make_shared<Player>();
+	pChasingEnemy_ = std::make_shared<ChasingEnemy>();
+
+	pChasingEnemy_->SetPlayer(pPlayer_);
+	pChasingEnemy_->SetField(pField_);
+
+	pPlayer_->SetChasingEnemy(pChasingEnemy_);
+	pPlayer_->SetField(pField_);
 }
 
 
@@ -53,18 +59,45 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 		fadeColor_ = 0xff0000;
 	}
 
-	// ゲームオーバー判定
 	if (Colision())
 	{
-		// プレイヤーの死亡フラグを立てる
-		pPlayer_->SetDead(true);
+		// プレイヤーがパワーエサを取得していない状態で敵と当たった時ゲームオーバー
+		//if (!pPlayer_->GetPowerFeed())
+		//{
+		//	// プレイヤーの死亡フラグを立てる
+		//	pPlayer_->SetDead(true);
 
-		// 敵を消すフラグを立てる
-		pChasingEnemy_->SetEnabled(true);
+		//	// 敵を消すフラグを立てる
+		//	pChasingEnemy_->SetEnabled(true);
 
-		// ゲームオーバー演出に移行
-		updateFunc_ = &GameplayingScene::GameOverDraw;
-		fadeColor_ = 0xff0000;
+		//	// ゲームオーバー演出に移行
+		//	updateFunc_ = &GameplayingScene::GameOverDraw;
+		//	fadeColor_ = 0xff0000;
+		//}
+		//else
+		//{
+		//	pChasingEnemy_->SetDead(true);
+		//	pChasingEnemy_->SetIzike(false);
+		//}
+
+		// 敵がイジケ状態ではないときに敵と当たった場合死亡
+		if (!pChasingEnemy_->GetIzike())
+		{
+			// プレイヤーの死亡フラグを立てる
+			pPlayer_->SetDead(true);
+
+			// 敵を消すフラグを立てる
+			pChasingEnemy_->SetEnabled(true);
+
+			// ゲームオーバー演出に移行
+			updateFunc_ = &GameplayingScene::GameOverDraw;
+			fadeColor_ = 0xff0000;
+		}
+		else if(pChasingEnemy_->GetIzike())
+		{
+			pChasingEnemy_->SetDead(true);
+			pChasingEnemy_->SetIzike(false);
+		}
 	}
 }
 
@@ -97,7 +130,7 @@ void GameplayingScene::GameOverDraw(const InputState& input)
 {
 	pPlayer_->DeadUpdate();
 
-	if (pPlayer_->GetEnd())
+	if (pPlayer_->GetAnimeEnd())
 	{
 		updateFunc_ = &GameplayingScene::GameOverFadeOutUpdate;
 	}

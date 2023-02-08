@@ -40,7 +40,7 @@ public:
 
 	// 指定の位置にプレイヤーがいる場合
 	// 指定の位置にワープさせる
-	int  PlayerWorp(int ky, int kx, int x, int y);
+	int  Worp(int ky, int kx, int x, int y);
 private:
 	// パワーエサの点滅
 	int blendCount_;

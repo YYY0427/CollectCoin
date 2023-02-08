@@ -62,3 +62,56 @@ struct Vector2
 
 //座標を表す別名
 using Position2 = Vector2;
+
+// サイズをまとめる構造体
+struct Size
+{	// 幅
+	int w;
+	// 高さ
+	int h;
+};
+
+/// <summary>
+/// 矩形構造体
+/// </summary>
+struct Rect
+{
+	Position2 center;
+	Size size;
+
+	Rect();
+	Rect(const Position2& c, const Size& sz);
+
+	/// <summary>
+	/// 左上上右下をしていすることで矩形を構築
+	/// </summary>
+	/// <param name="left">左</param>
+	/// <param name="top">上</param>
+	/// <param name="right">右</param>
+	/// <param name="bottom">下</param>
+	void SetLTRB(int left, int top, int right, int bottom);
+
+	// 左
+	int Left()const;
+	// 上
+	int Top()const;
+	// 右
+	int Right()const;
+	// 下
+	int Bottom()const;
+
+	const Position2& GetCenter()const;
+	const Size& GetSize()const;
+
+	/// <summary>
+	/// デバッグ用矩形表示
+	/// </summary>
+	void Draw(unsigned int color = 0xffffff);
+
+	/// <summary>
+	/// もう一つの矩形と当たったかどうか
+	/// </summary>
+	/// <param name="rc">矩形</param>
+	/// <returns>true 当たった false 外れた</returns>
+	bool IsHit(const Rect& rc)const;
+};

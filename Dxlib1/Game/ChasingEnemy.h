@@ -5,7 +5,7 @@
 
 class Field;
 class Player;
-class GameplayingScene;
+class ChasingEnemy;
 
 /// <summary>
 /// 粘着タイプ敵
@@ -13,7 +13,11 @@ class GameplayingScene;
 class ChasingEnemy : public EnemyBase
 {
 public:
-	ChasingEnemy(std::shared_ptr<Field>field, std::shared_ptr<Player>player);
+	ChasingEnemy();
+
+	// ポインタの設定
+	void SetPlayer(std::shared_ptr<Player>player) { pPlayer_ = player; }
+	void SetField(std::shared_ptr<Field>field) { pField_ = field; }
 
 	/// <summary>
 	/// 更新
@@ -34,11 +38,25 @@ public:
 	// インデックス座標を座標に変換
 	void PosCalculation();
 
+	// 敵が死んだときの初期化
+	void SetInit();
+
 	// 敵の座標の取得
 	Vec2 GetSize()const { return size_; }
 	Vec2 GetPos() const { return pos_; }
 
+	bool GetIzike()const { return isIzike_; }
+
+	// 敵の表示を消すか消さないかをセット
 	void SetEnabled(bool isEnabled) { isEnabled_ = isEnabled; }
+
+	// 敵が死んだ死んでないかをセット
+	void SetDead(bool isDead) { isDead_ = isDead; }
+
+	// 敵がイジケ状態かをセット
+	void SetIzike(bool isIzike) { isIzike_ = isIzike; }
+
+	void SetFlash(bool isFlash) { isFlash_ = isFlash; }
 
 	/// <summary>
 	/// 向いている方向によって値を返す
@@ -78,8 +96,17 @@ private:
 	// パワーエサを取得した状態でどのくらい経ったか
 	int powerFeedTimer_;
 
+	// 表示するか
 	bool isEnabled_;
 
 	int flashingImgY_;
+
+	// 死んだか
+	bool isDead_;
+
+	// イジケ状態か
+	bool isIzike_;
+
+	bool isFlash_;
 };
 

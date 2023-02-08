@@ -12,10 +12,13 @@ class Player
 {
 public:
 	// コンストラクタ
-	Player(std::shared_ptr<Field>field, std::shared_ptr<ChasingEnemy>chasingEnemy);
+	Player();
 
 	//デストラクタ
 	~Player(){};
+
+	void SetChasingEnemy(std::shared_ptr<ChasingEnemy>chasingEnemy) { pChasingEnemy_ = chasingEnemy; }
+	void SetField(std::shared_ptr<Field>field) { pField_ = field; }
 
 	// 処理
 	void Update(const InputState& input);
@@ -42,13 +45,11 @@ public:
 	// パワーエサを取得したかどうか
 	bool GetPowerFeed() const { return isPowerFeed_; }
 
-	bool GetEnemyFlashing()const { return isEnemyFlashing_; }
-
 	// 死亡設定
 	void SetDead(bool isDead) { isDead_ = isDead; }
 
-	// 死亡時のアニメーションインデックスの取得
-	bool GetEnd() const { return isAnimeEnd_; }
+	// 死亡時のアニメーションの終了するかどうかを取得
+	bool GetAnimeEnd() const { return isAnimeEnd_; }
 
 	enum Direct
 	{
@@ -62,18 +63,14 @@ public:
 
 private:
 
-	//フィールド
-	std::shared_ptr<Field> pField_;
-	
+	// ポインタ
+	std::shared_ptr<Field> pField_;	
 	std::shared_ptr<ChasingEnemy> pChasingEnemy_;
 
 	Vec2 size_;
-
-	Vec2 pos_;
-
+	
 	// プレイヤーの座標
-	int posX_;
-	int posY_;
+	Vec2 pos_;
 
 	//プレイヤーのインデックス座標
 	int indexX_;
@@ -121,8 +118,6 @@ private:
 	// プレイヤーが敵と当たったか
 	bool isDead_;
 
-	// 
+	// 死亡時アニメーションを終了するか
 	bool isAnimeEnd_;
-
-	bool isEnemyFlashing_;
 };

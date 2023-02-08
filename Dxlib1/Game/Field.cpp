@@ -151,7 +151,7 @@ bool Field::IsPowerFeed(int y, int x)
 	return false;
 }
 
-int  Field::PlayerWorp(int ky, int kx, int indexY, int indexX)
+int  Field::Worp(int ky, int kx, int indexY, int indexX)
 {
 	//前の座標が特定の位置かつ現在の座標が特定の位置ならワープ
 	if (ky == 10 && kx == 1 && indexY == 10 && indexX == 0)
