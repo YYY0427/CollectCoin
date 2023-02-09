@@ -9,8 +9,17 @@
 
 namespace
 {
+	// 画像の幅
+	constexpr int WIDTH = 16;
+
+	// 画像の高さ
+	constexpr int HEIGHT = 16;
+
+	// 画像の拡大率
+	constexpr float SCALE = 2.0f;
+
 	// 通常のプレイヤーの移動スピード
-	constexpr int NORMAL_SPEED = 32;
+	constexpr float NORMAL_SPEED = 1.5f;
 
 	// パワーエサを取得した場合の移動スピード(何倍か)
 	constexpr float GET_FEED_SPEED = 1.0f;
@@ -35,9 +44,11 @@ ChasingEnemy::ChasingEnemy() :
 	isIzike_(false),
 	isFlash_(false)
 {
+	// 画像のロード
 	handle_ = my::MyLoadGraph(L"Data/img/game/blinky.png");
 	izikeHandle_ = my::MyLoadGraph(L"Data/img/game/izike.png");
 
+	// 画像のサイズの取得
 	GetGraphSizeF(handle_, &size_.x, &size_.y);
 
 	indexX_ = 9;
@@ -50,12 +61,12 @@ ChasingEnemy::ChasingEnemy() :
 	moveDirection_ = right;
 	wantMoveDirection_ = 0;
 	
-	moveSpeed_ = NORMAL_SPEED;
+	moveInterval_ = Field::BLOCK_SIZE;
 
-	powerFeedSpeed_ = 1.0f;
+	speed_ = NORMAL_SPEED;
 
-	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
-	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
+	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_X);
+	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_Y);
 }
 
 void ChasingEnemy::Update()
@@ -79,8 +90,10 @@ void ChasingEnemy::Update()
 	kX_ = indexX_;
 	kY_ = indexY_;
 
+	moveInterval_ = Field::BLOCK_SIZE / speed_;
+
 	// 移動のインターバル
-	if (moveTimer_ % moveSpeed_ == 0)
+	if (moveTimer_ % moveInterval_ == 0)
 	{
 		if (!Colision(moveDirection_))
 		{
@@ -109,6 +122,8 @@ void ChasingEnemy::Update()
 
 		moveTimer_ = 0;
 	}
+	
+	SpeedCalculation();
 
 	// 壁に当たっていない場合
 	if (!Colision(moveDirection_))
@@ -127,7 +142,7 @@ void ChasingEnemy::Update()
 
 void ChasingEnemy::Draw()
 {
-	int imgX = (idX_ / ANIME_FRAME_SPEED) * 16;
+	int imgX = (idX_ / ANIME_FRAME_SPEED) * WIDTH;
 
 	// 通常時の表示
 	if (!isEnabled_ && !isIzike_)
@@ -137,8 +152,8 @@ void ChasingEnemy::Draw()
 
 		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
 						  imgX, imgY,			// 切り取り左上
-						  16, 16,				// 幅、高さ
-						  2.0f, 0,				// 拡大率、回転角度
+						  WIDTH, HEIGHT,		// 幅、高さ
+						  SCALE, 0,				// 拡大率、回転角度
 						  handle_, true);		// 画像のハンドル、透過するか
 	}
 	// プレイヤーがパワーエサを取得した時の表示
@@ -157,8 +172,8 @@ void ChasingEnemy::Draw()
 
 		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
 						  imgX, imgY,			// 切り取り左上
-						  16, 16,				// 幅、高さ
-						  2.0f, 0,				// 拡大率、回転角度
+						  WIDTH, HEIGHT,		// 幅、高さ
+						  SCALE, 0,				// 拡大率、回転角度
 						  izikeHandle_, true);	// 画像のハンドル、透過するか
 	}
 }
@@ -185,40 +200,37 @@ bool ChasingEnemy::Colision(int direction)
 
 void ChasingEnemy::SpeedCalculation()
 {
-	// パワーエサとの当たり判定
-	if (pField_->IsPowerFeed(indexY_, indexX_))
-	{
-		isPowerFeed_ = true;
-	}
-
-	// パワーエサを取得していた場合
-	// 画像を変えて、プレイヤーから逃げる挙動に変える
+	// プレイヤーがパワーエサを取得していた場合
 	if (pPlayer_->GetPowerFeed())
 	{
-		
+		speed_ = GET_FEED_SPEED;
+	}
+	else
+	{
+		speed_ = NORMAL_SPEED;
 	}
 }
 
 void ChasingEnemy::PosCalculation()
 {
 	// インデックス座標を計算
-	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
-	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
+	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_X);
+	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_Y);
 
 	// 向いている方向によって座標を計算
 	switch (moveDirection_)
 	{
 	case up:
-		pos_.y -= (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.y -= (moveTimer_ % moveInterval_) * speed_;
 		break;
 	case down:
-		pos_.y += (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.y += (moveTimer_ % moveInterval_) * speed_;
 		break;
 	case left:
-		pos_.x -= (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.x -= (moveTimer_ % moveInterval_) * speed_;
 		break;
 	case right:
-		pos_.x += (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.x += (moveTimer_ % moveInterval_) * speed_;
 		break;
 	default:
 		break;
@@ -227,9 +239,13 @@ void ChasingEnemy::PosCalculation()
 
 void ChasingEnemy::SetInit()
 {
+	// インデックス座標を変更し、座標の計算
 	indexX_ = 10;
 	indexY_ = 10;
-//	isIzike_ = false;
+	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_X);
+	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_Y);
+
+	// 初期化
 	isDead_ = false;
 }
 

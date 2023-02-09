@@ -85,10 +85,10 @@ private:
 	int wantMoveDirection_;
 
 	// プレイヤーの移動速度
-	int moveSpeed_;
+	int moveInterval_;
 
 	// パワーエサを取得した場合のスピード
-	float powerFeedSpeed_;
+	float speed_;
 
 	// パワーエサを取得したかどうか
 	bool isPowerFeed_;

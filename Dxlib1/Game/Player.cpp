@@ -3,12 +3,22 @@
 #include "../DrawFunctions.h"
 #include "../InputState.h"
 #include "ChasingEnemy.h"
+#include "../game.h"
 #include <DxLib.h>
 
 namespace
 {
-	// 通常のプレイヤーの移動スピード
-	constexpr int NORMAL_SPEED = 32;
+	// 画像の幅
+	constexpr int WIDTH = 16;
+
+	// 画像の高さ
+	constexpr int HEIGHT = 16;
+
+	// 画像の拡大率
+	constexpr float SCALE = 2.0f;
+
+	// 通常のプレイヤーの移動スピード(何倍か)
+	constexpr float NORMAL_SPEED = 1.5f;
 
 	// パワーエサを取得した場合の移動スピード(何倍か)
 	constexpr float GET_FEED_SPEED = 2.0f;
@@ -17,15 +27,15 @@ namespace
 	constexpr int FEED_DURATION = 60 * 9;
 
 	// 敵をフラッシュさせる割合
-	constexpr float RATIO = 0.6f;
+	constexpr float FLASH_RATIO = 0.6f;
 
 	// 1枚に必要なフレーム数
-	constexpr int ANIME_FRAME_SPEED = 3;
-	constexpr int DEAD_ANIME_FRAME_SPEED = 10;
+	constexpr int ANIME_FRAME_SPEED = 3;		// 通常時
+	constexpr int DEAD_ANIME_FRAME_SPEED = 10;	// 死亡時
 
 	// アニメーション枚数
-	constexpr int ANIME_FRAME_NUM = 5;
-	constexpr int DEAD_ANIME_FRAME_NUM = 12;
+	constexpr int ANIME_FRAME_NUM = 5;			// 通常時
+	constexpr int DEAD_ANIME_FRAME_NUM = 12;	// 死亡時
 }
 
 Player::Player() :
@@ -35,9 +45,9 @@ Player::Player() :
 	moveTimer_(0),
 	moveDirection_(0),
 	feedGetNum_(0),
-	moveSpeed_(NORMAL_SPEED),
+	moveInterval_(Field::BLOCK_SIZE),
 	powerFeedTimer_(0),
-	powerFeedSpeed_(1.0f),
+	speed2_(1.0f),
 	imgIdX_(0),
 	deadImgIdx_(0),
 	wantMoveDirection_(0),
@@ -50,11 +60,13 @@ Player::Player() :
 	deathHandle_ = my::MyLoadGraph(L"Data/img/game/PacmanDeath16.png");
 
 	// 画像サイズの取得
-	GetGraphSizeF(handle_, &size_.x, &size_.y);
+	GetGraphSizeF(deathHandle_, &deathImgSize_.x, &deathImgSize_.y);
 
 	// インデックスの座標から初期座標を求める
-	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
-	pos_.y= (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
+	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_X);
+	pos_.y=  (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_Y);
+
+	speed_ = NORMAL_SPEED;
 }
 
 void Player::Update(const InputState& input)
@@ -88,8 +100,10 @@ void Player::Update(const InputState& input)
 		wantMoveDirection_ = right;
 	}
 
+	moveInterval_ = Field::BLOCK_SIZE / speed_;
+
 	// 移動のインターバル				// 移動する方向に壁がない場合移動
-	if (moveTimer_ % moveSpeed_ == 0 && !Colision(moveDirection_))
+	if (moveTimer_ % moveInterval_ == 0 && !Colision(moveDirection_))
 	{
 		// 移動処理
 		switch (moveDirection_)
@@ -148,6 +162,7 @@ void Player::Update(const InputState& input)
 			}
 		}
 
+		// 初期化
 		moveTimer_ = 0;
 	}
 	
@@ -194,26 +209,29 @@ void Player::Draw()
 		// プレイヤー画像の表示
 		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
 						imgX, 0,				// 切り取り左上
-						16, 16,					// 幅、高さ
-						2.0f, angle_,			// 拡大率、回転角度
+						WIDTH, HEIGHT,			// 幅、高さ
+						SCALE, angle_,			// 拡大率、回転角度
 						handle_, true);			// 画像のハンドル、透過するか
 	}
 	else
 	{
+		// 画像のインデックスを計算
 		int imgX = (deadImgIdx_ / DEAD_ANIME_FRAME_SPEED) * 16;
 
-		if (imgX >= 192 - 16)
+		// アニメーション画像の右端まで表示した場合
+		if (imgX >= deathImgSize_.x - WIDTH)
 		{
+			// アニメーション終了フラグを立てる
 			isAnimeEnd_ = true;
 		}
 
 		// ゲームオーバー時の画像を表示
-		DrawRectRotaGraph(Game::kScreenWidth / 2 - 16,	// 座標
-						  Game::kScreenHeight / 2 - 16,
-						  imgX, 0,						// 切り取り左上
-						  16, 16,						// 幅、高さ
-						  2.0f, 0,						// 拡大率、回転角度
-						  deathHandle_, true);			// 画像のハンドル、透過するか
+		DrawRectRotaGraph(Game::kScreenWidth / 2 - WIDTH,	// 座標
+						  Game::kScreenHeight / 2 - HEIGHT,
+						  imgX, 0,							// 切り取り左上
+						  WIDTH, HEIGHT,					// 幅、高さ
+						  SCALE, 0,							// 拡大率、回転角度
+						  deathHandle_, true);				// 画像のハンドル、透過するか
 	}
 }
 
@@ -251,7 +269,10 @@ void Player::SpeedCalculation()
 	// パワーエサとの当たり判定
 	if (pField_->IsPowerFeed(indexY_, indexX_))
 	{
+		// パワーエサのフラグを立てる
 		isPowerFeed_ = true;
+
+		// 敵のイジケ状態を開始
 		pChasingEnemy_->SetIzike(true);
 	}
 
@@ -259,17 +280,19 @@ void Player::SpeedCalculation()
 	// 一定時間プレイヤーの移動を速くする
 	if (isPowerFeed_)
 	{
+		// タイマーを開始
 		powerFeedTimer_++;
-		moveSpeed_ = NORMAL_SPEED / GET_FEED_SPEED;
-		powerFeedSpeed_ = GET_FEED_SPEED;
+
+		// 移動速度を変更
+		speed_ = GET_FEED_SPEED;
 
 		// powerFeedTimerがFEED_DURATIONの特定の割合に達したら敵のアニメーションを変更
-		if ((FEED_DURATION * RATIO) < powerFeedTimer_)
+		if ((FEED_DURATION * FLASH_RATIO) < powerFeedTimer_)
 		{
 			pChasingEnemy_->SetFlash(true);	// 敵の点滅を開始
 		}
 
-		// 指定した時間が経過した場合元の速度に戻す
+		// タイマーが指定した時間を経過した場合元の速度に戻す
 		if (powerFeedTimer_ % FEED_DURATION == 0)
 		{
 			// 初期化
@@ -279,32 +302,31 @@ void Player::SpeedCalculation()
 			pChasingEnemy_->SetIzike(false);
 
 			// 元の移動速度に戻す
-			moveSpeed_ = NORMAL_SPEED;
-			powerFeedSpeed_ = 1.0f;
+			speed_ = NORMAL_SPEED;
 		}
 	}
 }
 
 void Player::PosCalculation()
 {
-	// インデックス座標を計算
-	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
-	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2);
+	// インデックス座標から座標を計算
+	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_X);
+	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_Y);
 
-	// 向いている方向によって座標を計算
+	// 向いている方向と移動速度によって座標を計算
 	switch (moveDirection_) 
 	{
 	case up:
-		pos_.y -= (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.y -= (moveTimer_ % moveInterval_) * speed_;
 		break;
 	case down:
-		pos_.y += (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.y += (moveTimer_ % moveInterval_) * speed_;
 		break;
 	case left:
-		pos_.x -= (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.x -= (moveTimer_ % moveInterval_) * speed_;
 		break;
 	case right:
-		pos_.x += (moveTimer_ % moveSpeed_) * powerFeedSpeed_;
+		pos_.x += (moveTimer_ % moveInterval_) * speed_;
 		break;
 	default:
 		break;

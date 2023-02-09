@@ -39,7 +39,7 @@ public:
 	void PosCalculation();
 
 	// プレイヤーの座標の取得
-	Vec2 GetSize() const { return size_; }
+	Vec2 GetSize() const { return deathImgSize_; }
 	Vec2 GetPos() const { return pos_; }
 
 	// パワーエサを取得したかどうか
@@ -67,7 +67,7 @@ private:
 	std::shared_ptr<Field> pField_;	
 	std::shared_ptr<ChasingEnemy> pChasingEnemy_;
 
-	Vec2 size_;
+	Vec2 deathImgSize_;
 	
 	// プレイヤーの座標
 	Vec2 pos_;
@@ -104,7 +104,7 @@ private:
 	int feedGetNum_;
 
 	// プレイヤーの移動速度
-	int moveSpeed_;
+	int moveInterval_;
 
 	// パワーエサを取得したかどうか
 	bool isPowerFeed_;
@@ -113,11 +113,13 @@ private:
 	int powerFeedTimer_;
 
 	// パワーエサを取得した場合のスピード
-	float powerFeedSpeed_;
+	float speed2_;
 
 	// プレイヤーが敵と当たったか
 	bool isDead_;
 
 	// 死亡時アニメーションを終了するか
 	bool isAnimeEnd_;
+
+	float speed_;
 };

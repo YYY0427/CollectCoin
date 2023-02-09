@@ -59,27 +59,10 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 		fadeColor_ = 0xff0000;
 	}
 
+	// プレイヤーと敵の当たり判定
 	if (Colision())
 	{
-		// プレイヤーがパワーエサを取得していない状態で敵と当たった時ゲームオーバー
-		//if (!pPlayer_->GetPowerFeed())
-		//{
-		//	// プレイヤーの死亡フラグを立てる
-		//	pPlayer_->SetDead(true);
-
-		//	// 敵を消すフラグを立てる
-		//	pChasingEnemy_->SetEnabled(true);
-
-		//	// ゲームオーバー演出に移行
-		//	updateFunc_ = &GameplayingScene::GameOverDraw;
-		//	fadeColor_ = 0xff0000;
-		//}
-		//else
-		//{
-		//	pChasingEnemy_->SetDead(true);
-		//	pChasingEnemy_->SetIzike(false);
-		//}
-
+		printfDx(L"Colision()\n");
 		// 敵がイジケ状態ではないときに敵と当たった場合死亡
 		if (!pChasingEnemy_->GetIzike())
 		{
@@ -93,10 +76,11 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 			updateFunc_ = &GameplayingScene::GameOverDraw;
 			fadeColor_ = 0xff0000;
 		}
-		else if(pChasingEnemy_->GetIzike())
+		// 敵がイジケ状態の場合に敵と当たった場合敵を殺す
+		else
 		{
+			// 敵の死亡フラグを立てる
 			pChasingEnemy_->SetDead(true);
-			pChasingEnemy_->SetIzike(false);
 		}
 	}
 }

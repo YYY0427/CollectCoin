@@ -58,14 +58,14 @@ void Field::Draw()
 			// エサの描画
 			if (mapData[y][x] == 1)
 			{
-				DrawFormatString(x * BLOCK_SIZE + 10, y * BLOCK_SIZE + 10, 0xffffff, L"・", true);
+				DrawFormatString(x * BLOCK_SIZE + 10 + DISPLAY_POS_X, y * BLOCK_SIZE + 10 + DISPLAY_POS_Y, 0xffffff, L"・", true);
 			}
 			// 壁の描画
 			if (mapData[y][x] == 2)
 			{
 				DrawBox(
-					x * BLOCK_SIZE, y * BLOCK_SIZE,
-					x * BLOCK_SIZE + BLOCK_SIZE, y * BLOCK_SIZE + BLOCK_SIZE,
+					x * BLOCK_SIZE + DISPLAY_POS_X, y * BLOCK_SIZE + DISPLAY_POS_Y,
+					x * BLOCK_SIZE + BLOCK_SIZE + DISPLAY_POS_X, y * BLOCK_SIZE + BLOCK_SIZE + DISPLAY_POS_Y,
 					GetColor(0, 0, 255), false);
 			}
 			// パワーエサの描画
@@ -81,7 +81,7 @@ void Field::Draw()
 void Field::PowerFeedFlash(int y, int x)
 {
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, blendCount_);
-	DrawRotaGraph(x * BLOCK_SIZE + 16, y * BLOCK_SIZE + 16, 1, 0, handle_, true);
+	DrawRotaGraph(x * BLOCK_SIZE + 16 + DISPLAY_POS_X, y * BLOCK_SIZE + 16 + DISPLAY_POS_Y, 1, 0, handle_, true);
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 }
 
