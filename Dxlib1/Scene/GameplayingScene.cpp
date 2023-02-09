@@ -9,8 +9,11 @@
 #include"../Game/Player.h"
 #include "../Game/Field.h"
 #include "../Game/ChasingEnemy.h"
+#include "../Game/CapriciousEnemy.h"
+#include "../Game/InconsistentEnemy.h"
+#include "../Game/PreemptiveEnemy.h"
+#include "../Game/EnemyBase.h"
 #include <DxLib.h>
-
 
 GameplayingScene::GameplayingScene(SceneManager& manager) :
 	Scene(manager),
@@ -18,12 +21,28 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 {
 	pField_ = std::make_shared<Field>();
 	pPlayer_ = std::make_shared<Player>();
-	pChasingEnemy_ = std::make_shared<ChasingEnemy>();
 
-	pChasingEnemy_->SetPlayer(pPlayer_);
-	pChasingEnemy_->SetField(pField_);
+	int chasingEnemyH = my::MyLoadGraph(L"Data/img/game/blinky.png");
+	int capriciousEnemyH = my::MyLoadGraph(L"Data/img/game/inky.png");
+	int inconsistentEnemyH = my::MyLoadGraph(L"Data/img/game/cryde.png");
+	int preemptiveEnemyH = my::MyLoadGraph(L"Data/img/game/pinky.png");
 
-	pPlayer_->SetChasingEnemy(pChasingEnemy_);
+	pEnemy_[0] = std::make_shared<ChasingEnemy>(chasingEnemyH, 9, 8);
+	pEnemy_[1] = std::make_shared<CapriciousEnemy>(capriciousEnemyH, 8, 10);
+	pEnemy_[2] = std::make_shared<InconsistentEnemy>(inconsistentEnemyH, 9, 10);
+	pEnemy_[3] = std::make_shared<PreemptiveEnemy>(preemptiveEnemyH, 10, 10);
+
+	for (auto& enemy : pEnemy_)
+	{
+		enemy->SetPlayer(pPlayer_);
+		enemy->SetField(pField_);
+	}
+	
+	for (int i = 0; i < 4; i++)
+	{
+		pPlayer_->SetEnemy(pEnemy_[i], i);
+	}
+
 	pPlayer_->SetField(pField_);
 }
 
@@ -41,9 +60,39 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 {
 	pField_->Updata();
 
-	pChasingEnemy_->Update();
-
 	pPlayer_->Update(input);
+
+	for (auto& enemy : pEnemy_)
+	{
+		enemy->Update();
+	}
+
+	for (auto& enemy : pEnemy_)
+	{
+		// ƒvƒŒƒCƒ„[‚Æ“G‚Ì“–‚½‚è”»’è
+		if (Colision(enemy))
+		{
+			// “G‚ªƒCƒWƒPó‘Ô‚Å‚Í‚È‚¢‚Æ‚«‚É“G‚Æ“–‚½‚Á‚½ê‡Ž€–S
+			if (!enemy->GetIzike())
+			{
+				// ƒvƒŒƒCƒ„[‚ÌŽ€–Sƒtƒ‰ƒO‚ð—§‚Ä‚é
+				pPlayer_->SetDead(true);
+
+				// “G‚ðÁ‚·ƒtƒ‰ƒO‚ð—§‚Ä‚é
+				enemy->SetEnabled(true);
+
+				// ƒQ[ƒ€ƒI[ƒo[‰‰o‚ÉˆÚs
+				updateFunc_ = &GameplayingScene::GameOverDraw;
+				fadeColor_ = 0xff0000;
+			}
+			// “G‚ªƒCƒWƒPó‘Ô‚Ìê‡‚É“G‚Æ“–‚½‚Á‚½ê‡“G‚ðŽE‚·
+			else
+			{
+				// “G‚ÌŽ€–Sƒtƒ‰ƒO‚ð—§‚Ä‚é
+				enemy->SetDead(true);
+			}
+		}
+	}
 
 	// ƒ|[ƒYƒV[ƒ“Ø‚è‘Ö‚¦
 	if (input.IsTriggered(InputType::pause))
@@ -58,31 +107,6 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 		updateFunc_ = &GameplayingScene::GameClearDraw;
 		fadeColor_ = 0xff0000;
 	}
-
-	// ƒvƒŒƒCƒ„[‚Æ“G‚Ì“–‚½‚è”»’è
-	if (Colision())
-	{
-		printfDx(L"Colision()\n");
-		// “G‚ªƒCƒWƒPó‘Ô‚Å‚Í‚È‚¢‚Æ‚«‚É“G‚Æ“–‚½‚Á‚½ê‡Ž€–S
-		if (!pChasingEnemy_->GetIzike())
-		{
-			// ƒvƒŒƒCƒ„[‚ÌŽ€–Sƒtƒ‰ƒO‚ð—§‚Ä‚é
-			pPlayer_->SetDead(true);
-
-			// “G‚ðÁ‚·ƒtƒ‰ƒO‚ð—§‚Ä‚é
-			pChasingEnemy_->SetEnabled(true);
-
-			// ƒQ[ƒ€ƒI[ƒo[‰‰o‚ÉˆÚs
-			updateFunc_ = &GameplayingScene::GameOverDraw;
-			fadeColor_ = 0xff0000;
-		}
-		// “G‚ªƒCƒWƒPó‘Ô‚Ìê‡‚É“G‚Æ“–‚½‚Á‚½ê‡“G‚ðŽE‚·
-		else
-		{
-			// “G‚ÌŽ€–Sƒtƒ‰ƒO‚ð—§‚Ä‚é
-			pChasingEnemy_->SetDead(true);
-		}
-	}
 }
 
 void GameplayingScene::Update(const InputState& input)
@@ -94,9 +118,12 @@ void GameplayingScene::Draw()
 {
 	pField_->Draw();
 
-	pChasingEnemy_->Draw();
-
 	pPlayer_->Draw();
+
+	for (auto& enemy : pEnemy_)
+	{
+		enemy->Draw();
+	}
 
 	DrawString(0, 0, L"GamePlayingScene", 0xffffff, true);
 
@@ -140,17 +167,17 @@ void GameplayingScene::GameOverFadeOutUpdate(const InputState& input)
 	}
 }
 
-bool GameplayingScene::Colision()
+bool GameplayingScene::Colision(std::shared_ptr<EnemyBase>enemy)
 {
 	float playerLeft = pPlayer_->GetPos().x;
 	float playerRight = pPlayer_->GetPos().x + 16.0f;
 	float playerTop = pPlayer_->GetPos().y;
 	float playerBottom = pPlayer_->GetPos().y + 16.0f;
 
-	float enemyLeft = pChasingEnemy_->GetPos().x;
-	float enemyRight = pChasingEnemy_->GetPos().x + 16.0f;
-	float enemyTop = pChasingEnemy_->GetPos().y;
-	float enemyBottom = pChasingEnemy_->GetPos().y + 16.0f;
+	float enemyLeft = enemy->GetPos().x;
+	float enemyRight = enemy->GetPos().x + 16.0f;
+	float enemyTop = enemy->GetPos().y;
+	float enemyBottom = enemy->GetPos().y + 16.0f;
 
 	if (playerLeft > enemyRight)	return false;
 	if (playerRight < enemyLeft)	return false;

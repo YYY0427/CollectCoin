@@ -5,8 +5,8 @@
 #include "../vec2.h"
 
 class Field;
-class ChasingEnemy;
 class InputState;
+class EnemyBase;
 
 class Player
 {
@@ -17,7 +17,8 @@ public:
 	//デストラクタ
 	~Player(){};
 
-	void SetChasingEnemy(std::shared_ptr<ChasingEnemy>chasingEnemy) { pChasingEnemy_ = chasingEnemy; }
+	// ポインタの設定
+	void SetEnemy(std::shared_ptr<EnemyBase>enemy, int i) { pEnemy_[i] = enemy; }
 	void SetField(std::shared_ptr<Field>field) { pField_ = field; }
 
 	// 処理
@@ -65,7 +66,7 @@ private:
 
 	// ポインタ
 	std::shared_ptr<Field> pField_;	
-	std::shared_ptr<ChasingEnemy> pChasingEnemy_;
+	std::shared_ptr<EnemyBase> pEnemy_[4];
 
 	Vec2 deathImgSize_;
 	

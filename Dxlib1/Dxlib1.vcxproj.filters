@@ -25,11 +25,11 @@
     <Filter Include="ソース ファイル\Game">
       <UniqueIdentifier>{031664be-100d-4a94-89ab-43c06d37fe25}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Game\Enemy">
-      <UniqueIdentifier>{9a779aa6-1b94-4106-9b27-28fa776f727d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ヘッダー ファイル\Game\Enemy">
       <UniqueIdentifier>{25450293-963a-4b6f-99cb-6e8eebafeddf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Game\Enemy">
+      <UniqueIdentifier>{9a779aa6-1b94-4106-9b27-28fa776f727d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -87,6 +87,15 @@
     <ClCompile Include="Scene\GameclearScene.cpp">
       <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Game\PreemptiveEnemy.cpp">
+      <Filter>ソース ファイル\Game\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\CapriciousEnemy.cpp">
+      <Filter>ソース ファイル\Game\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\InconsistentEnemy.cpp">
+      <Filter>ソース ファイル\Game\Enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -142,6 +151,15 @@
     </ClInclude>
     <ClInclude Include="Scene\GameclearScene.h">
       <Filter>ヘッダー ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\PreemptiveEnemy.h">
+      <Filter>ヘッダー ファイル\Game\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\InconsistentEnemy.h">
+      <Filter>ヘッダー ファイル\Game\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\CapriciousEnemy.h">
+      <Filter>ヘッダー ファイル\Game\Enemy</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -5,12 +5,15 @@ class Field
 public:
 	// マップの横幅
 	static constexpr int MAP_WIDTH = 19;
+
 	// マップの縦幅
 	static constexpr int MAP_HEIGHT = 22;
+
 	// ブロックの大きさ
 	static constexpr int BLOCK_SIZE = 32;
+
 	// 表示場所
-	static constexpr int DISPLAY_POS_X = 100;
+	static constexpr int DISPLAY_POS_X = 400;
 	static constexpr int DISPLAY_POS_Y = 100;
 
 	// コンストラクタ

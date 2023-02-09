@@ -6,7 +6,7 @@
 //プロトタイプ宣言
 class Player;	//プレイヤークラス
 class Field;	
-class ChasingEnemy;
+class EnemyBase;
 
 /// <summary>
 /// ゲーム中シーン
@@ -21,14 +21,14 @@ public:
 
 	void Draw();
 
-	bool Colision();
+	bool Colision(std::shared_ptr<EnemyBase>enemy);
 
 private:
 	//プレイヤー
 	std::shared_ptr<Player> pPlayer_;
 
-	// 敵①
-	std::shared_ptr<ChasingEnemy> pChasingEnemy_;
+	// 敵
+	std::array<std::shared_ptr<EnemyBase>, 4> pEnemy_;
 
 	//フィールド
 	std::shared_ptr<Field> pField_;

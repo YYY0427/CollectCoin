@@ -1,4 +1,4 @@
-#include "ChasingEnemy.h"
+#include "InconsistentEnemy.h"
 #include "../DrawFunctions.h"
 #include "Player.h"
 #include "Field.h"
@@ -36,14 +36,14 @@ namespace
 	constexpr int IZIKE_ANIME_FRAME_NUM = 2;
 }
 
-ChasingEnemy::ChasingEnemy(int handle, int indexX, int indexY)
+InconsistentEnemy::InconsistentEnemy(int handle, int indexX, int indexY)
 {
 	handle_ = handle;
 	indexX_ = indexX;
 	indexY_ = indexY;
 }
 
-void ChasingEnemy::Update()
+void InconsistentEnemy::Update()
 {
 	// €‚ñ‚¾ê‡‰Šú‰»
 	if (isDead_)

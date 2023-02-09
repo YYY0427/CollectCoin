@@ -4,6 +4,7 @@
 #include "../InputState.h"
 #include "ChasingEnemy.h"
 #include "../game.h"
+#include "EnemyBase.h"
 #include <DxLib.h>
 
 namespace
@@ -226,8 +227,8 @@ void Player::Draw()
 		}
 
 		// ゲームオーバー時の画像を表示
-		DrawRectRotaGraph(Game::kScreenWidth / 2 - WIDTH,	// 座標
-						  Game::kScreenHeight / 2 - HEIGHT,
+		DrawRectRotaGraph(pos_.x,							// 座標
+						  pos_.y,
 						  imgX, 0,							// 切り取り左上
 						  WIDTH, HEIGHT,					// 幅、高さ
 						  SCALE, 0,							// 拡大率、回転角度
@@ -272,8 +273,11 @@ void Player::SpeedCalculation()
 		// パワーエサのフラグを立てる
 		isPowerFeed_ = true;
 
-		// 敵のイジケ状態を開始
-		pChasingEnemy_->SetIzike(true);
+		for (auto& enemy : pEnemy_)
+		{
+			// 敵のイジケ状態を開始
+			enemy->SetIzike(true);
+		}
 	}
 
 	// パワーエサを取得していた場合
@@ -289,7 +293,10 @@ void Player::SpeedCalculation()
 		// powerFeedTimerがFEED_DURATIONの特定の割合に達したら敵のアニメーションを変更
 		if ((FEED_DURATION * FLASH_RATIO) < powerFeedTimer_)
 		{
-			pChasingEnemy_->SetFlash(true);	// 敵の点滅を開始
+			for (auto& enemy : pEnemy_)
+			{
+				enemy->SetFlash (true);	// 敵の点滅を開始
+			}	
 		}
 
 		// タイマーが指定した時間を経過した場合元の速度に戻す
@@ -298,8 +305,12 @@ void Player::SpeedCalculation()
 			// 初期化
 			powerFeedTimer_ = 0;
 			isPowerFeed_ = false;
-			pChasingEnemy_->SetFlash(false);
-			pChasingEnemy_->SetIzike(false);
+
+			for (auto& enemy : pEnemy_)
+			{
+				enemy->SetFlash(false);
+				enemy->SetIzike(false);
+			}
 
 			// 元の移動速度に戻す
 			speed_ = NORMAL_SPEED;

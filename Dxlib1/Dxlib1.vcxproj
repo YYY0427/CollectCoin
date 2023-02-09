@@ -151,6 +151,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\CapriciousEnemy.cpp" />
+    <ClCompile Include="Game\PreemptiveEnemy.cpp" />
+    <ClCompile Include="Game\InconsistentEnemy.cpp" />
     <ClCompile Include="Scene\GameclearScene.cpp" />
     <ClCompile Include="Game\ChasingEnemy.cpp" />
     <ClCompile Include="DrawFunctions.cpp" />
@@ -171,6 +174,9 @@
     <ClCompile Include="vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\CapriciousEnemy.h" />
+    <ClInclude Include="Game\PreemptiveEnemy.h" />
+    <ClInclude Include="Game\InconsistentEnemy.h" />
     <ClInclude Include="Scene\GameclearScene.h" />
     <ClInclude Include="Game\ChasingEnemy.h" />
     <ClInclude Include="DrawFunctions.h" />
