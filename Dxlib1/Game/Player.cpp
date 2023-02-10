@@ -199,6 +199,8 @@ void Player::Update(const InputState& input)
 		// アニメーション処理
 		imgIdX_ = (imgIdX_ + 1) % (ANIME_FRAME_SPEED * ANIME_FRAME_NUM);
 	}
+
+	pField_->MoveDataSet(indexY_, indexX_);
 }
 
 void Player::Draw()

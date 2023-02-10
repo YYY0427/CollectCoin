@@ -41,7 +41,7 @@ EnemyBase::EnemyBase() :
 	isEnabled_(true),
 	isDead_(false),
 	isIzike_(false),
-	isFlash_(false)
+isFlash_(false)
 {
 	// ‰æ‘œ‚Ìƒ[ƒh
 //	handle_ = my::MyLoadGraph(L"Data/img/game/blinky.png");
@@ -69,7 +69,7 @@ EnemyBase::EnemyBase() :
 
 void EnemyBase::Update()
 {
-	
+
 }
 
 void EnemyBase::Draw()
@@ -128,6 +128,39 @@ bool EnemyBase::Colision(int direction)
 		break;
 	}
 	return false;
+}
+
+int EnemyBase::NoBlockDirect(int indexX, int indexY)
+{
+	bool isMove = false;
+	int vecDirect = 0;
+	while (!isMove)
+	{
+		vecDirect = GetRand(4) + 1;
+
+		switch (vecDirect)
+		{
+		case up:
+			if (!pField_->IsBlock(indexY - 1, indexX))
+				isMove = true;
+			break;
+		case down:
+			if (!pField_->IsBlock(indexY + 1, indexX))
+				isMove = true;
+			break;
+		case left:
+			if (!pField_->IsBlock(indexY, indexX - 1))
+				isMove = true;
+			break;
+		case right:
+			if (!pField_->IsBlock(indexY, indexX + 1))
+				isMove = true;
+			break;
+		default:
+			break;
+		}
+	}
+	return vecDirect;
 }
 
 void EnemyBase::SpeedCalculation()

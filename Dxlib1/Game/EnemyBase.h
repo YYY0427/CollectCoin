@@ -29,8 +29,11 @@ public:
 	/// </summary>
 	virtual void Draw();
 
-	// 当たり判定
+	// 現在進んでいる方向への当たり判定
 	bool Colision(int direction);
+
+	// ブロックがない方向を見つける
+	int NoBlockDirect(int indexX, int indexY);
 
 	// パワーエサを取得した場合の速度計算
 	void SpeedCalculation();

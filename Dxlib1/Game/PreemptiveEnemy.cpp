@@ -91,8 +91,7 @@ void PreemptiveEnemy::Update()
 			};
 		}
 
-		// ƒ‰ƒ“ƒ_ƒ€‚É“G‚Ì•ûŒü‚ð•Ï‚¦‚é
-		moveDirection_ = GetRand(3) + 1;
+		moveDirection_ = NoBlockDirect(indexX_, indexY_);
 
 		moveTimer_ = 0;
 	}

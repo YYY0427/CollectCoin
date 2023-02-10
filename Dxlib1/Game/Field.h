@@ -47,7 +47,16 @@ public:
 	// 指定の位置にプレイヤーがいる場合
 	// 指定の位置にワープさせる
 	int  Worp(int ky, int kx, int x, int y);
+
+	// playerまでの最短経路を探すための準備として、コピーマップの初期化と目的地(player)の場所に10(目印)を設定
+	void MoveDataSet(int playerY, int playerX);
+
+	// 現在地からプレイヤーまでの最短経路を探す関数
+	void Search(int y, int x, int pos);
 private:
+
+	int mapData2[MAP_HEIGHT][MAP_WIDTH];
+
 	// パワーエサの点滅
 	int blendCount_;
 	bool blendLimitMax_;

@@ -15,11 +15,11 @@ namespace
 		{ 2, 1, 2, 2, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 1, 2 },
 		{ 2, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 2 },
 		{ 2, 2, 2, 2, 1, 2, 2, 2, 0, 2, 0, 2, 2, 2, 1, 2, 2, 2, 2 },
-		{ 0, 0, 0, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 0, 0, 0 },
+		{ 4, 4, 4, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 4, 4, 4 },
 		{ 2, 2, 2, 2, 1, 2, 0, 2, 2, 0, 2, 2, 0, 2, 1, 2, 2, 2, 2 },
 		{ 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0, 0 },
 		{ 2, 2, 2, 2, 1, 2, 0, 2, 2, 2, 2, 2, 0, 2, 1, 2, 2, 2, 2 },
-		{ 0, 0, 0, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 0, 0, 0 },
+		{ 4, 4, 4, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 4, 4, 4 },
 		{ 2, 2, 2, 2, 1, 2, 0, 2, 2, 2, 2, 2, 0, 2, 1, 2, 2, 2, 2 },
 		{ 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
 		{ 2, 1, 2, 2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 1, 2 },
@@ -72,6 +72,10 @@ void Field::Draw()
 			if (mapData[y][x] == 3)
 			{
 				PowerFeedFlash(y, x);
+			}
+			if (mapData2[y][x] >= 0)
+			{
+				DrawFormatString(x * BLOCK_SIZE + 10 + DISPLAY_POS_X, y * BLOCK_SIZE + 10 + DISPLAY_POS_Y, 0xffffff, L"%d", mapData2[y][x], true);
 			}
 		}
 	}
@@ -164,4 +168,49 @@ int  Field::Worp(int ky, int kx, int indexY, int indexX)
 		indexX = 0;
 	}
 	return (indexX);
+}
+
+void Field::MoveDataSet(int playerY, int playerX)
+{
+	for (int y = 0; y < MAP_HEIGHT; y++)
+	{
+		for (int x = 0; x < MAP_WIDTH; x++)
+		{
+			if (mapData[y][x] != 2 && mapData[y][x] != 4)
+			{
+				mapData2[y][x] = 0;
+			}
+		}
+	}
+
+	mapData2[playerY][playerX] = 0;
+	
+	Search(playerY, playerX, 0);
+}
+
+void Field::Search(int y, int x, int pos)
+{
+	pos += 1;
+
+	if (mapData2[y - 1][x] == 0 || mapData2[y - 1][x] > pos)
+	{
+		mapData2[y - 1][x] = pos;
+		Search(y - 1, x, pos);
+	}
+	if (mapData2[y + 1][x] == 0 || mapData2[y + 1][x] > pos)
+	{
+		mapData2[y + 1][x] = pos;
+		Search(y + 1, x, pos);
+	}
+	if (mapData2[y][x - 1] == 0 || mapData2[y][x - 1] > pos)
+	{
+		mapData2[y][x - 1] = pos;
+		Search(y, x - 1, pos);
+	}
+	if (mapData2[y][x + 1] == 0 || mapData2[y][x + 1] > pos)
+	{
+		mapData2[y][x + 1] = pos;
+		Search(y, x + 1, pos);
+	}
+	return;
 }
