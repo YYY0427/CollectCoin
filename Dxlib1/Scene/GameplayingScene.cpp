@@ -78,11 +78,14 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 				// ƒvƒŒƒCƒ„[‚ÌŽ€–Sƒtƒ‰ƒO‚ð—§‚Ä‚é
 				pPlayer_->SetDead(true);
 
-				// “G‚ðÁ‚·ƒtƒ‰ƒO‚ð—§‚Ä‚é
-				enemy->SetEnabled(true);
-
+				// ‚·‚×‚Ä‚Ì“G‚ðÁ‚·
+				for (auto& enemy : pEnemy_)
+				{
+					enemy->SetEnabled(false);
+				}
+				
 				// ƒQ[ƒ€ƒI[ƒo[‰‰o‚ÉˆÚs
-				updateFunc_ = &GameplayingScene::GameOverDraw;
+				updateFunc_ = &GameplayingScene::GameOverUpdate;
 				fadeColor_ = 0xff0000;
 			}
 			// “G‚ªƒCƒWƒPó‘Ô‚Ìê‡‚É“G‚Æ“–‚½‚Á‚½ê‡“G‚ðŽE‚·
@@ -90,6 +93,14 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 			{
 				// “G‚ÌŽ€–Sƒtƒ‰ƒO‚ð—§‚Ä‚é
 				enemy->SetDead(true);
+
+				// ƒvƒŒƒCƒ„[‚Æ‚ ‚½‚Á‚½“G‚ðÁ‚·
+				enemy->SetEnabled(false);
+
+				// “G‚ðÁ‚·
+				pPlayer_->SetEnabled(false);
+
+				updateFunc_ = &GameplayingScene::EnemyDeadUpdate;
 			}
 		}
 	}
@@ -104,8 +115,27 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 	if (pField_->IsGameClearCheck())
 	{
 		// ƒQ[ƒ€ƒNƒŠƒA‰‰o‚ÉˆÚs
-		updateFunc_ = &GameplayingScene::GameClearDraw;
+		updateFunc_ = &GameplayingScene::GameClearUpdate;
 		fadeColor_ = 0xff0000;
+	}
+}
+
+void GameplayingScene::EnemyDeadUpdate(const InputState& input)
+{
+	timer_++;
+
+	if (timer_ % 60 == 0)
+	{
+		for (auto& enemy : pEnemy_)
+		{
+			enemy->SetEnabled(true);
+		}
+
+		pPlayer_->SetEnabled(true);
+
+		timer_ = 0;
+
+		updateFunc_ = &GameplayingScene::NormalUpdate;
 	}
 }
 
@@ -132,12 +162,12 @@ void GameplayingScene::Draw()
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
-void GameplayingScene::GameClearDraw(const InputState& input)
+void GameplayingScene::GameClearUpdate(const InputState& input)
 {
 	updateFunc_ = &GameplayingScene::GameClearFadeOutUpdate;
 }
 
-void GameplayingScene::GameOverDraw(const InputState& input)
+void GameplayingScene::GameOverUpdate(const InputState& input)
 {
 	pPlayer_->DeadUpdate();
 

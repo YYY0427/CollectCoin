@@ -36,15 +36,32 @@ private:
 	//フェードの色(デフォ黒)
 	unsigned int  fadeColor_ = 0x000000; 
 
+	// フェード設定
 	static constexpr int fade_interval = 60;
 	int fadeTimer_ = fade_interval;
 	int fadeValue_ = 255;
 
+	int timer_;
+
+	// フェイドイン
 	void FadeInUpdate(const InputState& input);
+
+	// アップデート
 	void NormalUpdate(const InputState& input);
-	void GameClearDraw(const InputState& input);
-	void GameOverDraw(const InputState& input);
+
+	// 敵が死んだときの演出
+	void EnemyDeadUpdate(const InputState& input);
+
+	// ゲームクリア演出
+	void GameClearUpdate(const InputState& input);
+
+	// ゲームオーバー演出
+	void GameOverUpdate(const InputState& input);
+
+	// ゲームクリアじのフェイドアウト
 	void GameClearFadeOutUpdate(const InputState& input);
+
+	// ゲームオーバーじのフェイドアウト
 	void GameOverFadeOutUpdate(const InputState& input);
 
 	using UpdateFunc_t = void (GameplayingScene::*) (const InputState& input);

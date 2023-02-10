@@ -49,6 +49,9 @@ public:
 	// 死亡設定
 	void SetDead(bool isDead) { isDead_ = isDead; }
 
+	// 存在設定
+	void SetEnabled(bool isEnabled) { isEnabled_ = isEnabled; }
+
 	// 死亡時のアニメーションの終了するかどうかを取得
 	bool GetAnimeEnd() const { return isAnimeEnd_; }
 
@@ -123,4 +126,6 @@ private:
 	bool isAnimeEnd_;
 
 	float speed_;
+
+	bool isEnabled_;
 };

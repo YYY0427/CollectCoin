@@ -54,7 +54,8 @@ Player::Player() :
 	wantMoveDirection_(0),
 	isPowerFeed_(false),
 	isDead_(false),
-	isAnimeEnd_(false)
+	isAnimeEnd_(false),
+	isEnabled_(true)
 {
 	// 画像のロード
 	handle_ = my::MyLoadGraph(L"Data/img/game/Pacman16.png");
@@ -203,7 +204,7 @@ void Player::Update(const InputState& input)
 void Player::Draw()
 {
 	// プレイヤーが敵と当たったか
-	if (!isDead_)
+	if (!isDead_ && isEnabled_)
 	{
 		int imgX = (imgIdX_ / ANIME_FRAME_SPEED) * 16;
 
@@ -214,7 +215,7 @@ void Player::Draw()
 						SCALE, angle_,			// 拡大率、回転角度
 						handle_, true);			// 画像のハンドル、透過するか
 	}
-	else
+	else if(isDead_ && isEnabled_)
 	{
 		// 画像のインデックスを計算
 		int imgX = (deadImgIdx_ / DEAD_ANIME_FRAME_SPEED) * 16;

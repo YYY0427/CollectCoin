@@ -38,7 +38,7 @@ namespace
 EnemyBase::EnemyBase() :
 	powerFeedTimer_(0),
 	isPowerFeed_(false),
-	isEnabled_(false),
+	isEnabled_(true),
 	isDead_(false),
 	isIzike_(false),
 	isFlash_(false)
@@ -77,7 +77,7 @@ void EnemyBase::Draw()
 	int imgX = (idX_ / ANIME_FRAME_SPEED) * WIDTH;
 
 	// 通常時の表示
-	if (!isEnabled_ && !isIzike_)
+	if (isEnabled_ && !isIzike_)
 	{
 
 		int imgY = DirectReturnNum();
@@ -89,7 +89,7 @@ void EnemyBase::Draw()
 			handle_, true);		// 画像のハンドル、透過するか
 	}
 	// プレイヤーがパワーエサを取得した時の表示
-	if (!isEnabled_ && isIzike_)
+	if (isEnabled_ && isIzike_)
 	{
 		if (!isFlash_)
 		{
