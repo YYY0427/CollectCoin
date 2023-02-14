@@ -2,16 +2,15 @@
 #include "EnemyBase.h"
 
 /// <summary>
-/// ˆêŠÑ«‚ª‚È‚¢“G
+/// æ‰ñ‚è‚·‚é“G
 /// </summary>
-class InconsistentEnemy : public EnemyBase
+class PinkyEnemy : public EnemyBase
 {
 public:
-	InconsistentEnemy(int handle, int indexX, int indexY);
+	PinkyEnemy(int handle, int indexX, int indexY);
 
 	/// <summary>
 	/// XV
 	/// </summary>
 	virtual void Update()override;
 };
-

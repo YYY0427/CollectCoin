@@ -2,7 +2,7 @@
 #include "Field.h"
 #include "../DrawFunctions.h"
 #include "../InputState.h"
-#include "ChasingEnemy.h"
+#include "BlinkyEnemy.h"
 #include "../game.h"
 #include "EnemyBase.h"
 #include <DxLib.h>
@@ -200,7 +200,7 @@ void Player::Update(const InputState& input)
 		imgIdX_ = (imgIdX_ + 1) % (ANIME_FRAME_SPEED * ANIME_FRAME_NUM);
 	}
 
-	pField_->MoveDataSet(indexY_, indexX_);
+//	pField_->MoveDataSet(indexY_, indexX_);
 }
 
 void Player::Draw()

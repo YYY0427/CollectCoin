@@ -36,6 +36,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		input.Update();
 
 		sceneManager.Update(input);
+
 		sceneManager.Draw();
 
 		ScreenFlip();

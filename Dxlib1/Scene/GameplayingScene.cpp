@@ -8,10 +8,10 @@
 #include "PauseScene.h"
 #include"../Game/Player.h"
 #include "../Game/Field.h"
-#include "../Game/ChasingEnemy.h"
-#include "../Game/CapriciousEnemy.h"
-#include "../Game/InconsistentEnemy.h"
-#include "../Game/PreemptiveEnemy.h"
+#include "../Game/BlinkyEnemy.h"
+#include "../Game/InkyEnemy.h"
+#include "../Game/CrydeEnemy.h"
+#include "../Game/PinkyEnemy.h"
 #include "../Game/EnemyBase.h"
 #include <DxLib.h>
 
@@ -22,15 +22,15 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	pField_ = std::make_shared<Field>();
 	pPlayer_ = std::make_shared<Player>();
 
-	int chasingEnemyH = my::MyLoadGraph(L"Data/img/game/blinky.png");
-	int capriciousEnemyH = my::MyLoadGraph(L"Data/img/game/inky.png");
-	int inconsistentEnemyH = my::MyLoadGraph(L"Data/img/game/cryde.png");
-	int preemptiveEnemyH = my::MyLoadGraph(L"Data/img/game/pinky.png");
+	int blinkyEnemyH = my::MyLoadGraph(L"Data/img/game/blinky.png");
+	int inkyEnemyH = my::MyLoadGraph(L"Data/img/game/inky.png");
+	int crydeEnemyH = my::MyLoadGraph(L"Data/img/game/cryde.png");
+	int pinkyEnemyH = my::MyLoadGraph(L"Data/img/game/pinky.png");
 
-	pEnemy_[0] = std::make_shared<ChasingEnemy>(chasingEnemyH, 9, 8);
-	pEnemy_[1] = std::make_shared<CapriciousEnemy>(capriciousEnemyH, 8, 10);
-	pEnemy_[2] = std::make_shared<InconsistentEnemy>(inconsistentEnemyH, 9, 10);
-	pEnemy_[3] = std::make_shared<PreemptiveEnemy>(preemptiveEnemyH, 10, 10);
+	pEnemy_[0] = std::make_shared<BlinkyEnemy>(blinkyEnemyH, 9, 8);
+	pEnemy_[1] = std::make_shared<InkyEnemy>(inkyEnemyH, 8, 10);
+	pEnemy_[2] = std::make_shared<CrydeEnemy>(crydeEnemyH, 9, 10);
+	pEnemy_[3] = std::make_shared<PinkyEnemy>(pinkyEnemyH, 10, 10);
 
 	for (auto& enemy : pEnemy_)
 	{
@@ -38,12 +38,13 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 		enemy->SetField(pField_);
 	}
 	
+	pPlayer_->SetField(pField_);
+	pField_->SetPlayer(pPlayer_);
 	for (int i = 0; i < 4; i++)
 	{
 		pPlayer_->SetEnemy(pEnemy_[i], i);
+		pField_->SetEnemy(pEnemy_[i], i);
 	}
-
-	pPlayer_->SetField(pField_);
 }
 
 

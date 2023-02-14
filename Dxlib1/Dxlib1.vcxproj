@@ -151,11 +151,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Game\CapriciousEnemy.cpp" />
-    <ClCompile Include="Game\PreemptiveEnemy.cpp" />
-    <ClCompile Include="Game\InconsistentEnemy.cpp" />
+    <ClCompile Include="Game\InkyEnemy.cpp" />
+    <ClCompile Include="Game\PinkyEnemy.cpp" />
+    <ClCompile Include="Game\CrydeEnemy.cpp" />
     <ClCompile Include="Scene\GameclearScene.cpp" />
-    <ClCompile Include="Game\ChasingEnemy.cpp" />
+    <ClCompile Include="Game\BlinkyEnemy.cpp" />
     <ClCompile Include="DrawFunctions.cpp" />
     <ClCompile Include="Game\EnemyBase.cpp" />
     <ClCompile Include="Game\Field.cpp" />
@@ -174,11 +174,11 @@
     <ClCompile Include="vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game\CapriciousEnemy.h" />
-    <ClInclude Include="Game\PreemptiveEnemy.h" />
-    <ClInclude Include="Game\InconsistentEnemy.h" />
+    <ClInclude Include="Game\InkyEnemy.h" />
+    <ClInclude Include="Game\PinkyEnemy.h" />
+    <ClInclude Include="Game\CrydeEnemy.h" />
     <ClInclude Include="Scene\GameclearScene.h" />
-    <ClInclude Include="Game\ChasingEnemy.h" />
+    <ClInclude Include="Game\BlinkyEnemy.h" />
     <ClInclude Include="DrawFunctions.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="Game\EnemyBase.h" />

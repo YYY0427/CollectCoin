@@ -1,4 +1,8 @@
 #pragma once
+#include <memory>
+
+class Player;
+class EnemyBase;
 
 class Field
 {
@@ -29,6 +33,9 @@ public:
 	void Draw();
 	void PowerFeedFlash(int y, int x);
 
+	void SetEnemy(std::shared_ptr<EnemyBase>enemy, int i) { pEnemy_[i] = enemy; }
+	void SetPlayer(std::shared_ptr<Player>player) { pPlayer_ = player; }
+
 	// パワーエサの点滅
 	void Flash();
 
@@ -51,9 +58,19 @@ public:
 	// playerまでの最短経路を探すための準備として、コピーマップの初期化と目的地(player)の場所に10(目印)を設定
 	void MoveDataSet(int playerY, int playerX);
 
-	// 現在地からプレイヤーまでの最短経路を探す関数
+	// フィールドにプレイヤーからの距離を求める関数
 	void Search(int y, int x, int pos);
+
+	// mapData2を参照してプレイヤーからの数字が小さい方向の値を返す 
+	// プレイヤーがパワーエサを取得していたら大きい方向の値を返す
+	int BlinkyMove(int enemyIndexY, int enemyIndexX);
+
+	int PinkyMove(int enemyIndexY, int enemyIndexX);
+
+	int InkyMove(int enemyIndexY, int enemyIndexX);
 private:
+	std::shared_ptr<Player> pPlayer_;
+	std::shared_ptr<EnemyBase> pEnemy_[4];
 
 	int mapData2[MAP_HEIGHT][MAP_WIDTH];
 
@@ -66,4 +83,16 @@ private:
 
 	// パワーエサのハンドル
 	int handle_;
+
+	int pinkyGoalY_;
+	int pinkyGoalX_;
+
+	int blinkyGoalY_;
+	int blinkyGoalX_;
+
+	int InkyGoalY_;
+	int InkyGoalX_;
+
+	int crydeGoalY_;
+	int crydeGoalX_;
 };

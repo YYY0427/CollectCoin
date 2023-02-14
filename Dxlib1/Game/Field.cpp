@@ -1,5 +1,7 @@
 #include "Field.h"
+#include "Player.h"
 #include "../DrawFunctions.h"
+#include "EnemyBase.h"
 #include <DxLib.h>
 
 namespace
@@ -7,6 +9,8 @@ namespace
 	//マップデータ
 	int mapData[Field::MAP_HEIGHT][Field::MAP_WIDTH] =
 	{
+		// 1 エサ、2  壁、3 パワーエサ、4 
+
 		{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
 		{ 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
 		{ 2, 1, 2, 2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 1, 2 },
@@ -40,6 +44,15 @@ Field::Field() :
 	blendLimitMax_(false),
 	isDraw_(true)
 {
+	pinkyGoalX_ = 1;
+	pinkyGoalY_ = 1;
+
+	blinkyGoalX_ = 17;
+	blinkyGoalY_ = 1;
+
+	InkyGoalX_ = 1;
+	InkyGoalY_ = 20;
+
 	handle_ = my::MyLoadGraph(L"Data/img/game/powerpacdot.png");
 }
 
@@ -73,10 +86,12 @@ void Field::Draw()
 			{
 				PowerFeedFlash(y, x);
 			}
+#ifdef _DEBUG	// デバックの版場合
 			if (mapData2[y][x] >= 0)
 			{
 				DrawFormatString(x * BLOCK_SIZE + 10 + DISPLAY_POS_X, y * BLOCK_SIZE + 10 + DISPLAY_POS_Y, 0xffffff, L"%d", mapData2[y][x], true);
-			}
+			}		
+#endif
 		}
 	}
 }
@@ -192,25 +207,202 @@ void Field::Search(int y, int x, int pos)
 {
 	pos += 1;
 
-	if (mapData2[y - 1][x] == 0 || mapData2[y - 1][x] > pos)
+	if (x > 0 && y > 0 && x < MAP_WIDTH - 1 && y < MAP_HEIGHT - 1)
 	{
-		mapData2[y - 1][x] = pos;
-		Search(y - 1, x, pos);
+		if (mapData2[y - 1][x] == 0 || mapData2[y - 1][x] > pos)
+		{
+			mapData2[y - 1][x] = pos;
+			Search(y - 1, x, pos);
+		}
+		if (mapData2[y + 1][x] == 0 || mapData2[y + 1][x] > pos)
+		{
+			mapData2[y + 1][x] = pos;
+			Search(y + 1, x, pos);
+		}
+		if (mapData2[y][x - 1] == 0 || mapData2[y][x - 1] > pos)
+		{
+			mapData2[y][x - 1] = pos;
+			Search(y, x - 1, pos);
+		}
+		if (mapData2[y][x + 1] == 0 || mapData2[y][x + 1] > pos)
+		{
+			mapData2[y][x + 1] = pos;
+			Search(y, x + 1, pos);
+		}
+
+		mapData2[pPlayer_->GetIndexY()][pPlayer_->GetIndexX()] = 0;
 	}
-	if (mapData2[y + 1][x] == 0 || mapData2[y + 1][x] > pos)
-	{
-		mapData2[y + 1][x] = pos;
-		Search(y + 1, x, pos);
-	}
-	if (mapData2[y][x - 1] == 0 || mapData2[y][x - 1] > pos)
-	{
-		mapData2[y][x - 1] = pos;
-		Search(y, x - 1, pos);
-	}
-	if (mapData2[y][x + 1] == 0 || mapData2[y][x + 1] > pos)
-	{
-		mapData2[y][x + 1] = pos;
-		Search(y, x + 1, pos);
-	}
+	
 	return;
+}
+
+
+int Field::BlinkyMove(int enemyIndexY, int enemyIndexX)
+{
+	int y = enemyIndexY;
+	int x = enemyIndexX;
+	
+	if (!pEnemy_[0]->GetTracking())
+	{
+		// 追跡モード
+		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
+	}
+	else
+	{
+		// 縄張りモード
+		MoveDataSet(blinkyGoalY_, blinkyGoalX_);
+	}
+	if (pEnemy_[0]->GetIzike())
+	{
+		if (!IsBlock(y - 1, x) && mapData2[y][x] < mapData2[y - 1][x])
+		{
+			return EnemyBase::up;
+		}
+		if (!IsBlock(y + 1, x) && mapData2[y][x] < mapData2[y + 1][x])
+		{
+			return EnemyBase::down;
+		}
+		if (!IsBlock(y, x - 1) && mapData2[y][x] < mapData2[y][x - 1])
+		{
+			return EnemyBase::left;
+		}
+		if (!IsBlock(y, x + 1) && mapData2[y][x] < mapData2[y][x + 1])
+		{
+			return EnemyBase::right;
+		}
+	}
+	else
+	{
+		if (!IsBlock(y - 1, x) && mapData2[y][x] > mapData2[y - 1][x])
+		{
+			return EnemyBase::up;
+		}
+		if (!IsBlock(y + 1, x) && mapData2[y][x] > mapData2[y + 1][x])
+		{
+			return EnemyBase::down;
+		}
+		if (!IsBlock(y, x - 1) && mapData2[y][x] > mapData2[y][x - 1])
+		{
+			return EnemyBase::left;
+		}
+		if (!IsBlock(y, x + 1) && mapData2[y][x] > mapData2[y][x + 1])
+		{
+			return EnemyBase::right;
+		}
+	}
+	return 0;
+}
+
+int Field::PinkyMove(int enemyIndexY, int enemyIndexX)
+{
+	int y = enemyIndexY;
+	int x = enemyIndexX;
+
+	if (!pEnemy_[3]->GetTracking())
+	{
+		// 追跡モード
+		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
+	}
+	else
+	{
+		// 縄張りモード
+		MoveDataSet(pinkyGoalY_, pinkyGoalX_);
+	}
+	if (pEnemy_[3]->GetIzike())
+	{
+		if (!IsBlock(y + 1, x) && mapData2[y][x] < mapData2[y + 1][x])
+		{
+			return EnemyBase::down;
+		}
+		if (!IsBlock(y - 1, x) && mapData2[y][x] < mapData2[y - 1][x])
+		{
+			return EnemyBase::up;
+		}
+		if (!IsBlock(y, x + 1) && mapData2[y][x] < mapData2[y][x + 1])
+		{
+			return EnemyBase::right;
+		}
+		if (!IsBlock(y, x - 1) && mapData2[y][x] < mapData2[y][x - 1])
+		{
+			return EnemyBase::left;
+		}
+	}
+	else
+	{
+		if (!IsBlock(y + 1, x) && mapData2[y][x] > mapData2[y + 1][x])
+		{
+			return EnemyBase::down;
+		}
+		if (!IsBlock(y - 1, x) && mapData2[y][x] > mapData2[y - 1][x])
+		{
+			return EnemyBase::up;
+		}
+		if (!IsBlock(y, x + 1) && mapData2[y][x] > mapData2[y][x + 1])
+		{
+			return EnemyBase::right;
+		}
+		if (!IsBlock(y, x - 1) && mapData2[y][x] > mapData2[y][x - 1])
+		{
+			return EnemyBase::left;
+		}
+	}
+	return 0;
+}
+
+int Field::InkyMove(int enemyIndexY, int enemyIndexX)
+{
+	int y = enemyIndexY;
+	int x = enemyIndexX;
+
+	if (!pEnemy_[1]->GetTracking())
+	{
+		// 追跡モード
+		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
+	}
+	else
+	{
+		// 縄張りモード
+		MoveDataSet(InkyGoalY_, InkyGoalX_);
+	}
+	
+	if (pEnemy_[1]->GetIzike())
+	{
+		if (!IsBlock(y - 1, x) && mapData2[y][x] < mapData2[y - 1][x])
+		{
+			return EnemyBase::up;
+		}
+		if (!IsBlock(y + 1, x) && mapData2[y][x] < mapData2[y + 1][x])
+		{
+			return EnemyBase::down;
+		}
+		if (!IsBlock(y, x - 1) && mapData2[y][x] < mapData2[y][x - 1])
+		{
+			return EnemyBase::left;
+		}
+		if (!IsBlock(y, x + 1) && mapData2[y][x] < mapData2[y][x + 1])
+		{
+			return EnemyBase::right;
+		}
+	}
+	else
+	{
+		if (!IsBlock(y - 1, x) && mapData2[y][x] > mapData2[y - 1][x])
+		{
+			return EnemyBase::up;
+		}
+		if (!IsBlock(y + 1, x) && mapData2[y][x] > mapData2[y + 1][x])
+		{
+			return EnemyBase::down;
+		}
+		if (!IsBlock(y, x - 1) && mapData2[y][x] > mapData2[y][x - 1])
+		{
+			return EnemyBase::left;
+		}
+		if (!IsBlock(y, x + 1) && mapData2[y][x] > mapData2[y][x + 1])
+		{
+			return EnemyBase::right;
+		}
+	}
+
+	return 0;
 }

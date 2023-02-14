@@ -49,6 +49,9 @@ public:
 	Vec2 GetPos() const { return pos_; }
 
 	bool GetIzike()const { return isIzike_; }
+	bool GetTracking()const { return isTracking_; }
+	int  GetIndexY()const { return indexY_; }
+	int  GetIndexX()const { return indexX_; }
 
 	// 敵の表示を消すか消さないかをセット
 	void SetEnabled(bool isEnabled) { isEnabled_ = isEnabled; }
@@ -60,12 +63,21 @@ public:
 	void SetIzike(bool isIzike) { isIzike_ = isIzike; }
 
 	void SetFlash(bool isFlash) { isFlash_ = isFlash; }
-
+	
 	/// <summary>
 	/// 向いている方向によって値を返す
 	/// </summary>
 	/// <returns>画像のy座標</returns>
 	virtual int DirectReturnNum();
+
+	enum 
+	{
+		up = 1,
+		down,
+		left,
+		right,
+		direct_num
+	};
 protected:
 	std::shared_ptr<Field> pField_ = nullptr;
 	std::shared_ptr<Player> pPlayer_ = nullptr;
@@ -75,15 +87,6 @@ protected:
 
 	// 座標
 	Vec2 pos_;
-
-	enum DIRECT
-	{
-		up = 1,
-		down,
-		left,
-		right,
-		direct_num
-	};
 
 	// 画像のハンドル
 	int handle_;
@@ -136,4 +139,9 @@ protected:
 
 	// フラッシュさせるか
 	bool isFlash_;
+
+	// 追跡モードかどうか
+	bool isTracking_;
+
+	int trackingTimer_;
 };

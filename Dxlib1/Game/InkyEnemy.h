@@ -2,16 +2,17 @@
 #include "EnemyBase.h"
 
 /// <summary>
-/// æ‰ñ‚è‚·‚é“G
+/// ‹C‚Ü‚®‚ê‚È“G
 /// </summary>
-class PreemptiveEnemy : public EnemyBase
+class InkyEnemy : public EnemyBase
 {
 public:
-	PreemptiveEnemy(int handle, int indexX, int indexY);
+	InkyEnemy(int handle, int indexX, int indexY);
 
 	/// <summary>
 	/// XV
 	/// </summary>
 	virtual void Update()override;
-};
 
+private:
+};

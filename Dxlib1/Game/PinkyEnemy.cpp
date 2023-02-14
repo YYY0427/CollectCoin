@@ -1,4 +1,4 @@
-#include "ChasingEnemy.h"
+#include "PinkyEnemy.h"
 #include "../DrawFunctions.h"
 #include "Player.h"
 #include "Field.h"
@@ -36,14 +36,15 @@ namespace
 	constexpr int IZIKE_ANIME_FRAME_NUM = 2;
 }
 
-ChasingEnemy::ChasingEnemy(int handle, int indexX, int indexY)
+PinkyEnemy::PinkyEnemy(int handle, int indexX, int indexY)
 {
 	handle_ = handle;
 	indexX_ = indexX;
 	indexY_ = indexY;
+	isTracking_ = false;
 }
 
-void ChasingEnemy::Update()
+void PinkyEnemy::Update()
 {
 	// 死んだ場合初期化
 	if (isDead_)
@@ -54,6 +55,30 @@ void ChasingEnemy::Update()
 		if (indexX_ == 10 && indexY_ == 10)
 		{
 			isIzike_ = false;
+		}
+	}
+
+	// 追跡モードと縄張りモードの切り替え
+	if (!isTracking_)
+	{
+		trackingTimer_++;
+		if (trackingTimer_ % (60 * 20) == 0)
+		{
+			trackingTimer_ = 0;
+
+			// 追跡モードに切り替え
+			isTracking_ = true;
+		}
+	}
+	else
+	{
+		trackingTimer_++;
+		if (trackingTimer_ % (60 * 30) == 0)
+		{
+			trackingTimer_ = 0;
+
+			// 縄張りモードに切り替え
+			isTracking_ = false;
 		}
 	}
 
@@ -91,8 +116,7 @@ void ChasingEnemy::Update()
 			};
 		}
 
-		moveDirection_ = NoBlockDirect(indexX_, indexY_);
-
+		moveDirection_ = pField_->PinkyMove(indexY_, indexX_);
 		moveTimer_ = 0;
 	}
 

@@ -41,7 +41,8 @@ EnemyBase::EnemyBase() :
 	isEnabled_(true),
 	isDead_(false),
 	isIzike_(false),
-isFlash_(false)
+	isFlash_(false),
+	isTracking_(false)
 {
 	// 画像のロード
 //	handle_ = my::MyLoadGraph(L"Data/img/game/blinky.png");
@@ -130,13 +131,14 @@ bool EnemyBase::Colision(int direction)
 	return false;
 }
 
-int EnemyBase::NoBlockDirect(int indexX, int indexY)
+int EnemyBase::NoBlockDirect(int indexY, int indexX)
 {
 	bool isMove = false;
 	int vecDirect = 0;
 	while (!isMove)
 	{
 		vecDirect = GetRand(4) + 1;
+	//	vecDirect = pField_->GetDirect(indexY, indexX);
 
 		switch (vecDirect)
 		{
@@ -165,8 +167,8 @@ int EnemyBase::NoBlockDirect(int indexX, int indexY)
 
 void EnemyBase::SpeedCalculation()
 {
-	// プレイヤーがパワーエサを取得していた場合
-	if (pPlayer_->GetPowerFeed())
+	// イジケ状態場合遅くなる
+	if(isIzike_)
 	{
 		speed_ = GET_FEED_SPEED;
 	}

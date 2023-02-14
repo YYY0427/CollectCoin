@@ -2,18 +2,16 @@
 #include "EnemyBase.h"
 
 /// <summary>
-/// ‹C‚Ü‚®‚ê‚È“G
+/// ˆêŠÑ«‚ª‚È‚¢“G
 /// </summary>
-class CapriciousEnemy : public EnemyBase
+class CrydeEnemy : public EnemyBase
 {
 public:
-	CapriciousEnemy(int handle, int indexX, int indexY);
+	CrydeEnemy(int handle, int indexX, int indexY);
 
 	/// <summary>
 	/// XV
 	/// </summary>
 	virtual void Update()override;
-
-private:
 };
 

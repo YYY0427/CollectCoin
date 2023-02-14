@@ -24,11 +24,11 @@ public:
 	// 処理
 	void Update(const InputState& input);
 
+	// 敵が死んだ場合の処理 
+	void DeadUpdate();
+
 	// 描画
 	void Draw();
-
-	// 
-	void DeadUpdate();
 
 	// 当たり判定
 	bool Colision(int direction);
@@ -42,6 +42,10 @@ public:
 	// プレイヤーの座標の取得
 	Vec2 GetSize() const { return deathImgSize_; }
 	Vec2 GetPos() const { return pos_; }
+
+	int GetIndexX() const { return indexX_; }
+
+	int GetIndexY() const { return indexY_; }
 
 	// パワーエサを取得したかどうか
 	bool GetPowerFeed() const { return isPowerFeed_; }

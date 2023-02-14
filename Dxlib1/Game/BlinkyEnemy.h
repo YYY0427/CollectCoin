@@ -9,10 +9,10 @@ class Player;
 /// <summary>
 /// 粘着タイプ敵
 /// </summary>
-class ChasingEnemy : public EnemyBase
+class BlinkyEnemy : public EnemyBase
 {
 public:
-	ChasingEnemy(int handle, int indexX, int indexY);
+	BlinkyEnemy(int handle, int indexX, int indexY);
 
 	/// <summary>
 	/// 更新
