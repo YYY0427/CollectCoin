@@ -53,6 +53,9 @@ Field::Field() :
 	InkyGoalX_ = 1;
 	InkyGoalY_ = 20;
 
+	crydeGoalY_ = 20;
+	crydeGoalX_ = 17;
+
 	handle_ = my::MyLoadGraph(L"Data/img/game/powerpacdot.png");
 }
 
@@ -89,7 +92,7 @@ void Field::Draw()
 #ifdef _DEBUG	// デバックの版場合
 			if (mapData2[y][x] >= 0)
 			{
-				DrawFormatString(x * BLOCK_SIZE + 10 + DISPLAY_POS_X, y * BLOCK_SIZE + 10 + DISPLAY_POS_Y, 0xffffff, L"%d", mapData2[y][x], true);
+		//		DrawFormatString(x * BLOCK_SIZE + 10 + DISPLAY_POS_X, y * BLOCK_SIZE + 10 + DISPLAY_POS_Y, 0xffffff, L"%d", mapData2[y][x], true);
 			}		
 #endif
 		}
@@ -242,7 +245,7 @@ int Field::BlinkyMove(int enemyIndexY, int enemyIndexX)
 	int y = enemyIndexY;
 	int x = enemyIndexX;
 	
-	if (!pEnemy_[0]->GetTracking())
+	if (pEnemy_[0]->GetTracking())
 	{
 		// 追跡モード
 		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
@@ -298,7 +301,7 @@ int Field::PinkyMove(int enemyIndexY, int enemyIndexX)
 	int y = enemyIndexY;
 	int x = enemyIndexX;
 
-	if (!pEnemy_[3]->GetTracking())
+	if (pEnemy_[3]->GetTracking())
 	{
 		// 追跡モード
 		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
@@ -354,7 +357,7 @@ int Field::InkyMove(int enemyIndexY, int enemyIndexX)
 	int y = enemyIndexY;
 	int x = enemyIndexX;
 
-	if (!pEnemy_[1]->GetTracking())
+	if (pEnemy_[1]->GetTracking())
 	{
 		// 追跡モード
 		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
@@ -404,5 +407,61 @@ int Field::InkyMove(int enemyIndexY, int enemyIndexX)
 		}
 	}
 
+	return 0;
+}
+
+int Field::CrydeMove(int enemyIndexY, int enemyIndexX)
+{
+	int y = enemyIndexY;
+	int x = enemyIndexX;
+
+	if (pEnemy_[2]->GetTracking())
+	{
+		// 追跡モード
+		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
+	}
+	else
+	{
+		// 縄張りモード
+		MoveDataSet(crydeGoalY_, crydeGoalX_);
+	}
+	if (pEnemy_[2]->GetIzike())
+	{
+		if (!IsBlock(y - 1, x) && mapData2[y][x] < mapData2[y - 1][x])
+		{
+			return EnemyBase::up;
+		}
+		if (!IsBlock(y + 1, x) && mapData2[y][x] < mapData2[y + 1][x])
+		{
+			return EnemyBase::down;
+		}
+		if (!IsBlock(y, x - 1) && mapData2[y][x] < mapData2[y][x - 1])
+		{
+			return EnemyBase::left;
+		}
+		if (!IsBlock(y, x + 1) && mapData2[y][x] < mapData2[y][x + 1])
+		{
+			return EnemyBase::right;
+		}
+	}
+	else
+	{
+		if (!IsBlock(y - 1, x) && mapData2[y][x] > mapData2[y - 1][x])
+		{
+			return EnemyBase::up;
+		}
+		if (!IsBlock(y + 1, x) && mapData2[y][x] > mapData2[y + 1][x])
+		{
+			return EnemyBase::down;
+		}
+		if (!IsBlock(y, x - 1) && mapData2[y][x] > mapData2[y][x - 1])
+		{
+			return EnemyBase::left;
+		}
+		if (!IsBlock(y, x + 1) && mapData2[y][x] > mapData2[y][x + 1])
+		{
+			return EnemyBase::right;
+		}
+	}
 	return 0;
 }

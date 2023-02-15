@@ -68,6 +68,8 @@ public:
 	int PinkyMove(int enemyIndexY, int enemyIndexX);
 
 	int InkyMove(int enemyIndexY, int enemyIndexX);
+
+	int CrydeMove(int enemyIndexY, int enemyIndexX);
 private:
 	std::shared_ptr<Player> pPlayer_;
 	std::shared_ptr<EnemyBase> pEnemy_[4];

@@ -216,6 +216,33 @@ void EnemyBase::SetInit()
 	isDead_ = false;
 }
 
+void EnemyBase::ModeSwitch()
+{
+	// 追跡モードと縄張りモードの切り替え
+	if (!isTracking_)	// 縄張りモード
+	{
+		trackingTimer_++;
+		if (trackingTimer_ % TERRITORY_MODE_TIME == 0)
+		{
+			trackingTimer_ = 0;
+
+			// 追跡モードに切り替え
+			isTracking_ = true;
+		}
+	}
+	else				// 追跡モード
+	{
+		trackingTimer_++;
+		if (trackingTimer_ % TARGET_MODE_TIME == 0)
+		{
+			trackingTimer_ = 0;
+
+			// 縄張りモードに切り替え
+			isTracking_ = false;
+		}
+	}
+}
+
 int EnemyBase::DirectReturnNum()
 {
 	int imgY = 0;

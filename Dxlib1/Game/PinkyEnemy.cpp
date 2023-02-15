@@ -58,29 +58,8 @@ void PinkyEnemy::Update()
 		}
 	}
 
-	// 追跡モードと縄張りモードの切り替え
-	if (!isTracking_)
-	{
-		trackingTimer_++;
-		if (trackingTimer_ % (60 * 20) == 0)
-		{
-			trackingTimer_ = 0;
-
-			// 追跡モードに切り替え
-			isTracking_ = true;
-		}
-	}
-	else
-	{
-		trackingTimer_++;
-		if (trackingTimer_ % (60 * 30) == 0)
-		{
-			trackingTimer_ = 0;
-
-			// 縄張りモードに切り替え
-			isTracking_ = false;
-		}
-	}
+	// 縄張りモードと追跡モードの切り替え
+	ModeSwitch();
 
 	// 移動のインターバルのカウント
 	moveTimer_++;

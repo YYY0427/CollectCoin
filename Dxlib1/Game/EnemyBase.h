@@ -13,6 +13,11 @@ class Field;
 class EnemyBase
 {
 public:
+	// 追跡モードの時間
+	static constexpr int TARGET_MODE_TIME = 60 * 30;
+	// 縄張りモードの時間
+	static constexpr int TERRITORY_MODE_TIME = 60 * 15;
+
 	EnemyBase();
 
 	// ポインタの設定
@@ -63,6 +68,9 @@ public:
 	void SetIzike(bool isIzike) { isIzike_ = isIzike; }
 
 	void SetFlash(bool isFlash) { isFlash_ = isFlash; }
+
+	// 縄張りモードと追跡モードの切り替え
+	void ModeSwitch();
 	
 	/// <summary>
 	/// 向いている方向によって値を返す
@@ -78,6 +86,7 @@ public:
 		right,
 		direct_num
 	};
+
 protected:
 	std::shared_ptr<Field> pField_ = nullptr;
 	std::shared_ptr<Player> pPlayer_ = nullptr;
