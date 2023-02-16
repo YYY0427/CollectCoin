@@ -13,4 +13,6 @@ public:
 	/// XV
 	/// </summary>
 	virtual void Update()override;
+
+	virtual void MoveSwitch();
 };

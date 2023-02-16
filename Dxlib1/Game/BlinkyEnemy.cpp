@@ -18,10 +18,10 @@ namespace
 	// 画像の拡大率
 	constexpr float SCALE = 2.0f;
 
-	// 通常のプレイヤーの移動スピード
+	// 通常の移動スピード
 	constexpr float NORMAL_SPEED = 1.5f;
 
-	// パワーエサを取得した場合の移動スピード(何倍か)
+	// プレイヤーがパワーエサを取得した場合の移動スピード(何倍か)
 	constexpr float GET_FEED_SPEED = 1.0f;
 
 	// パワーエサを取得した場合持続時間(何秒か)
@@ -41,6 +41,8 @@ BlinkyEnemy::BlinkyEnemy(int handle, int indexX, int indexY)
 	handle_ = handle;
 	indexX_ = indexX;
 	indexY_ = indexY;
+
+	isMove_ = true;
 }
 
 void BlinkyEnemy::Update()
@@ -56,7 +58,7 @@ void BlinkyEnemy::Update()
 			isIzike_ = false;
 		}
 	}
-	
+
 	// 縄張りモードと追跡モードの切り替え
 	ModeSwitch();
 

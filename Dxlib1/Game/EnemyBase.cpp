@@ -23,6 +23,9 @@ namespace
 	// パワーエサを取得した場合の移動スピード(何倍か)
 	constexpr float GET_FEED_SPEED = 1.0f;
 
+	// 特定の場所での移動スピード
+	constexpr float SLOW_POSITION_SPEED = 0.5f;
+
 	// パワーエサを取得した場合持続時間(何秒か)
 	constexpr int FEED_DURATION = 10;
 
@@ -39,10 +42,24 @@ namespace
 
 	// 縄張りモードの時間
 	constexpr int TERRITORY_MODE_TIME = 60 * 15;
+
+	// 敵がリスポーン地点から出てくるインターバル
+	constexpr int INTERVAL = 60 * 5;
 }
 
 EnemyBase::EnemyBase() :
+	handle_(-1),
+	kX_(0),
+	kY_(0),
+	moveTimer_(0),
+	moveTimer2_(0),
+	trackingTimer_(0),
 	powerFeedTimer_(0),
+	moveDirection_(0),
+	wantMoveDirection_(0),
+	idX_(0),
+	idY_(0),
+	isMove_(false),
 	isPowerFeed_(false),
 	isEnabled_(true),
 	isDead_(false),
@@ -51,24 +68,14 @@ EnemyBase::EnemyBase() :
 	isTracking_(false)
 {
 	// 画像のロード
-//	handle_ = my::MyLoadGraph(L"Data/img/game/blinky.png");
 	izikeHandle_ = my::MyLoadGraph(L"Data/img/game/izike.png");
 
 	// 画像のサイズの取得
 	GetGraphSizeF(handle_, &size_.x, &size_.y);
 
-	kX_ = 0;
-	kY_ = 0;
-
-	moveTimer_ = 0;
-	moveDirection_ = 0;
-	wantMoveDirection_ = 0;
-
 	moveInterval_ = Field::BLOCK_SIZE;
 
 	speed_ = NORMAL_SPEED;
-
-	idX_ = 0;
 
 	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_X);
 	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_Y);
@@ -85,10 +92,10 @@ void EnemyBase::Draw()
 		int imgY = DirectReturnNum();
 
 		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
-			imgX, imgY,			// 切り取り左上
-			WIDTH, HEIGHT,		// 幅、高さ
-			SCALE, 0,				// 拡大率、回転角度
-			handle_, true);		// 画像のハンドル、透過するか
+			imgX, imgY,							// 切り取り左上
+			WIDTH, HEIGHT,						// 幅、高さ
+			SCALE, 0,							// 拡大率、回転角度
+			handle_, true);						// 画像のハンドル、透過するか
 	}
 	// プレイヤーがパワーエサを取得した時の表示
 	if (isEnabled_ && isIzike_)
@@ -172,6 +179,12 @@ void EnemyBase::SpeedCalculation()
 	{
 		speed_ = GET_FEED_SPEED;
 	}
+	// 特定の場所にいる場合足を遅くする
+	else if (pField_->SlowPosition(indexY_, indexX_))
+	{
+		speed_ = SLOW_POSITION_SPEED;
+	}
+	// 何もない場合普通のスピード
 	else
 	{
 		speed_ = NORMAL_SPEED;
@@ -219,7 +232,7 @@ void EnemyBase::SetInit()
 void EnemyBase::ModeSwitch()
 {
 	// 追跡モードと縄張りモードの切り替え
-	if (!isTracking_)	// 縄張りモード
+	if (!isTracking_ && isMove_)	// 縄張りモード
 	{
 		trackingTimer_++;
 		if (trackingTimer_ % TERRITORY_MODE_TIME == 0)
@@ -230,7 +243,7 @@ void EnemyBase::ModeSwitch()
 			isTracking_ = true;
 		}
 	}
-	else				// 追跡モード
+	else if(isTracking_ && isMove_)				// 追跡モード
 	{
 		trackingTimer_++;
 		if (trackingTimer_ % TARGET_MODE_TIME == 0)

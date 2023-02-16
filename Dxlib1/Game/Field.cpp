@@ -247,6 +247,26 @@ void Field::Search(int y, int x, int goalY, int goalX, int pos)
 	return;
 }
 
+bool Field::SlowPosition(int y, int x)
+{
+	if (y == 9 && x == 9)
+	{
+		return true;
+	}
+	if (y == 10 && x > 0 && x < 4)
+	{
+		return true;
+	}
+	if (y == 10 && x < 21 && x > 18)
+	{
+		return true;
+	}
+	if (y == 10 && x >= 8 && x <= 10)
+	{
+		return true;
+	}
+	return false;
+}
 
 int Field::BlinkyMove(int enemyIndexY, int enemyIndexX)
 {
@@ -258,12 +278,12 @@ int Field::BlinkyMove(int enemyIndexY, int enemyIndexX)
 		// 追跡モード
 		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
 	}
-	else if(!pEnemy_[0]->GetTracking())
+	else if (!pEnemy_[0]->GetTracking())
 	{
 		// 縄張りモード
 		MoveDataSet(blinkyGoalY_, blinkyGoalX_);
 
-		if (pEnemy_[0]->GetIndexY() == blinkyGoalY_ && pEnemy_[0]->GetIndexX() == blinkyGoalX_ )
+		if (pEnemy_[0]->GetIndexY() == blinkyGoalY_ && pEnemy_[0]->GetIndexX() == blinkyGoalX_)
 		{
 			if (blinkyGoalX_ == 17 && blinkyGoalY_ == 1)
 			{
@@ -334,77 +354,79 @@ int Field::PinkyMove(int enemyIndexY, int enemyIndexX)
 	int y = enemyIndexY;
 	int x = enemyIndexX;
 
-	if (pEnemy_[3]->GetTracking() || pEnemy_[3]->GetIzike())
+	if (pEnemy_[3]->GetMove())
 	{
-		// 追跡モード
-		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
-	}
-	else if (!pEnemy_[3]->GetTracking())
-	{
-		// 縄張りモード
-		MoveDataSet(pinkyGoalY_, pinkyGoalX_);
+		if (pEnemy_[3]->GetTracking() || pEnemy_[3]->GetIzike())
+		{
+			// 追跡モード
+			MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
+		}
+		else if (!pEnemy_[3]->GetTracking())
+		{
+			// 縄張りモード
+			MoveDataSet(pinkyGoalY_, pinkyGoalX_);
 
-		if (pEnemy_[3]->GetIndexY() == pinkyGoalY_ && pEnemy_[3]->GetIndexX() == pinkyGoalX_)
-		{
-			if (pinkyGoalX_ == 1 && pinkyGoalY_ == 1)
+			if (pEnemy_[3]->GetIndexY() == pinkyGoalY_ && pEnemy_[3]->GetIndexX() == pinkyGoalX_)
 			{
-				pinkyGoalX_ = 1;
-				pinkyGoalY_ = 4;
+				if (pinkyGoalX_ == 1 && pinkyGoalY_ == 1)
+				{
+					pinkyGoalX_ = 1;
+					pinkyGoalY_ = 4;
+				}
+				else if (pinkyGoalX_ == 1 && pinkyGoalY_ == 4)
+				{
+					pinkyGoalX_ = 8;
+					pinkyGoalY_ = 4;
+				}
+				else if (pinkyGoalX_ == 8 && pinkyGoalY_ == 4)
+				{
+					pinkyGoalX_ = 8;
+					pinkyGoalY_ = 1;
+				}
+				else if (pinkyGoalX_ == 8 && pinkyGoalY_ == 1)
+				{
+					pinkyGoalX_ = 1;
+					pinkyGoalY_ = 1;
+				}
 			}
-			else if (pinkyGoalX_ == 1 && pinkyGoalY_ == 4)
+		}
+		if (pEnemy_[3]->GetIzike())
+		{
+			if (!IsBlock(y + 1, x) && mapData2[y][x] < mapData2[y + 1][x])
 			{
-				pinkyGoalX_ = 8;
-				pinkyGoalY_ = 4;
-
+				return EnemyBase::down;
 			}
-			else if (pinkyGoalX_ == 8 && pinkyGoalY_ == 4)
+			if (!IsBlock(y - 1, x) && mapData2[y][x] < mapData2[y - 1][x])
 			{
-				pinkyGoalX_ = 8;
-				pinkyGoalY_ = 1;
+				return EnemyBase::up;
 			}
-			else if (pinkyGoalX_ == 8 && pinkyGoalY_ == 1)
+			if (!IsBlock(y, x + 1) && mapData2[y][x] < mapData2[y][x + 1])
 			{
-				pinkyGoalX_ = 1;
-				pinkyGoalY_ = 1;
+				return EnemyBase::right;
+			}
+			if (!IsBlock(y, x - 1) && mapData2[y][x] < mapData2[y][x - 1])
+			{
+				return EnemyBase::left;
 			}
 		}
-	}
-	if (pEnemy_[3]->GetIzike())
-	{
-		if (!IsBlock(y + 1, x) && mapData2[y][x] < mapData2[y + 1][x])
+		else
 		{
-			return EnemyBase::down;
-		}
-		if (!IsBlock(y - 1, x) && mapData2[y][x] < mapData2[y - 1][x])
-		{
-			return EnemyBase::up;
-		}
-		if (!IsBlock(y, x + 1) && mapData2[y][x] < mapData2[y][x + 1])
-		{
-			return EnemyBase::right;
-		}
-		if (!IsBlock(y, x - 1) && mapData2[y][x] < mapData2[y][x - 1])
-		{
-			return EnemyBase::left;
-		}
-	}
-	else
-	{
-		if (!IsBlock(y + 1, x) && mapData2[y][x] > mapData2[y + 1][x])
-		{
-			return EnemyBase::down;
-		}
-		if (!IsBlock(y - 1, x) && mapData2[y][x] > mapData2[y - 1][x])
-		{
-			return EnemyBase::up;
-		}
-		if (!IsBlock(y, x + 1) && mapData2[y][x] > mapData2[y][x + 1])
-		{
-			return EnemyBase::right;
-		}
-		if (!IsBlock(y, x - 1) && mapData2[y][x] > mapData2[y][x - 1])
-		{
-			return EnemyBase::left;
+			if (!IsBlock(y + 1, x) && mapData2[y][x] > mapData2[y + 1][x])
+			{
+				return EnemyBase::down;
+			}
+			if (!IsBlock(y - 1, x) && mapData2[y][x] > mapData2[y - 1][x])
+			{
+				return EnemyBase::up;
+			}
+			if (!IsBlock(y, x + 1) && mapData2[y][x] > mapData2[y][x + 1])
+			{
+				return EnemyBase::right;
+			}
+			if (!IsBlock(y, x - 1) && mapData2[y][x] > mapData2[y][x - 1])
+			{
+				return EnemyBase::left;
+			}
 		}
 	}
 	return 0;
@@ -415,101 +437,103 @@ int Field::InkyMove(int enemyIndexY, int enemyIndexX)
 	int y = enemyIndexY;
 	int x = enemyIndexX;
 
-	if (pEnemy_[1]->GetTracking() || pEnemy_[1]->GetIzike())
+	if (pEnemy_[1]->GetMove())
 	{
-		// 追跡モード
-		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
-	}
-	else if (!pEnemy_[1]->GetTracking())
-	{
-		// 縄張りモード
-		MoveDataSet(inkyGoalY_, InkyGoalX_);
+		if (pEnemy_[1]->GetTracking() || pEnemy_[1]->GetIzike())
+		{
+			// 追跡モード
+			MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
+		}
+		else if (!pEnemy_[1]->GetTracking())
+		{
+			// 縄張りモード
+			MoveDataSet(inkyGoalY_, InkyGoalX_);
 
-		if (pEnemy_[1]->GetIndexY() == inkyGoalY_ && pEnemy_[1]->GetIndexX() == InkyGoalX_)
-		{
-			if (InkyGoalX_ == 1 && inkyGoalY_ == 20)
+			if (pEnemy_[1]->GetIndexY() == inkyGoalY_ && pEnemy_[1]->GetIndexX() == InkyGoalX_)
 			{
-				InkyGoalX_ = 8;
-				inkyGoalY_ = 20;
-			}
-			else if (InkyGoalX_ == 8 && inkyGoalY_ == 20)
-			{
-				InkyGoalX_ = 8;
-				inkyGoalY_ = 18;
+				if (InkyGoalX_ == 1 && inkyGoalY_ == 20)
+				{
+					InkyGoalX_ = 8;
+					inkyGoalY_ = 20;
+				}
+				else if (InkyGoalX_ == 8 && inkyGoalY_ == 20)
+				{
+					InkyGoalX_ = 8;
+					inkyGoalY_ = 18;
 
+				}
+				else if (InkyGoalX_ == 8 && inkyGoalY_ == 18)
+				{
+					InkyGoalX_ = 6;
+					inkyGoalY_ = 18;
+				}
+				else if (InkyGoalX_ == 6 && inkyGoalY_ == 18)
+				{
+					InkyGoalX_ = 6;
+					inkyGoalY_ = 16;
+				}
+				else if (InkyGoalX_ == 6 && inkyGoalY_ == 16)
+				{
+					InkyGoalX_ = 4;
+					inkyGoalY_ = 16;
+				}
+				else if (InkyGoalX_ == 4 && inkyGoalY_ == 16)
+				{
+					InkyGoalX_ = 4;
+					inkyGoalY_ = 18;
+				}
+				else if (InkyGoalX_ == 4 && inkyGoalY_ == 18)
+				{
+					InkyGoalX_ = 1;
+					inkyGoalY_ = 18;
+				}
+				else if (InkyGoalX_ == 1 && inkyGoalY_ == 18)
+				{
+					InkyGoalX_ = 1;
+					inkyGoalY_ = 20;
+				}
 			}
-			else if (InkyGoalX_ == 8 && inkyGoalY_ == 18)
-			{
-				InkyGoalX_ = 6;
-				inkyGoalY_ = 18;
-			}
-			else if (InkyGoalX_ == 6 && inkyGoalY_ == 18)
-			{
-				InkyGoalX_ = 6;
-				inkyGoalY_ = 16;
-			}
-			else if (InkyGoalX_ == 6 && inkyGoalY_ == 16)
-			{
-				InkyGoalX_ = 4;
-				inkyGoalY_ = 16;
-			}
-			else if (InkyGoalX_ == 4 && inkyGoalY_ == 16)
-			{
-				InkyGoalX_ = 4;
-				inkyGoalY_ = 18;
-			}
-			else if (InkyGoalX_ == 4 && inkyGoalY_ == 18)
-			{
-				InkyGoalX_ = 1;
-				inkyGoalY_ = 18;
-			}
-			else if (InkyGoalX_ == 1 && inkyGoalY_ == 18)
-			{
-				InkyGoalX_ = 1;
-				inkyGoalY_ = 20;
-			}
 		}
-	}
-	
-	if (pEnemy_[1]->GetIzike())
-	{
-		if (!IsBlock(y - 1, x) && mapData2[y][x] < mapData2[y - 1][x])
-		{
-			return EnemyBase::up;
-		}
-		if (!IsBlock(y + 1, x) && mapData2[y][x] < mapData2[y + 1][x])
-		{
-			return EnemyBase::down;
-		}
-		if (!IsBlock(y, x - 1) && mapData2[y][x] < mapData2[y][x - 1])
-		{
-			return EnemyBase::left;
-		}
-		if (!IsBlock(y, x + 1) && mapData2[y][x] < mapData2[y][x + 1])
-		{
-			return EnemyBase::right;
-		}
-	}
-	else
-	{
-		if (!IsBlock(y - 1, x) && mapData2[y][x] > mapData2[y - 1][x])
-		{
-			return EnemyBase::up;
-		}
-		if (!IsBlock(y + 1, x) && mapData2[y][x] > mapData2[y + 1][x])
-		{
-			return EnemyBase::down;
-		}
-		if (!IsBlock(y, x - 1) && mapData2[y][x] > mapData2[y][x - 1])
-		{
-			return EnemyBase::left;
-		}
-		if (!IsBlock(y, x + 1) && mapData2[y][x] > mapData2[y][x + 1])
-		{
-			return EnemyBase::right;
-		}
-	}
 
+		if (pEnemy_[1]->GetIzike())
+		{
+			if (!IsBlock(y - 1, x) && mapData2[y][x] < mapData2[y - 1][x])
+			{
+				return EnemyBase::up;
+			}
+			if (!IsBlock(y + 1, x) && mapData2[y][x] < mapData2[y + 1][x])
+			{
+				return EnemyBase::down;
+			}
+			if (!IsBlock(y, x - 1) && mapData2[y][x] < mapData2[y][x - 1])
+			{
+				return EnemyBase::left;
+			}
+			if (!IsBlock(y, x + 1) && mapData2[y][x] < mapData2[y][x + 1])
+			{
+				return EnemyBase::right;
+			}
+		}
+		else
+		{
+			if (!IsBlock(y - 1, x) && mapData2[y][x] > mapData2[y - 1][x])
+			{
+				return EnemyBase::up;
+			}
+			if (!IsBlock(y + 1, x) && mapData2[y][x] > mapData2[y + 1][x])
+			{
+				return EnemyBase::down;
+			}
+			if (!IsBlock(y, x - 1) && mapData2[y][x] > mapData2[y][x - 1])
+			{
+				return EnemyBase::left;
+			}
+			if (!IsBlock(y, x + 1) && mapData2[y][x] > mapData2[y][x + 1])
+			{
+				return EnemyBase::right;
+			}
+		}
+	}
 	return 0;
 }
 
@@ -518,88 +542,91 @@ int Field::CrydeMove(int enemyIndexY, int enemyIndexX)
 	int y = enemyIndexY;
 	int x = enemyIndexX;
 
-	if (pEnemy_[2]->GetTracking() || pEnemy_[2]->GetIzike())
+	if (pEnemy_[2]->GetMove())
 	{
-		// 追跡モード
-		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
-	}
-	else if (!pEnemy_[2]->GetTracking())
-	{
-		// 縄張りモード
-		MoveDataSet(crydeGoalY_, crydeGoalX_);
+		if (pEnemy_[2]->GetTracking() || pEnemy_[2]->GetIzike())
+		{
+			// 追跡モード
+			MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
+		}
+		else if (!pEnemy_[2]->GetTracking())
+		{
+			// 縄張りモード
+			MoveDataSet(crydeGoalY_, crydeGoalX_);
 
-		if (pEnemy_[2]->GetIndexY() == crydeGoalY_ && pEnemy_[2]->GetIndexX() == crydeGoalX_)
-		{
-			if (crydeGoalX_ == 17 && crydeGoalY_ == 20)
+			if (pEnemy_[2]->GetIndexY() == crydeGoalY_ && pEnemy_[2]->GetIndexX() == crydeGoalX_)
 			{
-				crydeGoalY_ = 18;
-			}
-			else if (crydeGoalX_ == 17 && crydeGoalY_ == 18)
-			{
-				crydeGoalX_ = 14;
-			}
-			else if (crydeGoalX_ == 14 && crydeGoalY_ == 18)
-			{
-				crydeGoalY_ = 16;
-			}
-			else if (crydeGoalX_ == 14 && crydeGoalY_ == 16)
-			{
-				crydeGoalX_ = 12;
-			}
-			else if (crydeGoalX_ == 12 && crydeGoalY_ == 16)
-			{
-				crydeGoalY_ = 18;
-			}
-			else if (crydeGoalX_ == 12 && crydeGoalY_ == 18)
-			{
-				crydeGoalX_ = 10;
-			}
-			else if (crydeGoalX_ == 10 && crydeGoalY_ == 18)
-			{
-				crydeGoalY_ = 20;
-			}
-			else if (crydeGoalX_ == 10 && crydeGoalY_ == 20)
-			{
-				crydeGoalX_ = 17;
+				if (crydeGoalX_ == 17 && crydeGoalY_ == 20)
+				{
+					crydeGoalY_ = 18;
+				}
+				else if (crydeGoalX_ == 17 && crydeGoalY_ == 18)
+				{
+					crydeGoalX_ = 14;
+				}
+				else if (crydeGoalX_ == 14 && crydeGoalY_ == 18)
+				{
+					crydeGoalY_ = 16;
+				}
+				else if (crydeGoalX_ == 14 && crydeGoalY_ == 16)
+				{
+					crydeGoalX_ = 12;
+				}
+				else if (crydeGoalX_ == 12 && crydeGoalY_ == 16)
+				{
+					crydeGoalY_ = 18;
+				}
+				else if (crydeGoalX_ == 12 && crydeGoalY_ == 18)
+				{
+					crydeGoalX_ = 10;
+				}
+				else if (crydeGoalX_ == 10 && crydeGoalY_ == 18)
+				{
+					crydeGoalY_ = 20;
+				}
+				else if (crydeGoalX_ == 10 && crydeGoalY_ == 20)
+				{
+					crydeGoalX_ = 17;
+				}
 			}
 		}
-	}
-	if (pEnemy_[2]->GetIzike())
-	{
-		if (!IsBlock(y - 1, x) && mapData2[y][x] < mapData2[y - 1][x])
+		if (pEnemy_[2]->GetIzike())
 		{
-			return EnemyBase::up;
+			if (!IsBlock(y - 1, x) && mapData2[y][x] < mapData2[y - 1][x])
+			{
+				return EnemyBase::up;
+			}
+			if (!IsBlock(y + 1, x) && mapData2[y][x] < mapData2[y + 1][x])
+			{
+				return EnemyBase::down;
+			}
+			if (!IsBlock(y, x - 1) && mapData2[y][x] < mapData2[y][x - 1])
+			{
+				return EnemyBase::left;
+			}
+			if (!IsBlock(y, x + 1) && mapData2[y][x] < mapData2[y][x + 1])
+			{
+				return EnemyBase::right;
+			}
 		}
-		if (!IsBlock(y + 1, x) && mapData2[y][x] < mapData2[y + 1][x])
+		else
 		{
-			return EnemyBase::down;
-		}
-		if (!IsBlock(y, x - 1) && mapData2[y][x] < mapData2[y][x - 1])
-		{
-			return EnemyBase::left;
-		}
-		if (!IsBlock(y, x + 1) && mapData2[y][x] < mapData2[y][x + 1])
-		{
-			return EnemyBase::right;
-		}
-	}
-	else
-	{
-		if (!IsBlock(y - 1, x) && mapData2[y][x] > mapData2[y - 1][x])
-		{
-			return EnemyBase::up;
-		}
-		if (!IsBlock(y + 1, x) && mapData2[y][x] > mapData2[y + 1][x])
-		{
-			return EnemyBase::down;
-		}
-		if (!IsBlock(y, x - 1) && mapData2[y][x] > mapData2[y][x - 1])
-		{
-			return EnemyBase::left;
-		}
-		if (!IsBlock(y, x + 1) && mapData2[y][x] > mapData2[y][x + 1])
-		{
-			return EnemyBase::right;
+			if (!IsBlock(y - 1, x) && mapData2[y][x] > mapData2[y - 1][x])
+			{
+				return EnemyBase::up;
+			}
+			if (!IsBlock(y + 1, x) && mapData2[y][x] > mapData2[y + 1][x])
+			{
+				return EnemyBase::down;
+			}
+			if (!IsBlock(y, x - 1) && mapData2[y][x] > mapData2[y][x - 1])
+			{
+				return EnemyBase::left;
+			}
+			if (!IsBlock(y, x + 1) && mapData2[y][x] > mapData2[y][x + 1])
+			{
+				return EnemyBase::right;
+			}
 		}
 	}
 	return 0;

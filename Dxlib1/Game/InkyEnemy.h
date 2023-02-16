@@ -14,5 +14,6 @@ public:
 	/// </summary>
 	virtual void Update()override;
 
+	void MoveSwitch();
 private:
 };

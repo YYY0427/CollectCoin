@@ -52,6 +52,7 @@ public:
 	bool GetTracking()const { return isTracking_; }
 	int  GetIndexY()const { return indexY_; }
 	int  GetIndexX()const { return indexX_; }
+	bool GetMove() const { return isMove_; }
 
 	// 敵の表示を消すか消さないかをセット
 	void SetEnabled(bool isEnabled) { isEnabled_ = isEnabled; }
@@ -62,6 +63,7 @@ public:
 	// 敵がイジケ状態かをセット
 	void SetIzike(bool isIzike) { isIzike_ = isIzike; }
 
+	// 敵を白く光らせるか
 	void SetFlash(bool isFlash) { isFlash_ = isFlash; }
 
 	// 縄張りモードと追跡モードの切り替え
@@ -148,4 +150,10 @@ protected:
 	bool isTracking_;
 
 	int trackingTimer_;
+
+	// 敵を動かすか
+	bool isMove_;
+
+
+	int moveTimer2_;
 };

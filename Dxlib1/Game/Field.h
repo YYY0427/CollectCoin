@@ -61,6 +61,9 @@ public:
 	// フィールドにプレイヤーからの距離を求める関数
 	void Search(int y, int x, int goalY, int goalX, int pos);
 
+	// 敵が特定の場所にいる場合敵の足を遅くするフラグを立てる関数
+	bool SlowPosition(int y,int x);
+
 	// mapData2を参照してプレイヤーからの数字が小さい方向の値を返す 
 	// プレイヤーがパワーエサを取得していたら大きい方向の値を返す
 	int BlinkyMove(int enemyIndexY, int enemyIndexX);
