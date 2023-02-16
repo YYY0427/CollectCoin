@@ -59,7 +59,7 @@ public:
 	void MoveDataSet(int playerY, int playerX);
 
 	// フィールドにプレイヤーからの距離を求める関数
-	void Search(int y, int x, int pos);
+	void Search(int y, int x, int goalY, int goalX, int pos);
 
 	// mapData2を参照してプレイヤーからの数字が小さい方向の値を返す 
 	// プレイヤーがパワーエサを取得していたら大きい方向の値を返す
@@ -92,7 +92,7 @@ private:
 	int blinkyGoalY_;
 	int blinkyGoalX_;
 
-	int InkyGoalY_;
+	int inkyGoalY_;
 	int InkyGoalX_;
 
 	int crydeGoalY_;

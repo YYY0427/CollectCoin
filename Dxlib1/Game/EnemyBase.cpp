@@ -33,6 +33,12 @@ namespace
 	// アニメーション枚数
 	constexpr int ANIME_FRAME_NUM = 2;
 	constexpr int IZIKE_ANIME_FRAME_NUM = 2;
+
+	// 追跡モードの時間
+	constexpr int TARGET_MODE_TIME = 60 * 30;
+
+	// 縄張りモードの時間
+	constexpr int TERRITORY_MODE_TIME = 60 * 15;
 }
 
 EnemyBase::EnemyBase() :
@@ -66,11 +72,6 @@ EnemyBase::EnemyBase() :
 
 	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_X);
 	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_Y);
-}
-
-void EnemyBase::Update()
-{
-
 }
 
 void EnemyBase::Draw()
@@ -138,7 +139,6 @@ int EnemyBase::NoBlockDirect(int indexY, int indexX)
 	while (!isMove)
 	{
 		vecDirect = GetRand(4) + 1;
-	//	vecDirect = pField_->GetDirect(indexY, indexX);
 
 		switch (vecDirect)
 		{

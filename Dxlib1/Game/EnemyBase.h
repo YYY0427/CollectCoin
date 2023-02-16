@@ -13,11 +13,6 @@ class Field;
 class EnemyBase
 {
 public:
-	// 追跡モードの時間
-	static constexpr int TARGET_MODE_TIME = 60 * 30;
-	// 縄張りモードの時間
-	static constexpr int TERRITORY_MODE_TIME = 60 * 15;
-
 	EnemyBase();
 
 	// ポインタの設定
@@ -27,7 +22,7 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	virtual void Update();
+	virtual void Update() = 0;
 
 	/// <summary>
 	/// 描画

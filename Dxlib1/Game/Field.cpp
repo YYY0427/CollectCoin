@@ -51,7 +51,7 @@ Field::Field() :
 	blinkyGoalY_ = 1;
 
 	InkyGoalX_ = 1;
-	InkyGoalY_ = 20;
+	inkyGoalY_ = 20;
 
 	crydeGoalY_ = 20;
 	crydeGoalX_ = 17;
@@ -188,7 +188,7 @@ int  Field::Worp(int ky, int kx, int indexY, int indexX)
 	return (indexX);
 }
 
-void Field::MoveDataSet(int playerY, int playerX)
+void Field::MoveDataSet(int goalY, int goalX)
 {
 	for (int y = 0; y < MAP_HEIGHT; y++)
 	{
@@ -201,12 +201,10 @@ void Field::MoveDataSet(int playerY, int playerX)
 		}
 	}
 
-	mapData2[playerY][playerX] = 0;
-	
-	Search(playerY, playerX, 0);
+	Search(goalY, goalX, goalY, goalX, 0);
 }
 
-void Field::Search(int y, int x, int pos)
+void Field::Search(int y, int x, int goalY, int goalX, int pos)
 {
 	pos += 1;
 
@@ -215,25 +213,35 @@ void Field::Search(int y, int x, int pos)
 		if (mapData2[y - 1][x] == 0 || mapData2[y - 1][x] > pos)
 		{
 			mapData2[y - 1][x] = pos;
-			Search(y - 1, x, pos);
+			Search(y - 1, x, goalY, goalX, pos);
 		}
 		if (mapData2[y + 1][x] == 0 || mapData2[y + 1][x] > pos)
 		{
 			mapData2[y + 1][x] = pos;
-			Search(y + 1, x, pos);
+			Search(y + 1, x, goalY, goalX, pos);
 		}
 		if (mapData2[y][x - 1] == 0 || mapData2[y][x - 1] > pos)
 		{
 			mapData2[y][x - 1] = pos;
-			Search(y, x - 1, pos);
+			Search(y, x - 1, goalY, goalX, pos);
 		}
 		if (mapData2[y][x + 1] == 0 || mapData2[y][x + 1] > pos)
 		{
 			mapData2[y][x + 1] = pos;
-			Search(y, x + 1, pos);
+			Search(y, x + 1, goalY, goalX, pos);
 		}
 
-		mapData2[pPlayer_->GetIndexY()][pPlayer_->GetIndexX()] = 0;
+		for (auto& enemy : pEnemy_)
+		{
+			if (enemy->GetTracking())
+			{
+				mapData2[pPlayer_->GetIndexY()][pPlayer_->GetIndexX()] = 0;
+			}
+			else
+			{
+				mapData2[goalY][goalX] = 0;
+			}
+		}
 	}
 	
 	return;
@@ -245,15 +253,40 @@ int Field::BlinkyMove(int enemyIndexY, int enemyIndexX)
 	int y = enemyIndexY;
 	int x = enemyIndexX;
 	
-	if (pEnemy_[0]->GetTracking())
+	if (pEnemy_[0]->GetTracking() || pEnemy_[0]->GetIzike())
 	{
 		// 追跡モード
 		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
 	}
-	else
+	else if(!pEnemy_[0]->GetTracking())
 	{
 		// 縄張りモード
 		MoveDataSet(blinkyGoalY_, blinkyGoalX_);
+
+		if (pEnemy_[0]->GetIndexY() == blinkyGoalY_ && pEnemy_[0]->GetIndexX() == blinkyGoalX_ )
+		{
+			if (blinkyGoalX_ == 17 && blinkyGoalY_ == 1)
+			{
+				blinkyGoalX_ = 10;
+				blinkyGoalY_ = 1;
+			}
+			else if (blinkyGoalX_ == 10 && blinkyGoalY_ == 1)
+			{
+				blinkyGoalX_ = 10;
+				blinkyGoalY_ = 4;
+
+			}
+			else if (blinkyGoalX_ == 10 && blinkyGoalY_ == 4)
+			{
+				blinkyGoalX_ = 17;
+				blinkyGoalY_ = 4;
+			}
+			else if (blinkyGoalX_ == 17 && blinkyGoalY_ == 4)
+			{
+				blinkyGoalX_ = 17;
+				blinkyGoalY_ = 1;
+			}
+		}
 	}
 	if (pEnemy_[0]->GetIzike())
 	{
@@ -301,15 +334,40 @@ int Field::PinkyMove(int enemyIndexY, int enemyIndexX)
 	int y = enemyIndexY;
 	int x = enemyIndexX;
 
-	if (pEnemy_[3]->GetTracking())
+	if (pEnemy_[3]->GetTracking() || pEnemy_[3]->GetIzike())
 	{
 		// 追跡モード
 		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
 	}
-	else
+	else if (!pEnemy_[3]->GetTracking())
 	{
 		// 縄張りモード
 		MoveDataSet(pinkyGoalY_, pinkyGoalX_);
+
+		if (pEnemy_[3]->GetIndexY() == pinkyGoalY_ && pEnemy_[3]->GetIndexX() == pinkyGoalX_)
+		{
+			if (pinkyGoalX_ == 1 && pinkyGoalY_ == 1)
+			{
+				pinkyGoalX_ = 1;
+				pinkyGoalY_ = 4;
+			}
+			else if (pinkyGoalX_ == 1 && pinkyGoalY_ == 4)
+			{
+				pinkyGoalX_ = 8;
+				pinkyGoalY_ = 4;
+
+			}
+			else if (pinkyGoalX_ == 8 && pinkyGoalY_ == 4)
+			{
+				pinkyGoalX_ = 8;
+				pinkyGoalY_ = 1;
+			}
+			else if (pinkyGoalX_ == 8 && pinkyGoalY_ == 1)
+			{
+				pinkyGoalX_ = 1;
+				pinkyGoalY_ = 1;
+			}
+		}
 	}
 	if (pEnemy_[3]->GetIzike())
 	{
@@ -357,15 +415,60 @@ int Field::InkyMove(int enemyIndexY, int enemyIndexX)
 	int y = enemyIndexY;
 	int x = enemyIndexX;
 
-	if (pEnemy_[1]->GetTracking())
+	if (pEnemy_[1]->GetTracking() || pEnemy_[1]->GetIzike())
 	{
 		// 追跡モード
 		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
 	}
-	else
+	else if (!pEnemy_[1]->GetTracking())
 	{
 		// 縄張りモード
-		MoveDataSet(InkyGoalY_, InkyGoalX_);
+		MoveDataSet(inkyGoalY_, InkyGoalX_);
+
+		if (pEnemy_[1]->GetIndexY() == inkyGoalY_ && pEnemy_[1]->GetIndexX() == InkyGoalX_)
+		{
+			if (InkyGoalX_ == 1 && inkyGoalY_ == 20)
+			{
+				InkyGoalX_ = 8;
+				inkyGoalY_ = 20;
+			}
+			else if (InkyGoalX_ == 8 && inkyGoalY_ == 20)
+			{
+				InkyGoalX_ = 8;
+				inkyGoalY_ = 18;
+
+			}
+			else if (InkyGoalX_ == 8 && inkyGoalY_ == 18)
+			{
+				InkyGoalX_ = 6;
+				inkyGoalY_ = 18;
+			}
+			else if (InkyGoalX_ == 6 && inkyGoalY_ == 18)
+			{
+				InkyGoalX_ = 6;
+				inkyGoalY_ = 16;
+			}
+			else if (InkyGoalX_ == 6 && inkyGoalY_ == 16)
+			{
+				InkyGoalX_ = 4;
+				inkyGoalY_ = 16;
+			}
+			else if (InkyGoalX_ == 4 && inkyGoalY_ == 16)
+			{
+				InkyGoalX_ = 4;
+				inkyGoalY_ = 18;
+			}
+			else if (InkyGoalX_ == 4 && inkyGoalY_ == 18)
+			{
+				InkyGoalX_ = 1;
+				inkyGoalY_ = 18;
+			}
+			else if (InkyGoalX_ == 1 && inkyGoalY_ == 18)
+			{
+				InkyGoalX_ = 1;
+				inkyGoalY_ = 20;
+			}
+		}
 	}
 	
 	if (pEnemy_[1]->GetIzike())
@@ -415,15 +518,51 @@ int Field::CrydeMove(int enemyIndexY, int enemyIndexX)
 	int y = enemyIndexY;
 	int x = enemyIndexX;
 
-	if (pEnemy_[2]->GetTracking())
+	if (pEnemy_[2]->GetTracking() || pEnemy_[2]->GetIzike())
 	{
 		// 追跡モード
 		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
 	}
-	else
+	else if (!pEnemy_[2]->GetTracking())
 	{
 		// 縄張りモード
 		MoveDataSet(crydeGoalY_, crydeGoalX_);
+
+		if (pEnemy_[2]->GetIndexY() == crydeGoalY_ && pEnemy_[2]->GetIndexX() == crydeGoalX_)
+		{
+			if (crydeGoalX_ == 17 && crydeGoalY_ == 20)
+			{
+				crydeGoalY_ = 18;
+			}
+			else if (crydeGoalX_ == 17 && crydeGoalY_ == 18)
+			{
+				crydeGoalX_ = 14;
+			}
+			else if (crydeGoalX_ == 14 && crydeGoalY_ == 18)
+			{
+				crydeGoalY_ = 16;
+			}
+			else if (crydeGoalX_ == 14 && crydeGoalY_ == 16)
+			{
+				crydeGoalX_ = 12;
+			}
+			else if (crydeGoalX_ == 12 && crydeGoalY_ == 16)
+			{
+				crydeGoalY_ = 18;
+			}
+			else if (crydeGoalX_ == 12 && crydeGoalY_ == 18)
+			{
+				crydeGoalX_ = 10;
+			}
+			else if (crydeGoalX_ == 10 && crydeGoalY_ == 18)
+			{
+				crydeGoalY_ = 20;
+			}
+			else if (crydeGoalX_ == 10 && crydeGoalY_ == 20)
+			{
+				crydeGoalX_ = 17;
+			}
+		}
 	}
 	if (pEnemy_[2]->GetIzike())
 	{

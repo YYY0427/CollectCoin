@@ -96,6 +96,7 @@ void PinkyEnemy::Update()
 		}
 
 		moveDirection_ = pField_->PinkyMove(indexY_, indexX_);
+
 		moveTimer_ = 0;
 	}
 
