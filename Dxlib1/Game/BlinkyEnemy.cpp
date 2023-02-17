@@ -103,6 +103,17 @@ void BlinkyEnemy::Update()
 
 	SpeedCalculation();
 
+	if (pField_->SpornInOrAuto(indexY_, indexX_))
+	{
+		// リスポーン地点いる
+		
+	}
+	else
+	{
+		// リスポーン地点にいない
+
+	}
+
 	// 壁に当たっていない場合
 	if (!Colision(moveDirection_))
 	{

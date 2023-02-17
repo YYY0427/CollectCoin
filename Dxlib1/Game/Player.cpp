@@ -22,10 +22,10 @@ namespace
 	constexpr float NORMAL_SPEED = 1.5f;
 
 	// パワーエサを取得した場合の移動スピード(何倍か)
-	constexpr float GET_FEED_SPEED = 2.0f;
+	constexpr float GET_FEED_SPEED = 1.7f;
 
 	// パワーエサを取得した場合持続時間(何秒か)
-	constexpr int FEED_DURATION = 60 * 9;
+	constexpr int FEED_DURATION = 60 * 8;
 
 	// 敵をフラッシュさせる割合
 	constexpr float FLASH_RATIO = 0.6f;
@@ -55,6 +55,7 @@ Player::Player() :
 	isPowerFeed_(false),
 	isDead_(false),
 	isAnimeEnd_(false),
+	isPowerFeed2_(false),
 	isEnabled_(true)
 {
 	// 画像のロード
@@ -270,16 +271,27 @@ bool Player::Colision(int direction)
 
 void Player::SpeedCalculation()
 {
-	// パワーエサとの当たり判定
-	if (pField_->IsPowerFeed(indexY_, indexX_))
+	// パワーエサを取得していない状態でパワーエサを取得した
+	if (!isPowerFeed_)
 	{
-		// パワーエサのフラグを立てる
-		isPowerFeed_ = true;
-
-		for (auto& enemy : pEnemy_)
+		if (pField_->IsPowerFeed(indexY_, indexX_))
 		{
-			// 敵のイジケ状態を開始
-			enemy->SetIzike(true);
+			// パワーエサのフラグを立てる
+			isPowerFeed_ = true;
+
+			for (auto& enemy : pEnemy_)
+			{
+				// 敵のイジケ状態を開始
+				enemy->SetIzike(true);
+			}
+		}
+	}
+	else
+	{
+		// パワーエサを取得している状態でパワーエサを取得した
+		if (pField_->IsPowerFeed(indexY_, indexX_))
+		{
+			isPowerFeed2_ = true;
 		}
 	}
 
@@ -293,6 +305,12 @@ void Player::SpeedCalculation()
 		// 移動速度を変更
 		speed_ = GET_FEED_SPEED;
 
+		if (isPowerFeed2_)
+		{
+			powerFeedTimer_ = 1;
+			isPowerFeed2_ = false;
+		}
+
 		// powerFeedTimerがFEED_DURATIONの特定の割合に達したら敵のアニメーションを変更
 		if ((FEED_DURATION * FLASH_RATIO) < powerFeedTimer_)
 		{
@@ -300,6 +318,13 @@ void Player::SpeedCalculation()
 			{
 				enemy->SetFlash (true);	// 敵の点滅を開始
 			}	
+		}
+		else
+		{
+			for (auto& enemy : pEnemy_)
+			{
+				enemy->SetFlash(false);	
+			}
 		}
 
 		// タイマーが指定した時間を経過した場合元の速度に戻す

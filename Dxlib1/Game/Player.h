@@ -116,6 +116,9 @@ private:
 
 	// パワーエサを取得したかどうか
 	bool isPowerFeed_;
+
+	// パワーエサを取得した状態でパワーエサを取得したか
+	bool isPowerFeed2_;
 	
 	// パワーエサを取得した状態でどのくらい経ったか
 	int powerFeedTimer_;

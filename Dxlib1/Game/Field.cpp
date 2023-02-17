@@ -20,7 +20,7 @@ namespace
 		{ 2, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 2 },
 		{ 2, 2, 2, 2, 1, 2, 2, 2, 0, 2, 0, 2, 2, 2, 1, 2, 2, 2, 2 },
 		{ 4, 4, 4, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 4, 4, 4 },
-		{ 2, 2, 2, 2, 1, 2, 0, 2, 2, 0, 2, 2, 0, 2, 1, 2, 2, 2, 2 },
+		{ 2, 2, 2, 2, 1, 2, 0, 2, 2, 5, 2, 2, 0, 2, 1, 2, 2, 2, 2 },
 		{ 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0, 0 },
 		{ 2, 2, 2, 2, 1, 2, 0, 2, 2, 2, 2, 2, 0, 2, 1, 2, 2, 2, 2 },
 		{ 4, 4, 4, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 4, 4, 4 },
@@ -88,6 +88,13 @@ void Field::Draw()
 			if (mapData[y][x] == 3)
 			{
 				PowerFeedFlash(y, x);
+			}
+			if (mapData[y][x] == 5)
+			{
+				DrawBox(
+					x * BLOCK_SIZE + DISPLAY_POS_X, y * BLOCK_SIZE + DISPLAY_POS_Y,
+					x * BLOCK_SIZE + BLOCK_SIZE + DISPLAY_POS_X, y * BLOCK_SIZE + (BLOCK_SIZE / 4) + DISPLAY_POS_Y,
+					GetColor(255, 255, 0), true);
 			}
 #ifdef _DEBUG	// デバックの版場合
 			if (mapData2[y][x] >= 0)
@@ -265,6 +272,17 @@ bool Field::SlowPosition(int y, int x)
 	{
 		return true;
 	}
+	return false;
+}
+
+bool Field::SpornInOrAuto(int y, int x)
+{
+	if (y == 10 && x >= 8 && x <= 10)
+	{
+		// リスポーン地点にいる
+		return true;
+	}
+	// リスポーン地点にいない
 	return false;
 }
 

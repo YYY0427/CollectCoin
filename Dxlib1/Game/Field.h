@@ -64,6 +64,9 @@ public:
 	// 敵が特定の場所にいる場合敵の足を遅くするフラグを立てる関数
 	bool SlowPosition(int y,int x);
 
+	// 敵のスポーン地点の外にいるか中にいるか
+	bool SpornInOrAuto(int y, int x);
+
 	// mapData2を参照してプレイヤーからの数字が小さい方向の値を返す 
 	// プレイヤーがパワーエサを取得していたら大きい方向の値を返す
 	int BlinkyMove(int enemyIndexY, int enemyIndexX);
@@ -78,6 +81,8 @@ private:
 	std::shared_ptr<EnemyBase> pEnemy_[4];
 
 	int mapData2[MAP_HEIGHT][MAP_WIDTH];
+
+//	int blinkyEnemyData[][];
 
 	// パワーエサの点滅
 	int blendCount_;
