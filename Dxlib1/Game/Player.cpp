@@ -19,7 +19,7 @@ namespace
 	constexpr float SCALE = 2.0f;
 
 	// 通常のプレイヤーの移動スピード(何倍か)
-	constexpr float NORMAL_SPEED = 1.5f;
+	constexpr float NORMAL_SPEED = 1.4f;
 
 	// パワーエサを取得した場合の移動スピード(何倍か)
 	constexpr float GET_FEED_SPEED = 1.7f;
@@ -56,7 +56,8 @@ Player::Player() :
 	isDead_(false),
 	isAnimeEnd_(false),
 	isPowerFeed2_(false),
-	isEnabled_(true)
+	isEnabled_(true),
+	isIntrusion_(false)
 {
 	// 画像のロード
 	handle_ = my::MyLoadGraph(L"Data/img/game/Pacman16.png");
@@ -139,7 +140,7 @@ void Player::Update(const InputState& input)
 		}
 		else if (wantMoveDirection_ == down)
 		{
-			if (!pField_->IsBlock(indexY_ + 1, indexX_))
+			if (!pField_->IsBlock(indexY_ + 1, indexX_) && pField_->Intrusion(indexY_ + 1, indexX_, isIntrusion_))
 			{
 				//方向の切り替え
 				angle_ = 1.55f;
@@ -257,7 +258,7 @@ bool Player::Colision(int direction)
 		if (pField_->IsBlock(indexY_ - 1, indexX_))	return true;
 		break;
 	case down:
-		if (pField_->IsBlock(indexY_ + 1, indexX_))	return true;
+		if (pField_->IsBlock(indexY_ + 1, indexX_) || !pField_->Intrusion(indexY_ + 1, indexX_, isIntrusion_))	return true;
 		break;
 	case left:
 		if (pField_->IsBlock(indexY_, indexX_ - 1))	return true;

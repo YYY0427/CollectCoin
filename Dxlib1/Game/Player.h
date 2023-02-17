@@ -135,4 +135,7 @@ private:
 	float speed_;
 
 	bool isEnabled_;
+
+	// 特定のブロックに侵入可能か
+	bool isIntrusion_;
 };

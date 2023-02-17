@@ -67,22 +67,23 @@ public:
 	// 敵のスポーン地点の外にいるか中にいるか
 	bool SpornInOrAuto(int y, int x);
 
+	// 特定のブロックに侵入可能か
+	bool Intrusion(int y, int x, bool flag);
+
 	// mapData2を参照してプレイヤーからの数字が小さい方向の値を返す 
 	// プレイヤーがパワーエサを取得していたら大きい方向の値を返す
-	int BlinkyMove(int enemyIndexY, int enemyIndexX);
+	int BlinkyMove(int enemyIndexY, int enemyIndexX, bool flag);
 
-	int PinkyMove(int enemyIndexY, int enemyIndexX);
+	int PinkyMove(int enemyIndexY, int enemyIndexX, bool flag);
 
-	int InkyMove(int enemyIndexY, int enemyIndexX);
+	int InkyMove(int enemyIndexY, int enemyIndexX, bool flag);
 
-	int CrydeMove(int enemyIndexY, int enemyIndexX);
+	int CrydeMove(int enemyIndexY, int enemyIndexX, bool flag);
 private:
 	std::shared_ptr<Player> pPlayer_;
 	std::shared_ptr<EnemyBase> pEnemy_[4];
 
 	int mapData2[MAP_HEIGHT][MAP_WIDTH];
-
-//	int blinkyEnemyData[][];
 
 	// パワーエサの点滅
 	int blendCount_;

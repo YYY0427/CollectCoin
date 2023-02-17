@@ -65,7 +65,8 @@ EnemyBase::EnemyBase() :
 	isDead_(false),
 	isIzike_(false),
 	isFlash_(false),
-	isTracking_(false)
+	isTracking_(false),
+	isIntrusion_(true)
 {
 	// ‰æ‘œ‚Ìƒ[ƒh
 	izikeHandle_ = my::MyLoadGraph(L"Data/img/game/izike.png");

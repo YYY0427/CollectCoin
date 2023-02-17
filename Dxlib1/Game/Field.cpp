@@ -282,11 +282,31 @@ bool Field::SpornInOrAuto(int y, int x)
 		// リスポーン地点にいる
 		return true;
 	}
+	if (y == 9 && x == 9)
+	{
+		return true;
+	}
 	// リスポーン地点にいない
 	return false;
 }
 
-int Field::BlinkyMove(int enemyIndexY, int enemyIndexX)
+bool Field::Intrusion(int y, int x, bool flag)
+{
+	// flagがfalseの場合通れない
+	// flagがtrueの場合通れる
+	if (!flag)
+	{
+		if (mapData[y][x] == 5)
+		{
+			// 通れない
+			return false;
+		}
+	}
+	// 通れる
+	return true;
+}
+
+int Field::BlinkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 {
 	int y = enemyIndexY;
 	int x = enemyIndexX;
@@ -296,6 +316,7 @@ int Field::BlinkyMove(int enemyIndexY, int enemyIndexX)
 		// 追跡モード
 		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
 	}
+	// 縄張りモードのときの移動
 	else if (!pEnemy_[0]->GetTracking())
 	{
 		// 縄張りモード
@@ -326,13 +347,14 @@ int Field::BlinkyMove(int enemyIndexY, int enemyIndexX)
 			}
 		}
 	}
+
 	if (pEnemy_[0]->GetIzike())
 	{
-		if (!IsBlock(y - 1, x) && mapData2[y][x] < mapData2[y - 1][x])
+		if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] < mapData2[y - 1][x])
 		{
 			return EnemyBase::up;
 		}
-		if (!IsBlock(y + 1, x) && mapData2[y][x] < mapData2[y + 1][x])
+		if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] < mapData2[y + 1][x])
 		{
 			return EnemyBase::down;
 		}
@@ -347,11 +369,11 @@ int Field::BlinkyMove(int enemyIndexY, int enemyIndexX)
 	}
 	else
 	{
-		if (!IsBlock(y - 1, x) && mapData2[y][x] > mapData2[y - 1][x])
+		if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] > mapData2[y - 1][x])
 		{
 			return EnemyBase::up;
 		}
-		if (!IsBlock(y + 1, x) && mapData2[y][x] > mapData2[y + 1][x])
+		if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] > mapData2[y + 1][x])
 		{
 			return EnemyBase::down;
 		}
@@ -367,7 +389,7 @@ int Field::BlinkyMove(int enemyIndexY, int enemyIndexX)
 	return 0;
 }
 
-int Field::PinkyMove(int enemyIndexY, int enemyIndexX)
+int Field::PinkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 {
 	int y = enemyIndexY;
 	int x = enemyIndexX;
@@ -410,11 +432,11 @@ int Field::PinkyMove(int enemyIndexY, int enemyIndexX)
 		}
 		if (pEnemy_[3]->GetIzike())
 		{
-			if (!IsBlock(y + 1, x) && mapData2[y][x] < mapData2[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] < mapData2[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y - 1, x) && mapData2[y][x] < mapData2[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] < mapData2[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
@@ -429,11 +451,11 @@ int Field::PinkyMove(int enemyIndexY, int enemyIndexX)
 		}
 		else
 		{
-			if (!IsBlock(y + 1, x) && mapData2[y][x] > mapData2[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] > mapData2[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y - 1, x) && mapData2[y][x] > mapData2[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] > mapData2[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
@@ -450,7 +472,7 @@ int Field::PinkyMove(int enemyIndexY, int enemyIndexX)
 	return 0;
 }
 
-int Field::InkyMove(int enemyIndexY, int enemyIndexX)
+int Field::InkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 {
 	int y = enemyIndexY;
 	int x = enemyIndexX;
@@ -515,11 +537,11 @@ int Field::InkyMove(int enemyIndexY, int enemyIndexX)
 
 		if (pEnemy_[1]->GetIzike())
 		{
-			if (!IsBlock(y - 1, x) && mapData2[y][x] < mapData2[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] < mapData2[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y + 1, x) && mapData2[y][x] < mapData2[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] < mapData2[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
@@ -534,11 +556,11 @@ int Field::InkyMove(int enemyIndexY, int enemyIndexX)
 		}
 		else
 		{
-			if (!IsBlock(y - 1, x) && mapData2[y][x] > mapData2[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] > mapData2[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y + 1, x) && mapData2[y][x] > mapData2[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] > mapData2[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
@@ -555,7 +577,7 @@ int Field::InkyMove(int enemyIndexY, int enemyIndexX)
 	return 0;
 }
 
-int Field::CrydeMove(int enemyIndexY, int enemyIndexX)
+int Field::CrydeMove(int enemyIndexY, int enemyIndexX, bool flag)
 {
 	int y = enemyIndexY;
 	int x = enemyIndexX;
@@ -608,13 +630,14 @@ int Field::CrydeMove(int enemyIndexY, int enemyIndexX)
 				}
 			}
 		}
+		// リスポーン地点にいる状態でイジケ状態の場合逃げずにリスポーン地点からでる
 		if (pEnemy_[2]->GetIzike())
 		{
-			if (!IsBlock(y - 1, x) && mapData2[y][x] < mapData2[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] < mapData2[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y + 1, x) && mapData2[y][x] < mapData2[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] < mapData2[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
@@ -629,11 +652,11 @@ int Field::CrydeMove(int enemyIndexY, int enemyIndexX)
 		}
 		else
 		{
-			if (!IsBlock(y - 1, x) && mapData2[y][x] > mapData2[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] > mapData2[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y + 1, x) && mapData2[y][x] > mapData2[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] > mapData2[y + 1][x])
 			{
 				return EnemyBase::down;
 			}

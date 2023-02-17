@@ -10,10 +10,10 @@
 namespace
 {
 	// 通常のプレイヤーの移動スピード
-	constexpr float NORMAL_SPEED = 1.5f;
+	constexpr float NORMAL_SPEED = 1.6f;
 
 	// パワーエサを取得した場合の移動スピード(何倍か)
-	constexpr float GET_FEED_SPEED = 1.0f;
+	constexpr float GET_FEED_SPEED = 1.2f;
 
 	// パワーエサを取得した場合持続時間(何秒か)
 	constexpr int FEED_DURATION = 10;
@@ -53,6 +53,7 @@ void PinkyEnemy::Update()
 		{
 			isIzike_ = false;
 			isMove_ = false;
+			isIntrusion_ = true;
 		}
 	}
 
@@ -95,12 +96,23 @@ void PinkyEnemy::Update()
 			};
 		}
 
-		moveDirection_ = pField_->PinkyMove(indexY_, indexX_);
+		moveDirection_ = pField_->PinkyMove(indexY_, indexX_, isIntrusion_);
 
 		moveTimer_ = 0;
 	}
 
 	SpeedCalculation();
+
+	if (!pField_->SpornInOrAuto(indexY_, indexX_))
+	{
+		// リスポーン地点にいない
+		isIntrusion_ = false;
+	}
+	else
+	{
+		// リスポーン地点にいる
+		isIntrusion_ = true;
+	}
 
 	// 壁に当たっていない場合
 	if (!Colision(moveDirection_))

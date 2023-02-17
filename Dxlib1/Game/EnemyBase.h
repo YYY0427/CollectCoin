@@ -154,6 +154,8 @@ protected:
 	// 敵を動かすか
 	bool isMove_;
 
+	// 特定のブロックに侵入可能か
+	bool isIntrusion_;
 
 	int moveTimer2_;
 };

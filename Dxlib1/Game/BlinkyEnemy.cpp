@@ -9,20 +9,11 @@
 
 namespace
 {
-	// 画像の幅
-	constexpr int WIDTH = 16;
-
-	// 画像の高さ
-	constexpr int HEIGHT = 16;
-
-	// 画像の拡大率
-	constexpr float SCALE = 2.0f;
-
 	// 通常の移動スピード
-	constexpr float NORMAL_SPEED = 1.5f;
+	constexpr float NORMAL_SPEED = 1.6f;
 
 	// プレイヤーがパワーエサを取得した場合の移動スピード(何倍か)
-	constexpr float GET_FEED_SPEED = 1.0f;
+	constexpr float GET_FEED_SPEED = 1.2f;
 
 	// パワーエサを取得した場合持続時間(何秒か)
 	constexpr int FEED_DURATION = 10;
@@ -56,6 +47,7 @@ void BlinkyEnemy::Update()
 		if (indexX_ == 10 && indexY_ == 10)
 		{
 			isIzike_ = false;
+			isIntrusion_ = true;
 		}
 	}
 
@@ -96,22 +88,22 @@ void BlinkyEnemy::Update()
 			};
 		}
 
-		moveDirection_ = pField_->BlinkyMove(indexY_, indexX_);
+		moveDirection_ = pField_->BlinkyMove(indexY_, indexX_, isIntrusion_);
 
 		moveTimer_ = 0;
 	}
 
 	SpeedCalculation();
 
-	if (pField_->SpornInOrAuto(indexY_, indexX_))
+	if (!pField_->SpornInOrAuto(indexY_, indexX_))
 	{
-		// リスポーン地点いる
-		
+		// リスポーン地点にいない
+		isIntrusion_ = false;
 	}
 	else
 	{
-		// リスポーン地点にいない
-
+		// リスポーン地点にいる
+		isIntrusion_ = true;
 	}
 
 	// 壁に当たっていない場合
