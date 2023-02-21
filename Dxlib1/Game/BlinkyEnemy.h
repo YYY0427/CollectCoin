@@ -13,10 +13,13 @@ class BlinkyEnemy : public EnemyBase
 {
 public:
 	BlinkyEnemy(int handle, int indexX, int indexY);
+	virtual ~BlinkyEnemy(){}
 
 	/// <summary>
 	/// XV
 	/// </summary>
 	virtual void Update()override;
+
+	virtual void SetInit()override;
 private:
 };

@@ -13,24 +13,31 @@
 #include "../Game/CrydeEnemy.h"
 #include "../Game/PinkyEnemy.h"
 #include "../Game/EnemyBase.h"
+#include "../Game.h"
 #include <DxLib.h>
 
 GameplayingScene::GameplayingScene(SceneManager& manager) :
 	Scene(manager),
-	updateFunc_(&GameplayingScene::FadeInUpdate)
+	updateFunc_(&GameplayingScene::FadeInUpdate),
+	life_(3),
+	timer_(0),
+	clearOrOver_(false)
 {
+	playerH_ = my::MyLoadGraph(L"Data/img/game/Pacman16.png");
+	int deadPlayerH = my::MyLoadGraph(L"Data/img/game/PacmanDeath16.png");
+	pPlayer_ = std::make_shared<Player>(playerH_, deadPlayerH);
+
 	pField_ = std::make_shared<Field>();
-	pPlayer_ = std::make_shared<Player>();
 
-	int blinkyEnemyH = my::MyLoadGraph(L"Data/img/game/blinky.png");
-	int inkyEnemyH = my::MyLoadGraph(L"Data/img/game/inky.png");
-	int crydeEnemyH = my::MyLoadGraph(L"Data/img/game/cryde.png");
-	int pinkyEnemyH = my::MyLoadGraph(L"Data/img/game/pinky.png");
+	int blinkyEnemyH_ = my::MyLoadGraph(L"Data/img/game/blinky.png");
+	int inkyEnemyH_ = my::MyLoadGraph(L"Data/img/game/inky.png");
+	int crydeEnemyH_ = my::MyLoadGraph(L"Data/img/game/cryde.png");
+	int pinkyEnemyH_ = my::MyLoadGraph(L"Data/img/game/pinky.png");
 
-	pEnemy_[0] = std::make_shared<BlinkyEnemy>(blinkyEnemyH, 9, 8);
-	pEnemy_[1] = std::make_shared<InkyEnemy>(inkyEnemyH, 8, 10);
-	pEnemy_[2] = std::make_shared<CrydeEnemy>(crydeEnemyH, 9, 10);
-	pEnemy_[3] = std::make_shared<PinkyEnemy>(pinkyEnemyH, 10, 10);
+	pEnemy_[EnemyBase::blinky] = std::make_shared<BlinkyEnemy>(blinkyEnemyH_, 9, 8);
+	pEnemy_[EnemyBase::inky] = std::make_shared<InkyEnemy>(inkyEnemyH_, 8, 10);
+	pEnemy_[EnemyBase::cryde] = std::make_shared<CrydeEnemy>(crydeEnemyH_, 9, 10);
+	pEnemy_[EnemyBase::pinky] = std::make_shared<PinkyEnemy>(pinkyEnemyH_, 10, 10);
 
 	for (auto& enemy : pEnemy_)
 	{
@@ -40,7 +47,8 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	
 	pPlayer_->SetField(pField_);
 	pField_->SetPlayer(pPlayer_);
-	for (int i = 0; i < 4; i++)
+
+	for (int i = 0; i < EnemyBase::enemy_num; i++)
 	{
 		pPlayer_->SetEnemy(pEnemy_[i], i);
 		pField_->SetEnemy(pEnemy_[i], i);
@@ -50,9 +58,25 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 
 void GameplayingScene::FadeInUpdate(const InputState& input)
 {
-	fadeValue_ = 255 * static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval);
+	for (auto& enemy : pEnemy_)
+	{
+		enemy->SetEnabled(false);
+	}
+
+	pPlayer_->SetEnabled(false);
+
+	fadeValue_ = 255 * (static_cast<float>(fadeTimer_)) / static_cast<float>(fade_interval);
 	if (--fadeTimer_ == 0)
 	{
+		for (auto& enemy : pEnemy_)
+		{
+			enemy->SetEnabled(true);
+		}
+
+		pPlayer_->SetEnabled(true);
+
+		fadeValue_ = 0;
+
 		updateFunc_ = &GameplayingScene::NormalUpdate;
 	}
 }
@@ -73,9 +97,12 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 		// プレイヤーと敵の当たり判定
 		if (Colision(enemy))
 		{
-			// 敵がイジケ状態ではないときに敵と当たった場合死亡
+			// 敵がイジケ状態ではないときに敵と当たった場合
 			if (!enemy->GetIzike())
 			{
+				// 残機 - 1
+				life_--;
+
 				// プレイヤーの死亡フラグを立てる
 				pPlayer_->SetDead(true);
 
@@ -84,9 +111,9 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 				{
 					enemy->SetEnabled(false);
 				}
-				
-				// ゲームオーバー演出に移行
-				updateFunc_ = &GameplayingScene::GameOverUpdate;
+
+				// ゲームオーバー演出移行
+				updateFunc_ = &GameplayingScene::PlayerDeadUpdate;
 				fadeColor_ = 0xff0000;
 			}
 			// 敵がイジケ状態の場合に敵と当たった場合敵を殺す
@@ -156,46 +183,82 @@ void GameplayingScene::Draw()
 		enemy->Draw();
 	}
 
+	for (int i = 0; i < life_; i++)
+	{
+		int x = Game::kScreenWidth / 2 + i * 40;
+
+		DrawRectRotaGraph(x, Game::kScreenHeight - 16, 32, 0, 16, 16, 2.0f, 0.0f, playerH_, true);
+	}
+
 	DrawString(0, 0, L"GamePlayingScene", 0xffffff, true);
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
-	DrawBox(0, 0, 640, 480, fadeColor_, true);
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 void GameplayingScene::GameClearUpdate(const InputState& input)
 {
-	updateFunc_ = &GameplayingScene::GameClearFadeOutUpdate;
+	updateFunc_ = &GameplayingScene::FadeOutUpdate;
 }
 
 void GameplayingScene::GameOverUpdate(const InputState& input)
+{
+	updateFunc_ = &GameplayingScene::FadeOutUpdate;
+}
+
+void GameplayingScene::PlayerDeadUpdate(const InputState& input)
 {
 	pPlayer_->DeadUpdate();
 
 	if (pPlayer_->GetAnimeEnd())
 	{
-		updateFunc_ = &GameplayingScene::GameOverFadeOutUpdate;
+		a_ = true;
+		updateFunc_ = &GameplayingScene::FadeOutUpdate;
 	}
 }
 
-void GameplayingScene::GameClearFadeOutUpdate(const InputState& input)
+void GameplayingScene::FadeOutUpdate(const InputState& input)
 {
-	fadeValue_ = 255 * static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval);
-	if (++fadeTimer_ == fade_interval)
-	{
-		manager_.ChangeScene(new GameclearScene(manager_));
-		return;
-	}
-}
+	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
 
-void GameplayingScene::GameOverFadeOutUpdate(const InputState& input)
-{
-	fadeValue_ = 255 * static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval);
-	if (++fadeTimer_ == fade_interval)
+	fadeTimer_++;
+
+	// ゲーム
+	if (fadeTimer_ > fade_interval && !clearOrOver_ && life_ == 0)
 	{
 		manager_.ChangeScene(new GameoverScene(manager_));
 		return;
 	}
+	else if (fadeTimer_ > fade_interval && clearOrOver_)
+	{
+		manager_.ChangeScene(new GameclearScene(manager_));
+		return;
+	}
+	else if (fadeTimer_ > fade_interval && a_)
+	{
+		for (auto& enemy : pEnemy_)
+		{
+			enemy->Init();
+			enemy->SetInit();
+		}
+
+		pPlayer_->Init();
+
+		pField_->Init();
+
+		SetInit();
+
+		updateFunc_ = &GameplayingScene::FadeInUpdate;
+	}
+}
+
+void GameplayingScene::SetInit()
+{
+	a_ = false;
+	fadeTimer_ = fade_interval;
+	fadeValue_ = 255;
+	timer_ = 0;
 }
 
 bool GameplayingScene::Colision(std::shared_ptr<EnemyBase>enemy)

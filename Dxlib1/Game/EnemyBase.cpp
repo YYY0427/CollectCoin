@@ -56,9 +56,11 @@ EnemyBase::EnemyBase() :
 	trackingTimer_(0),
 	powerFeedTimer_(0),
 	moveDirection_(0),
-	wantMoveDirection_(0),
 	idX_(0),
 	idY_(0),
+	flashingImgY_(0),
+	indexX_(0),
+	indexY_(0),
 	isMove_(false),
 	isPowerFeed_(false),
 	isEnabled_(true),
@@ -120,6 +122,27 @@ void EnemyBase::Draw()
 	}
 }
 
+void EnemyBase::Init()
+{
+	moveTimer_ = 0;
+	moveTimer2_ = 0;
+	kX_ = 0;
+	kY_ = 0;
+	flashingImgY_ = 0;
+	idX_ = 0;
+	idY_ = 0;
+	moveDirection_ = 0;
+	powerFeedTimer_ = 0;
+	isMove_ = false;
+	isPowerFeed_ = false;
+	isEnabled_ = true;
+	isDead_ = false;
+	isIzike_ = false;
+	isFlash_ = false; 
+	isTracking_ = false;
+	isIntrusion_ = false;
+}
+
 bool EnemyBase::Colision(int direction)
 {
 	switch (direction)
@@ -173,7 +196,7 @@ int EnemyBase::NoBlockDirect(int indexY, int indexX)
 	return vecDirect;
 }
 
-void EnemyBase::SpeedCalculation()
+void EnemyBase::SpeedChange()
 {
 	// イジケ状態場合遅くなる
 	if(isIzike_)
@@ -218,7 +241,7 @@ void EnemyBase::PosCalculation()
 	};
 }
 
-void EnemyBase::SetInit()
+void EnemyBase::SetDeadInit()
 {
 	// インデックス座標を変更し、座標の計算
 	indexX_ = 10;
@@ -253,6 +276,32 @@ void EnemyBase::ModeSwitch()
 
 			// 縄張りモードに切り替え
 			isTracking_ = false;
+		}
+	}
+}
+
+void EnemyBase::MoveSwitch(int startInterval, int deadInterval)
+{
+	if (!isMove_ && !isDead_)
+	{
+		moveTimer2_++;
+
+		if (moveTimer2_ % startInterval == 0)
+		{
+			moveTimer2_ = 0;
+
+			isMove_ = true;
+		}
+	}
+	else if (!isMove_ && isDead_)
+	{
+		moveTimer2_++;
+
+		if (moveTimer2_ % deadInterval == 0)
+		{
+			moveTimer2_ = 0;
+
+			isMove_ = true;
 		}
 	}
 }

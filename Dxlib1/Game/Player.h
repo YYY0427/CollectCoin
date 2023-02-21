@@ -3,6 +3,7 @@
 #include <memory>	
 #include "../Geometry.h"
 #include "../vec2.h"
+#include "EnemyBase.h"
 
 class Field;
 class InputState;
@@ -12,7 +13,7 @@ class Player
 {
 public:
 	// コンストラクタ
-	Player();
+	Player(int handle, int deadH);
 
 	//デストラクタ
 	~Player(){};
@@ -20,6 +21,8 @@ public:
 	// ポインタの設定
 	void SetEnemy(std::shared_ptr<EnemyBase>enemy, int i) { pEnemy_[i] = enemy; }
 	void SetField(std::shared_ptr<Field>field) { pField_ = field; }
+
+	void Init();
 
 	// 処理
 	void Update(const InputState& input);
@@ -50,6 +53,8 @@ public:
 	// パワーエサを取得したかどうか
 	bool GetPowerFeed() const { return isPowerFeed_; }
 
+	bool GetDead() const { return isDead_; }
+
 	// 死亡設定
 	void SetDead(bool isDead) { isDead_ = isDead; }
 
@@ -59,6 +64,7 @@ public:
 	// 死亡時のアニメーションの終了するかどうかを取得
 	bool GetAnimeEnd() const { return isAnimeEnd_; }
 
+	// 方向
 	enum Direct
 	{
 		// 1からカウント
@@ -73,7 +79,7 @@ private:
 
 	// ポインタ
 	std::shared_ptr<Field> pField_;	
-	std::shared_ptr<EnemyBase> pEnemy_[4];
+	std::shared_ptr<EnemyBase> pEnemy_[EnemyBase::enemy_num];
 
 	Vec2 deathImgSize_;
 	

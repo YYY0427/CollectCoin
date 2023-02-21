@@ -9,6 +9,15 @@
 
 namespace
 {
+	// 画像の幅
+	constexpr int WIDTH = 16;
+
+	// 画像の高さ
+	constexpr int HEIGHT = 16;
+
+	// 画像の拡大率
+	constexpr float SCALE = 2.0f;
+
 	// 通常のプレイヤーの移動スピード
 	constexpr float NORMAL_SPEED = 1.6f;
 
@@ -47,7 +56,7 @@ void CrydeEnemy::Update()
 	// 死んだ場合初期化
 	if (isDead_)
 	{
-		SetInit();
+		SetDeadInit();
 
 		// 敵が死んでいる状態で指定の位置に存在する場合にイジケ状態を解除
 		if (indexX_ == 10 && indexY_ == 10)
@@ -58,7 +67,7 @@ void CrydeEnemy::Update()
 		}
 	}
 
-	MoveSwitch();
+	MoveSwitch(STARET_MOVE_INTEVAL, DIEAD_MOVE_INTERVAL);
 
 	// 縄張りモードと追跡モードの切り替え
 	ModeSwitch();
@@ -102,7 +111,7 @@ void CrydeEnemy::Update()
 		moveTimer_ = 0;
 	}
 
-	SpeedCalculation();
+	SpeedChange();
 
 	if (!pField_->SpornInOrAuto(indexY_, indexX_))
 	{
@@ -130,28 +139,8 @@ void CrydeEnemy::Update()
 	idY_ = (idY_ + 1) % (IZIKE_ANIME_FRAME_SPEED * IZIKE_ANIME_FRAME_NUM);	//イジケ用処理
 }
 
-void CrydeEnemy::MoveSwitch()
+void CrydeEnemy::SetInit()
 {
-	if (!isMove_ && !isDead_)
-	{
-		moveTimer2_++;
-
-		if (moveTimer2_ % STARET_MOVE_INTEVAL == 0)
-		{
-			moveTimer2_ = 0;
-
-			isMove_ = true;
-		}
-	}
-	else if (!isMove_ && isDead_)
-	{
-		moveTimer2_++;
-
-		if (moveTimer2_ % DIEAD_MOVE_INTERVAL == 0)
-		{
-			moveTimer2_ = 0;
-
-			isMove_ = true;
-		}
-	}
+	indexX_ = 9;
+	indexY_ = 10;
 }

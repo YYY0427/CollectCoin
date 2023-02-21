@@ -39,7 +39,7 @@ namespace
 	constexpr int DEAD_ANIME_FRAME_NUM = 12;	// 死亡時
 }
 
-Player::Player() :
+Player::Player(int handle, int deadH) :
 	angle_(0.0f),
 	kX_(0), kY_(0),
 	indexX_(9), indexY_(16),
@@ -59,9 +59,8 @@ Player::Player() :
 	isEnabled_(true),
 	isIntrusion_(false)
 {
-	// 画像のロード
-	handle_ = my::MyLoadGraph(L"Data/img/game/Pacman16.png");
-	deathHandle_ = my::MyLoadGraph(L"Data/img/game/PacmanDeath16.png");
+	handle_ = handle;
+	deathHandle_ = deadH;
 
 	// 画像サイズの取得
 	GetGraphSizeF(deathHandle_, &deathImgSize_.x, &deathImgSize_.y);
@@ -71,6 +70,30 @@ Player::Player() :
 	pos_.y=  (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_Y);
 
 	speed_ = NORMAL_SPEED;
+}
+
+void Player::Init()
+{
+	angle_ = 0.0f;
+	kX_ = 0; 
+	kY_ = 0;
+	indexX_ = 9; 
+	indexY_ = 16;
+	moveTimer_ = 0;
+	moveDirection_ = 0;
+	feedGetNum_ = 0;
+	moveInterval_ = Field::BLOCK_SIZE;
+	powerFeedTimer_ = 0;
+	speed2_ = 1.0f;
+	imgIdX_ = 0;
+	deadImgIdx_ = 0;
+	wantMoveDirection_ = 0;
+	isPowerFeed_ = false;
+	isDead_ = false;
+	isAnimeEnd_ = false;
+	isPowerFeed2_ = false;
+	isEnabled_ = true;
+	isIntrusion_ = false;
 }
 
 void Player::Update(const InputState& input)
@@ -202,7 +225,7 @@ void Player::Update(const InputState& input)
 		imgIdX_ = (imgIdX_ + 1) % (ANIME_FRAME_SPEED * ANIME_FRAME_NUM);
 	}
 
-//	pField_->MoveDataSet(indexY_, indexX_);
+	DrawFormatString(0, 30, 0xffffff, L"playerY : %d, playerX : %d", indexY_, indexX_);
 }
 
 void Player::Draw()

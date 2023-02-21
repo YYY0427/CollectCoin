@@ -14,10 +14,13 @@ class EnemyBase
 {
 public:
 	EnemyBase();
+	virtual ~EnemyBase(){}
 
 	// ポインタの設定
 	void SetPlayer(std::shared_ptr<Player>player) { pPlayer_ = player; }
 	void SetField(std::shared_ptr<Field>field) { pField_ = field; }
+
+	void Init();
 
 	/// <summary>
 	/// 更新
@@ -29,20 +32,23 @@ public:
 	/// </summary>
 	virtual void Draw();
 
+
 	// 現在進んでいる方向への当たり判定
 	bool Colision(int direction);
 
 	// ブロックがない方向を見つける
 	int NoBlockDirect(int indexX, int indexY);
 
-	// パワーエサを取得した場合の速度計算
-	void SpeedCalculation();
+	// 移動スピードの変更
+	void SpeedChange();
 
 	// インデックス座標を座標に変換
 	void PosCalculation();
 
 	// 敵が死んだときの初期化
-	void SetInit();
+	void SetDeadInit();
+
+	virtual void SetInit() = 0;
 
 	// 敵の座標の取得
 	Vec2 GetSize()const { return size_; }
@@ -69,12 +75,15 @@ public:
 	// 縄張りモードと追跡モードの切り替え
 	void ModeSwitch();
 	
+	void MoveSwitch(int startInterval, int deadInterval);
+
 	/// <summary>
 	/// 向いている方向によって値を返す
 	/// </summary>
 	/// <returns>画像のy座標</returns>
 	virtual int DirectReturnNum();
 
+	// 方向
 	enum 
 	{
 		up = 1,
@@ -84,6 +93,15 @@ public:
 		direct_num
 	};
 
+	// 敵の種類
+	enum 
+	{
+		blinky,
+		inky, 
+		cryde,
+		pinky,
+		enemy_num
+	};
 protected:
 	std::shared_ptr<Field> pField_ = nullptr;
 	std::shared_ptr<Player> pPlayer_ = nullptr;
@@ -115,9 +133,6 @@ protected:
 
 	// 移動インターバル用タイマー
 	int moveTimer_;
-
-	// プレイヤーがどの方向に進みたいか
-	int wantMoveDirection_;
 
 	// プレイヤーの移動速度
 	int moveInterval_;

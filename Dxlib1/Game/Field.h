@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "EnemyBase.h"
 
 class Player;
 class EnemyBase;
@@ -26,6 +27,8 @@ public:
 	// デストラクタ
 	~Field(){}
 
+	void Init();
+
 	// 更新処理
 	void Updata();
 
@@ -33,6 +36,7 @@ public:
 	void Draw();
 	void PowerFeedFlash(int y, int x);
 
+	// ポインタの設定
 	void SetEnemy(std::shared_ptr<EnemyBase>enemy, int i) { pEnemy_[i] = enemy; }
 	void SetPlayer(std::shared_ptr<Player>player) { pPlayer_ = player; }
 
@@ -55,7 +59,7 @@ public:
 	// 指定の位置にワープさせる
 	int  Worp(int ky, int kx, int x, int y);
 
-	// playerまでの最短経路を探すための準備として、コピーマップの初期化と目的地(player)の場所に10(目印)を設定
+	// 目的地までの最短経路を探すための準備として、コピーマップの初期化と目的地の場所に0(目印)を設定
 	void MoveDataSet(int playerY, int playerX);
 
 	// フィールドにプレイヤーからの距離を求める関数
@@ -81,9 +85,9 @@ public:
 	int CrydeMove(int enemyIndexY, int enemyIndexX, bool flag);
 private:
 	std::shared_ptr<Player> pPlayer_;
-	std::shared_ptr<EnemyBase> pEnemy_[4];
+	std::shared_ptr<EnemyBase> pEnemy_[EnemyBase::enemy_num];
 
-	int mapData2[MAP_HEIGHT][MAP_WIDTH];
+	int mapData2[Field::MAP_HEIGHT][Field::MAP_WIDTH];
 
 	// パワーエサの点滅
 	int blendCount_;

@@ -9,6 +9,7 @@ namespace Game
 	constexpr bool kWindowMode = false;		// リリース版の場合
 #endif
 
+	// ゲームウィンドウ名
 	const char* const kTitleText = "ＧＡＭＥ";
 
 	//ウィンドウサイズ

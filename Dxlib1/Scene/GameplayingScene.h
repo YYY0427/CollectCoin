@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene.h"
+#include "../Game/EnemyBase.h"
 #include <memory>	//「スマートポインタ」を使うためのinclude
 #include <array>	//配列用
 
@@ -21,6 +22,9 @@ public:
 
 	void Draw();
 
+	// 死亡時の初期化
+	void SetInit();
+
 	bool Colision(std::shared_ptr<EnemyBase>enemy);
 
 private:
@@ -28,7 +32,7 @@ private:
 	std::shared_ptr<Player> pPlayer_;
 
 	// 敵
-	std::array<std::shared_ptr<EnemyBase>, 4> pEnemy_;
+	std::array<std::shared_ptr<EnemyBase>, EnemyBase::enemy_num> pEnemy_;
 
 	//フィールド
 	std::shared_ptr<Field> pField_;
@@ -41,13 +45,28 @@ private:
 	int fadeTimer_ = fade_interval;
 	int fadeValue_ = 255;
 
+	int clearOrOver_;
+
+	int playerH_;
+
+	bool a_;
+
 	int timer_;
+
+	// 残機
+	int life_;
 
 	// フェイドイン
 	void FadeInUpdate(const InputState& input);
 
 	// アップデート
 	void NormalUpdate(const InputState& input);
+
+	// フェイドアウト
+	void FadeOutUpdate(const InputState& input);
+
+	// プレイヤー死亡時の演出
+	void PlayerDeadUpdate(const InputState& input);
 
 	// 敵が死んだときの演出
 	void EnemyDeadUpdate(const InputState& input);
@@ -57,12 +76,6 @@ private:
 
 	// ゲームオーバー演出
 	void GameOverUpdate(const InputState& input);
-
-	// ゲームクリアじのフェイドアウト
-	void GameClearFadeOutUpdate(const InputState& input);
-
-	// ゲームオーバーじのフェイドアウト
-	void GameOverFadeOutUpdate(const InputState& input);
 
 	using UpdateFunc_t = void (GameplayingScene::*) (const InputState& input);
 	UpdateFunc_t updateFunc_ = nullptr;

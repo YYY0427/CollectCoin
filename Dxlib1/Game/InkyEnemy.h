@@ -9,11 +9,13 @@ class InkyEnemy : public EnemyBase
 public:
 	InkyEnemy(int handle, int indexX, int indexY);
 
+	virtual ~InkyEnemy(){}
 	/// <summary>
 	/// XV
 	/// </summary>
 	virtual void Update()override;
 
-	void MoveSwitch();
+	virtual void SetInit()override;
+
 private:
 };

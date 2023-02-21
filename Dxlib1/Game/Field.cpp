@@ -59,6 +59,25 @@ Field::Field() :
 	handle_ = my::MyLoadGraph(L"Data/img/game/powerpacdot.png");
 }
 
+void Field::Init()
+{
+	pinkyGoalX_ = 1;
+	pinkyGoalY_ = 1;
+
+	blinkyGoalX_ = 17;
+	blinkyGoalY_ = 1;
+
+	InkyGoalX_ = 1;
+	inkyGoalY_ = 20;
+
+	crydeGoalY_ = 20;
+	crydeGoalX_ = 17;
+
+	blendCount_ = 0;
+	blendLimitMax_ = false;
+	isDraw_ = true;
+}
+
 void Field::Updata()
 {
 	// パワーエサの点滅更新処理

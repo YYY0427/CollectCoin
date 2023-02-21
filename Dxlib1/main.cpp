@@ -3,7 +3,7 @@
 #include "Scene/SceneManager.h"
 #include "Scene/TitleScene.h"
 #include "InputState.h"
-#include "game.h"
+#include "Game.h"
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
