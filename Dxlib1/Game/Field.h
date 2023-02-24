@@ -25,7 +25,7 @@ public:
 	Field();
 	 
 	// デストラクタ
-	~Field(){}
+	virtual ~Field(){}
 
 	void Init();
 
@@ -34,14 +34,10 @@ public:
 
 	// 描画処理
 	void Draw();
-	void PowerFeedFlash(int y, int x);
-
+	
 	// ポインタの設定
 	void SetEnemy(std::shared_ptr<EnemyBase>enemy, int i) { pEnemy_[i] = enemy; }
 	void SetPlayer(std::shared_ptr<Player>player) { pPlayer_ = player; }
-
-	// パワーエサの点滅
-	void Flash();
 
 	// ゲームクリアチェック判定
 	bool IsGameClearCheck();
@@ -89,15 +85,16 @@ private:
 
 	int mapData2[Field::MAP_HEIGHT][Field::MAP_WIDTH];
 
-	// パワーエサの点滅
-	int blendCount_;
-	bool blendLimitMax_;
-
 	// 表示するかどうか
 	bool isDraw_;
 
-	// パワーエサのハンドル
+	// 画像のハンドル
 	int handle_;
+	int coinH_;
+	int sordH_;
+
+	int imgIdX_;
+	int sordIdx_;
 
 	int pinkyGoalY_;
 	int pinkyGoalX_;

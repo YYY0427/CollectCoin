@@ -9,9 +9,14 @@ namespace
 	//マップデータ
 	int mapData[Field::MAP_HEIGHT][Field::MAP_WIDTH] =
 	{
-		// 1 エサ、2  壁、3 パワーエサ、4 
+		// 0 : なにもなし
+		// 8 : なにもなし
+		// 1 : エサ
+		// 2 : 壁
+		// 3 : 宝箱 
+		// 7 : 扉(中からは出れて、外からは入れない)
 
-		{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
+		{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, 
 		{ 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
 		{ 2, 1, 2, 2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 1, 2 },
 		{ 2, 3, 2, 2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 3, 2 },
@@ -19,11 +24,11 @@ namespace
 		{ 2, 1, 2, 2, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 1, 2 },
 		{ 2, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 2 },
 		{ 2, 2, 2, 2, 1, 2, 2, 2, 0, 2, 0, 2, 2, 2, 1, 2, 2, 2, 2 },
-		{ 4, 4, 4, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 4, 4, 4 },
-		{ 2, 2, 2, 2, 1, 2, 0, 2, 2, 5, 2, 2, 0, 2, 1, 2, 2, 2, 2 },
+		{ 0, 0, 0, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 8, 8, 8 },
+		{ 2, 2, 2, 2, 1, 2, 0, 2, 2, 7, 2, 2, 0, 2, 1, 2, 2, 2, 2 },
 		{ 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0, 0 },
 		{ 2, 2, 2, 2, 1, 2, 0, 2, 2, 2, 2, 2, 0, 2, 1, 2, 2, 2, 2 },
-		{ 4, 4, 4, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 4, 4, 4 },
+		{ 0, 0, 0, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 2, 1, 2, 8, 8, 8 },
 		{ 2, 2, 2, 2, 1, 2, 0, 2, 2, 2, 2, 2, 0, 2, 1, 2, 2, 2, 2 },
 		{ 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
 		{ 2, 1, 2, 2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 1, 2 },
@@ -37,11 +42,18 @@ namespace
 
 	// 点滅スピード
 	constexpr int FLASH_SPEED = 20;
+
+	// アニメーション
+	constexpr int COIN_FRAME_NUM = 4;		
+	constexpr int COIN_FRAME_SPEED = 15;
+
+	constexpr int BOX_FRAME_NUM = 3;
+	constexpr int BOX_FRAME_SPEED = 20;
 }
 
 Field::Field() :
-	blendCount_(0),
-	blendLimitMax_(false),
+	imgIdX_(0),
+	sordIdx_(0),
 	isDraw_(true)
 {
 	pinkyGoalX_ = 1;
@@ -56,7 +68,9 @@ Field::Field() :
 	crydeGoalY_ = 20;
 	crydeGoalX_ = 17;
 
-	handle_ = my::MyLoadGraph(L"Data/img/game/powerpacdot.png");
+	sordH_ = my::MyLoadGraph(L"Data/img/game/sord.png");
+
+	coinH_ = my::MyLoadGraph(L"Data/img/game/coin.png");
 }
 
 void Field::Init()
@@ -73,15 +87,13 @@ void Field::Init()
 	crydeGoalY_ = 20;
 	crydeGoalX_ = 17;
 
-	blendCount_ = 0;
-	blendLimitMax_ = false;
 	isDraw_ = true;
 }
 
 void Field::Updata()
 {
-	// パワーエサの点滅更新処理
-	Flash();
+	// アニメーション処理
+	imgIdX_ = (imgIdX_ + 1) % (COIN_FRAME_SPEED * COIN_FRAME_NUM);
 }
 
 void Field::Draw()
@@ -90,10 +102,12 @@ void Field::Draw()
 	{
 		for (int x = 0; x < MAP_WIDTH; x++)
 		{
-			// エサの描画
+			// コインの描画
 			if (mapData[y][x] == 1)
 			{
-				DrawFormatString(x * BLOCK_SIZE + 10 + DISPLAY_POS_X, y * BLOCK_SIZE + 10 + DISPLAY_POS_Y, 0xffffff, L"・", true);
+				int imgX = (imgIdX_ / COIN_FRAME_SPEED) * 8;
+				DrawRectRotaGraph(x * BLOCK_SIZE + 16 + DISPLAY_POS_X, y * BLOCK_SIZE + 16 + DISPLAY_POS_Y,
+					imgX, 0, 8, 8, 2.0f, 0.0f, coinH_, true);
 			}
 			// 壁の描画
 			if (mapData[y][x] == 2)
@@ -103,51 +117,21 @@ void Field::Draw()
 					x * BLOCK_SIZE + BLOCK_SIZE + DISPLAY_POS_X, y * BLOCK_SIZE + BLOCK_SIZE + DISPLAY_POS_Y,
 					GetColor(0, 0, 255), false);
 			}
-			// パワーエサの描画
+			// 宝箱の描画
 			if (mapData[y][x] == 3)
 			{
-				PowerFeedFlash(y, x);
+				int imgX = (sordIdx_ / BOX_FRAME_SPEED) * 16;
+				DrawRectRotaGraph(x * BLOCK_SIZE + 16 + DISPLAY_POS_X, y * BLOCK_SIZE + 16 + DISPLAY_POS_Y,
+					imgX, 0, 16, 16, 2.0f, 0.0f, sordH_, true);
 			}
-			if (mapData[y][x] == 5)
+			if (mapData[y][x] == 7)
 			{
 				DrawBox(
 					x * BLOCK_SIZE + DISPLAY_POS_X, y * BLOCK_SIZE + DISPLAY_POS_Y,
 					x * BLOCK_SIZE + BLOCK_SIZE + DISPLAY_POS_X, y * BLOCK_SIZE + (BLOCK_SIZE / 4) + DISPLAY_POS_Y,
 					GetColor(255, 255, 0), true);
 			}
-#ifdef _DEBUG	// デバックの版場合
-			if (mapData2[y][x] >= 0)
-			{
-		//		DrawFormatString(x * BLOCK_SIZE + 10 + DISPLAY_POS_X, y * BLOCK_SIZE + 10 + DISPLAY_POS_Y, 0xffffff, L"%d", mapData2[y][x], true);
-			}		
-#endif
 		}
-	}
-}
-
-// パワーエサの描画
-void Field::PowerFeedFlash(int y, int x)
-{
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, blendCount_);
-	DrawRotaGraph(x * BLOCK_SIZE + 16 + DISPLAY_POS_X, y * BLOCK_SIZE + 16 + DISPLAY_POS_Y, 1, 0, handle_, true);
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-}
-
-// パワーエサの点滅処理
-void Field::Flash()
-{
-	//点滅
-	if (blendLimitMax_)
-	{
-		blendCount_ += FLASH_SPEED;
-		if (blendCount_ > 255)
-			blendLimitMax_ = false;
-	}
-	else
-	{
-		blendCount_ -= FLASH_SPEED;
-		if (blendCount_ < 0)
-			blendLimitMax_ = true;
 	}
 }
 
@@ -188,7 +172,7 @@ bool Field::IsFeed(int y, int x)
 	return false;
 }
 
-// パワーエサがあるかどうか
+// 宝箱があるかどうか
 bool Field::IsPowerFeed(int y, int x)
 {
 	if (mapData[y][x] == 3)
@@ -220,7 +204,7 @@ void Field::MoveDataSet(int goalY, int goalX)
 	{
 		for (int x = 0; x < MAP_WIDTH; x++)
 		{
-			if (mapData[y][x] != 2 && mapData[y][x] != 4)
+			if (mapData[y][x] != 2 && mapData[y][x] != 8)
 			{
 				mapData2[y][x] = 0;
 			}
@@ -315,7 +299,7 @@ bool Field::Intrusion(int y, int x, bool flag)
 	// flagがtrueの場合通れる
 	if (!flag)
 	{
-		if (mapData[y][x] == 5)
+		if (mapData[y][x] == 7)
 		{
 			// 通れない
 			return false;

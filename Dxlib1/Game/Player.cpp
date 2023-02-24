@@ -16,7 +16,7 @@ namespace
 	constexpr int HEIGHT = 16;
 
 	// 画像の拡大率
-	constexpr float SCALE = 2.0f;
+	constexpr float SCALE = 2.5f;
 
 	// 通常のプレイヤーの移動スピード(何倍か)
 	constexpr float NORMAL_SPEED = 1.4f;
@@ -31,11 +31,11 @@ namespace
 	constexpr float FLASH_RATIO = 0.6f;
 
 	// 1枚に必要なフレーム数
-	constexpr int ANIME_FRAME_SPEED = 3;		// 通常時
+	constexpr int ANIME_FRAME_SPEED = 10;		// 通常時
 	constexpr int DEAD_ANIME_FRAME_SPEED = 10;	// 死亡時
 
 	// アニメーション枚数
-	constexpr int ANIME_FRAME_NUM = 5;			// 通常時
+	constexpr int ANIME_FRAME_NUM = 6;			// 通常時
 	constexpr int DEAD_ANIME_FRAME_NUM = 12;	// 死亡時
 }
 
@@ -94,6 +94,7 @@ void Player::Init()
 	isPowerFeed2_ = false;
 	isEnabled_ = true;
 	isIntrusion_ = false;
+	turnFlag_ = false;
 }
 
 void Player::Update(const InputState& input)
@@ -157,7 +158,6 @@ void Player::Update(const InputState& input)
 			if (!pField_->IsBlock(indexY_ - 1, indexX_))
 			{
 				// 方向の切り替え
-				angle_ = 4.65f;
 				moveDirection_ = wantMoveDirection_;
 			}
 		}
@@ -166,7 +166,6 @@ void Player::Update(const InputState& input)
 			if (!pField_->IsBlock(indexY_ + 1, indexX_) && pField_->Intrusion(indexY_ + 1, indexX_, isIntrusion_))
 			{
 				//方向の切り替え
-				angle_ = 1.55f;
 				moveDirection_ = wantMoveDirection_;
 			}
 		}
@@ -175,7 +174,7 @@ void Player::Update(const InputState& input)
 			if (!pField_->IsBlock(indexY_, indexX_ - 1))
 			{
 				//方向の切り替え
-				angle_ = 3.1f;
+				turnFlag_ = true;
 				moveDirection_ = wantMoveDirection_;
 			}
 		}
@@ -184,7 +183,7 @@ void Player::Update(const InputState& input)
 			if (!pField_->IsBlock(indexY_, indexX_ + 1))
 			{
 				// 方向の切り替え
-				angle_ = 0.0f;
+				turnFlag_ = false;
 				moveDirection_ = wantMoveDirection_;
 			}
 		}
@@ -224,8 +223,6 @@ void Player::Update(const InputState& input)
 		// アニメーション処理
 		imgIdX_ = (imgIdX_ + 1) % (ANIME_FRAME_SPEED * ANIME_FRAME_NUM);
 	}
-
-	DrawFormatString(0, 30, 0xffffff, L"playerY : %d, playerX : %d", indexY_, indexX_);
 }
 
 void Player::Draw()
@@ -239,8 +236,8 @@ void Player::Draw()
 		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
 						imgX, 0,				// 切り取り左上
 						WIDTH, HEIGHT,			// 幅、高さ
-						SCALE, angle_,			// 拡大率、回転角度
-						handle_, true);			// 画像のハンドル、透過するか
+						SCALE, 0.0f,			// 拡大率、回転角度
+						handle_, true, turnFlag_);			// 画像のハンドル、透過するか
 	}
 	else if(isDead_ && isEnabled_)
 	{
@@ -281,7 +278,8 @@ bool Player::Colision(int direction)
 		if (pField_->IsBlock(indexY_ - 1, indexX_))	return true;
 		break;
 	case down:
-		if (pField_->IsBlock(indexY_ + 1, indexX_) || !pField_->Intrusion(indexY_ + 1, indexX_, isIntrusion_))	return true;
+		if (pField_->IsBlock(indexY_ + 1, indexX_) || 
+			!pField_->Intrusion(indexY_ + 1, indexX_, isIntrusion_))	return true;
 		break;
 	case left:
 		if (pField_->IsBlock(indexY_, indexX_ - 1))	return true;
@@ -302,7 +300,7 @@ void Player::SpeedCalculation()
 		{
 			// パワーエサのフラグを立てる
 			isPowerFeed_ = true;
-
+	
 			for (auto& enemy : pEnemy_)
 			{
 				// 敵のイジケ状態を開始

@@ -23,21 +23,21 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	timer_(0),
 	clearOrOver_(false)
 {
-	playerH_ = my::MyLoadGraph(L"Data/img/game/Pacman16.png");
+	int playerH = my::MyLoadGraph(L"Data/img/game/man.png");
+	hartH_ = my::MyLoadGraph(L"Data/img/game/hart.png");
 	int deadPlayerH = my::MyLoadGraph(L"Data/img/game/PacmanDeath16.png");
-	pPlayer_ = std::make_shared<Player>(playerH_, deadPlayerH);
+	int blinkyEnemyH = my::MyLoadGraph(L"Data/img/game/blinky.png");
+	int inkyEnemyH = my::MyLoadGraph(L"Data/img/game/inky.png");
+	int crydeEnemyH = my::MyLoadGraph(L"Data/img/game/cryde.png");
+	int pinkyEnemyH = my::MyLoadGraph(L"Data/img/game/pinky.png");
 
+	pEnemy_[EnemyBase::blinky] = std::make_shared<BlinkyEnemy>(blinkyEnemyH, 9, 8);
+	pEnemy_[EnemyBase::inky] = std::make_shared<InkyEnemy>(inkyEnemyH, 8, 10);
+	pEnemy_[EnemyBase::cryde] = std::make_shared<CrydeEnemy>(crydeEnemyH, 9, 10);
+	pEnemy_[EnemyBase::pinky] = std::make_shared<PinkyEnemy>(pinkyEnemyH, 10, 10);
+
+	pPlayer_ = std::make_shared<Player>(playerH, deadPlayerH);
 	pField_ = std::make_shared<Field>();
-
-	int blinkyEnemyH_ = my::MyLoadGraph(L"Data/img/game/blinky.png");
-	int inkyEnemyH_ = my::MyLoadGraph(L"Data/img/game/inky.png");
-	int crydeEnemyH_ = my::MyLoadGraph(L"Data/img/game/cryde.png");
-	int pinkyEnemyH_ = my::MyLoadGraph(L"Data/img/game/pinky.png");
-
-	pEnemy_[EnemyBase::blinky] = std::make_shared<BlinkyEnemy>(blinkyEnemyH_, 9, 8);
-	pEnemy_[EnemyBase::inky] = std::make_shared<InkyEnemy>(inkyEnemyH_, 8, 10);
-	pEnemy_[EnemyBase::cryde] = std::make_shared<CrydeEnemy>(crydeEnemyH_, 9, 10);
-	pEnemy_[EnemyBase::pinky] = std::make_shared<PinkyEnemy>(pinkyEnemyH_, 10, 10);
 
 	for (auto& enemy : pEnemy_)
 	{
@@ -185,9 +185,9 @@ void GameplayingScene::Draw()
 
 	for (int i = 0; i < life_; i++)
 	{
-		int x = Game::kScreenWidth / 2 + i * 40;
+		int x = Game::kScreenWidth / 2 + 100 + (i * 40);
 
-		DrawRectRotaGraph(x, Game::kScreenHeight - 16, 32, 0, 16, 16, 2.0f, 0.0f, playerH_, true);
+		DrawRectRotaGraph(x, Game::kScreenHeight - 16, 0, 0, 16, 16, 2.0f, 0.0f, hartH_, true);
 	}
 
 	DrawString(0, 0, L"GamePlayingScene", 0xffffff, true);

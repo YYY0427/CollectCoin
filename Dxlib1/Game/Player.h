@@ -1,5 +1,4 @@
 #pragma once
-//「スマートポインタ」を使うためのinclude
 #include <memory>	
 #include "../Geometry.h"
 #include "../vec2.h"
@@ -93,6 +92,8 @@ private:
 	// プレイヤーの仮の座標
 	int kX_;
 	int kY_;
+
+	int turnFlag_;
 
 	//プレイヤーの画像
 	int handle_;

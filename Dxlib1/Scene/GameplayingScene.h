@@ -47,7 +47,7 @@ private:
 
 	int clearOrOver_;
 
-	int playerH_;
+	int hartH_;
 
 	bool a_;
 
@@ -67,6 +67,8 @@ private:
 
 	// プレイヤー死亡時の演出
 	void PlayerDeadUpdate(const InputState& input);
+
+	void BoxAnimeUpdate(const InputState& input);
 
 	// 敵が死んだときの演出
 	void EnemyDeadUpdate(const InputState& input);
