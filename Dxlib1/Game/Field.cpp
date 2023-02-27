@@ -106,29 +106,29 @@ void Field::Draw()
 			if (mapData[y][x] == 1)
 			{
 				int imgX = (imgIdX_ / COIN_FRAME_SPEED) * 8;
-				DrawRectRotaGraph(x * BLOCK_SIZE + 16 + DISPLAY_POS_X, y * BLOCK_SIZE + 16 + DISPLAY_POS_Y,
+				DrawRectRotaGraph(x * CHIP_SIZE + 16 + DISPLAY_POS_X, y * CHIP_SIZE + 16 + DISPLAY_POS_Y,
 					imgX, 0, 8, 8, 2.0f, 0.0f, coinH_, true);
 			}
 			// •Ç‚Ì•`‰æ
-			if (mapData[y][x] == 2)
+			/*if (mapData[y][x] == 2)
 			{
 				DrawBox(
-					x * BLOCK_SIZE + DISPLAY_POS_X, y * BLOCK_SIZE + DISPLAY_POS_Y,
-					x * BLOCK_SIZE + BLOCK_SIZE + DISPLAY_POS_X, y * BLOCK_SIZE + BLOCK_SIZE + DISPLAY_POS_Y,
+					x * CHIP_SIZE + DISPLAY_POS_X, y * CHIP_SIZE + DISPLAY_POS_Y,
+					x * CHIP_SIZE + CHIP_SIZE + DISPLAY_POS_X, y * CHIP_SIZE + CHIP_SIZE + DISPLAY_POS_Y,
 					GetColor(0, 0, 255), false);
-			}
+			}*/
 			// •ó” ‚Ì•`‰æ
 			if (mapData[y][x] == 3)
 			{
 				int imgX = (sordIdx_ / BOX_FRAME_SPEED) * 16;
-				DrawRectRotaGraph(x * BLOCK_SIZE + 16 + DISPLAY_POS_X, y * BLOCK_SIZE + 16 + DISPLAY_POS_Y,
+				DrawRectRotaGraph(x * CHIP_SIZE + 16 + DISPLAY_POS_X, y * CHIP_SIZE + 16 + DISPLAY_POS_Y,
 					imgX, 0, 16, 16, 2.0f, 0.0f, sordH_, true);
 			}
 			if (mapData[y][x] == 7)
 			{
 				DrawBox(
-					x * BLOCK_SIZE + DISPLAY_POS_X, y * BLOCK_SIZE + DISPLAY_POS_Y,
-					x * BLOCK_SIZE + BLOCK_SIZE + DISPLAY_POS_X, y * BLOCK_SIZE + (BLOCK_SIZE / 4) + DISPLAY_POS_Y,
+					x * CHIP_SIZE + DISPLAY_POS_X, y * CHIP_SIZE + DISPLAY_POS_Y,
+					x * CHIP_SIZE + CHIP_SIZE + DISPLAY_POS_X, y * CHIP_SIZE + (CHIP_SIZE / 4) + DISPLAY_POS_Y,
 					GetColor(255, 255, 0), true);
 			}
 		}

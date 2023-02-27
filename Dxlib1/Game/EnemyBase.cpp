@@ -76,12 +76,12 @@ EnemyBase::EnemyBase() :
 	// 画像のサイズの取得
 	GetGraphSizeF(handle_, &size_.x, &size_.y);
 
-	moveInterval_ = Field::BLOCK_SIZE;
+	moveInterval_ = Field::CHIP_SIZE;
 
 	speed_ = NORMAL_SPEED;
 
-	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_X);
-	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_Y);
+	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_X);
+	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_Y);
 }
 
 void EnemyBase::Draw()
@@ -218,8 +218,8 @@ void EnemyBase::SpeedChange()
 void EnemyBase::PosCalculation()
 {
 	// インデックス座標を計算
-	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_X);
-	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_Y);
+	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_X);
+	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_Y);
 
 	// 向いている方向によって座標を計算
 	switch (moveDirection_)
@@ -246,8 +246,8 @@ void EnemyBase::SetDeadInit()
 	// インデックス座標を変更し、座標の計算
 	indexX_ = 10;
 	indexY_ = 10;
-	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_X);
-	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_Y);
+	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_X);
+	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_Y);
 
 	// 初期化
 	isDead_ = false;

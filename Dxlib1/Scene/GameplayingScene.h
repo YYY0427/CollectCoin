@@ -8,6 +8,7 @@
 class Player;	//プレイヤークラス
 class Field;	
 class EnemyBase;
+class Map;
 
 /// <summary>
 /// ゲーム中シーン
@@ -36,6 +37,8 @@ private:
 
 	//フィールド
 	std::shared_ptr<Field> pField_;
+
+	std::shared_ptr<Map> pMap_;
 
 	//フェードの色(デフォ黒)
 	unsigned int  fadeColor_ = 0x000000; 

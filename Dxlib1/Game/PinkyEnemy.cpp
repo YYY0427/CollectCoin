@@ -79,7 +79,7 @@ void PinkyEnemy::Update()
 	kY_ = indexY_;
 
 	// スピードによって移動のインターバルを変更
-	moveInterval_ = Field::BLOCK_SIZE / speed_;
+	moveInterval_ = Field::CHIP_SIZE / speed_;
 
 	// 移動のインターバル
 	if (moveTimer_ % moveInterval_ == 0)

@@ -154,6 +154,7 @@
     <ClCompile Include="Game\InkyEnemy.cpp" />
     <ClCompile Include="Game\PinkyEnemy.cpp" />
     <ClCompile Include="Game\CrydeEnemy.cpp" />
+    <ClCompile Include="Game\Map.cpp" />
     <ClCompile Include="Scene\GameclearScene.cpp" />
     <ClCompile Include="Game\BlinkyEnemy.cpp" />
     <ClCompile Include="DrawFunctions.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="Game\InkyEnemy.h" />
     <ClInclude Include="Game\PinkyEnemy.h" />
     <ClInclude Include="Game\CrydeEnemy.h" />
+    <ClInclude Include="Game\Map.h" />
     <ClInclude Include="Scene\GameclearScene.h" />
     <ClInclude Include="Game\BlinkyEnemy.h" />
     <ClInclude Include="DrawFunctions.h" />

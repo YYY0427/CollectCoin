@@ -14,6 +14,7 @@
 #include "../Game/PinkyEnemy.h"
 #include "../Game/EnemyBase.h"
 #include "../Game.h"
+#include "../Game/Map.h"
 #include <DxLib.h>
 
 GameplayingScene::GameplayingScene(SceneManager& manager) :
@@ -38,6 +39,7 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 
 	pPlayer_ = std::make_shared<Player>(playerH, deadPlayerH);
 	pField_ = std::make_shared<Field>();
+	pMap_ = std::make_shared<Map>();
 
 	for (auto& enemy : pEnemy_)
 	{
@@ -174,6 +176,8 @@ void GameplayingScene::Update(const InputState& input)
 
 void GameplayingScene::Draw()
 {
+
+	pMap_->Draw();
 	pField_->Draw();
 
 	pPlayer_->Draw();

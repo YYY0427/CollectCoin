@@ -15,7 +15,7 @@ public:
 	static constexpr int MAP_HEIGHT = 22;
 
 	// ブロックの大きさ
-	static constexpr int BLOCK_SIZE = 32;
+	static constexpr int CHIP_SIZE = 32;
 
 	// 表示場所
 	static constexpr int DISPLAY_POS_X = 400;

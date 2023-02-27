@@ -46,7 +46,7 @@ Player::Player(int handle, int deadH) :
 	moveTimer_(0),
 	moveDirection_(0),
 	feedGetNum_(0),
-	moveInterval_(Field::BLOCK_SIZE),
+	moveInterval_(Field::CHIP_SIZE),
 	powerFeedTimer_(0),
 	speed2_(1.0f),
 	imgIdX_(0),
@@ -66,8 +66,8 @@ Player::Player(int handle, int deadH) :
 	GetGraphSizeF(deathHandle_, &deathImgSize_.x, &deathImgSize_.y);
 
 	// インデックスの座標から初期座標を求める
-	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_X);
-	pos_.y=  (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_Y);
+	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_X);
+	pos_.y=  (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_Y);
 
 	speed_ = NORMAL_SPEED;
 }
@@ -82,7 +82,7 @@ void Player::Init()
 	moveTimer_ = 0;
 	moveDirection_ = 0;
 	feedGetNum_ = 0;
-	moveInterval_ = Field::BLOCK_SIZE;
+	moveInterval_ = Field::CHIP_SIZE;
 	powerFeedTimer_ = 0;
 	speed2_ = 1.0f;
 	imgIdX_ = 0;
@@ -128,7 +128,7 @@ void Player::Update(const InputState& input)
 		wantMoveDirection_ = right;
 	}
 
-	moveInterval_ = Field::BLOCK_SIZE / speed_;
+	moveInterval_ = Field::CHIP_SIZE / speed_;
 
 	// 移動のインターバル				// 移動する方向に壁がない場合移動
 	if (moveTimer_ % moveInterval_ == 0 && !Colision(moveDirection_))
@@ -233,7 +233,7 @@ void Player::Draw()
 		int imgX = (imgIdX_ / ANIME_FRAME_SPEED) * 16;
 
 		// プレイヤー画像の表示
-		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
+		DrawRectRotaGraph(pos_.x, pos_.y - 5,		// 座標
 						imgX, 0,				// 切り取り左上
 						WIDTH, HEIGHT,			// 幅、高さ
 						SCALE, 0.0f,			// 拡大率、回転角度
@@ -371,8 +371,8 @@ void Player::SpeedCalculation()
 void Player::PosCalculation()
 {
 	// インデックス座標から座標を計算
-	pos_.x = (indexX_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_X);
-	pos_.y = (indexY_ * Field::BLOCK_SIZE) + (Field::BLOCK_SIZE / 2 + Field::DISPLAY_POS_Y);
+	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_X);
+	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_Y);
 
 	// 向いている方向と移動速度によって座標を計算
 	switch (moveDirection_) 

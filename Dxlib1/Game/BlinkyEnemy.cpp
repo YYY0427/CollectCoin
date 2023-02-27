@@ -70,7 +70,7 @@ void BlinkyEnemy::Update()
 	kX_ = indexX_;
 	kY_ = indexY_;
 
-	moveInterval_ = Field::BLOCK_SIZE / speed_;
+	moveInterval_ = Field::CHIP_SIZE / speed_;
 
 	// 移動のインターバル
 	if (moveTimer_ % moveInterval_ == 0)
