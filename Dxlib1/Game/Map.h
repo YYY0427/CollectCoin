@@ -2,14 +2,13 @@
 class Map
 {
 public:
-	Map();
-	virtual ~Map();
+	Map(int handle);
+	virtual ~Map(){};
 
 	//描画
 	void Draw();
 
 private:
-
 	//マップの描画
 	void DrawMap();
 
@@ -25,5 +24,4 @@ private:
 	//グラフィックのデータ
 	int graphWidth_;
 	int graphHeight_;
-
 };

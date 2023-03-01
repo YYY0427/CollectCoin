@@ -17,7 +17,7 @@ class GameplayingScene : public Scene
 {
 public:
 	GameplayingScene(SceneManager& manager);
-	~GameplayingScene() {}
+	~GameplayingScene(){};
 
 	void Update(const InputState& input);
 
@@ -52,12 +52,14 @@ private:
 
 	int hartH_;
 
-	bool a_;
+	bool isAnimeEnd_;
 
 	int timer_;
 
 	// 残機
 	int life_;
+
+	bool faideEnabled_;
 
 	// フェイドイン
 	void FadeInUpdate(const InputState& input);

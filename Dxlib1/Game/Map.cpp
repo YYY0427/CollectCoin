@@ -36,18 +36,12 @@ namespace
 	constexpr int SCALE = 2.0f;
 }
 
-Map::Map() :
-	handle_(-1),
+Map::Map(int handle) :
+	handle_(handle),
 	graphWidth_(0),
 	graphHeight_(0)
 {
-	handle_ = LoadGraph(L"Data/img/game/mapchip.png");
 	GetGraphSize(handle_, &graphWidth_, &graphHeight_);
-}
-
-Map::~Map() 
-{
-	DeleteGraph(handle_);
 }
 
 void Map::Draw() 
@@ -63,7 +57,6 @@ void Map::Draw()
 
 void Map::DrawMap() 
 {
-
 	for (int y = 0; y < Field::MAP_HEIGHT; y++) 
 	{
 		for (int x = 0; x < Field::MAP_WIDTH; x++) 

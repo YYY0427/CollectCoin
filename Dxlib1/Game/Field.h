@@ -18,7 +18,7 @@ public:
 	static constexpr int CHIP_SIZE = 32;
 
 	// 表示場所
-	static constexpr int DISPLAY_POS_X = 400;
+	static constexpr int DISPLAY_POS_X = 450;
 	static constexpr int DISPLAY_POS_Y = 100;
 
 	// コンストラクタ

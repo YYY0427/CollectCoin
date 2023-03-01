@@ -10,13 +10,13 @@
 namespace
 {
 	// 画像の幅
-	constexpr int WIDTH = 16;
+	constexpr int WIDTH = 32;
 
 	// 画像の高さ
-	constexpr int HEIGHT = 16;
+	constexpr int HEIGHT = 32;
 
 	// 画像の拡大率
-	constexpr float SCALE = 2.5f;
+	constexpr float SCALE = 2.0f;
 
 	// 通常のプレイヤーの移動スピード(何倍か)
 	constexpr float NORMAL_SPEED = 1.4f;
@@ -35,14 +35,13 @@ namespace
 	constexpr int DEAD_ANIME_FRAME_SPEED = 10;	// 死亡時
 
 	// アニメーション枚数
-	constexpr int ANIME_FRAME_NUM = 6;			// 通常時
-	constexpr int DEAD_ANIME_FRAME_NUM = 12;	// 死亡時
+	constexpr int ANIME_FRAME_NUM = 8;			// 通常時
+	constexpr int DEAD_ANIME_FRAME_NUM = 8;	// 死亡時
 }
 
-Player::Player(int handle, int deadH) :
+Player::Player(int normalH, int waponH, int deadH, int indexX, int indexY) :
 	angle_(0.0f),
 	kX_(0), kY_(0),
-	indexX_(9), indexY_(16),
 	moveTimer_(0),
 	moveDirection_(0),
 	feedGetNum_(0),
@@ -52,18 +51,26 @@ Player::Player(int handle, int deadH) :
 	imgIdX_(0),
 	deadImgIdx_(0),
 	wantMoveDirection_(0),
+	imgY_(0),
 	isPowerFeed_(false),
 	isDead_(false),
 	isAnimeEnd_(false),
 	isPowerFeed2_(false),
 	isEnabled_(true),
-	isIntrusion_(false)
+	isIntrusion_(false),
+	turnFlag_(false)
 {
-	handle_ = handle;
-	deathHandle_ = deadH;
+	indexX_ = indexX;
+	indexY_ = indexY;
+
+	normalH_ = normalH;
+	waponH_ = waponH;
+	deathH_ = deadH;
+
+	handle_ = normalH_;
 
 	// 画像サイズの取得
-	GetGraphSizeF(deathHandle_, &deathImgSize_.x, &deathImgSize_.y);
+	GetGraphSizeF(deathH_, &deathImgSize_.x, &deathImgSize_.y);
 
 	// インデックスの座標から初期座標を求める
 	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_X);
@@ -74,6 +81,7 @@ Player::Player(int handle, int deadH) :
 
 void Player::Init()
 {
+	handle_ = normalH_;
 	angle_ = 0.0f;
 	kX_ = 0; 
 	kY_ = 0;
@@ -158,6 +166,7 @@ void Player::Update(const InputState& input)
 			if (!pField_->IsBlock(indexY_ - 1, indexX_))
 			{
 				// 方向の切り替え
+				imgY_ = 32;
 				moveDirection_ = wantMoveDirection_;
 			}
 		}
@@ -166,6 +175,7 @@ void Player::Update(const InputState& input)
 			if (!pField_->IsBlock(indexY_ + 1, indexX_) && pField_->Intrusion(indexY_ + 1, indexX_, isIntrusion_))
 			{
 				//方向の切り替え
+				imgY_ = 96;
 				moveDirection_ = wantMoveDirection_;
 			}
 		}
@@ -174,7 +184,7 @@ void Player::Update(const InputState& input)
 			if (!pField_->IsBlock(indexY_, indexX_ - 1))
 			{
 				//方向の切り替え
-				turnFlag_ = true;
+				imgY_ = 64;
 				moveDirection_ = wantMoveDirection_;
 			}
 		}
@@ -183,7 +193,7 @@ void Player::Update(const InputState& input)
 			if (!pField_->IsBlock(indexY_, indexX_ + 1))
 			{
 				// 方向の切り替え
-				turnFlag_ = false;
+				imgY_ = 0;
 				moveDirection_ = wantMoveDirection_;
 			}
 		}
@@ -230,11 +240,11 @@ void Player::Draw()
 	// プレイヤーが敵と当たったか
 	if (!isDead_ && isEnabled_)
 	{
-		int imgX = (imgIdX_ / ANIME_FRAME_SPEED) * 16;
+		int imgX = (imgIdX_ / ANIME_FRAME_SPEED) * WIDTH;
 
 		// プレイヤー画像の表示
 		DrawRectRotaGraph(pos_.x, pos_.y - 5,		// 座標
-						imgX, 0,				// 切り取り左上
+						imgX, imgY_,				// 切り取り左上
 						WIDTH, HEIGHT,			// 幅、高さ
 						SCALE, 0.0f,			// 拡大率、回転角度
 						handle_, true, turnFlag_);			// 画像のハンドル、透過するか
@@ -242,7 +252,7 @@ void Player::Draw()
 	else if(isDead_ && isEnabled_)
 	{
 		// 画像のインデックスを計算
-		int imgX = (deadImgIdx_ / DEAD_ANIME_FRAME_SPEED) * 16;
+		int imgX = (deadImgIdx_ / DEAD_ANIME_FRAME_SPEED) * 32;
 
 		// アニメーション画像の右端まで表示した場合
 		if (imgX >= deathImgSize_.x - WIDTH)
@@ -257,7 +267,7 @@ void Player::Draw()
 						  imgX, 0,							// 切り取り左上
 						  WIDTH, HEIGHT,					// 幅、高さ
 						  SCALE, 0,							// 拡大率、回転角度
-						  deathHandle_, true);				// 画像のハンドル、透過するか
+						  deathH_, true);				// 画像のハンドル、透過するか
 	}
 }
 
@@ -300,7 +310,10 @@ void Player::SpeedCalculation()
 		{
 			// パワーエサのフラグを立てる
 			isPowerFeed_ = true;
-	
+
+			// プレイヤー画像を変更
+			handle_ = waponH_;
+
 			for (auto& enemy : pEnemy_)
 			{
 				// 敵のイジケ状態を開始
@@ -310,6 +323,9 @@ void Player::SpeedCalculation()
 	}
 	else
 	{
+		// プレイヤー画像を変更
+		handle_ = waponH_;
+
 		// パワーエサを取得している状態でパワーエサを取得した
 		if (pField_->IsPowerFeed(indexY_, indexX_))
 		{
@@ -361,6 +377,9 @@ void Player::SpeedCalculation()
 				enemy->SetFlash(false);
 				enemy->SetIzike(false);
 			}
+
+			// プレイヤー画像を変更
+			handle_ = normalH_;
 
 			// 元の移動速度に戻す
 			speed_ = NORMAL_SPEED;

@@ -10,10 +10,10 @@
 namespace
 {
 	// 画像の幅
-	constexpr int WIDTH = 16;
+	constexpr int WIDTH = 32;
 
 	// 画像の高さ
-	constexpr int HEIGHT = 16;
+	constexpr int HEIGHT = 32;
 
 	// 画像の拡大率
 	constexpr float SCALE = 2.0f;
@@ -29,11 +29,9 @@ namespace
 
 	// 1枚に必要なフレーム数
 	constexpr int ANIME_FRAME_SPEED = 10;
-	constexpr int IZIKE_ANIME_FRAME_SPEED = 30;
 
 	// アニメーション枚数
-	constexpr int ANIME_FRAME_NUM = 2;
-	constexpr int IZIKE_ANIME_FRAME_NUM = 2;
+	constexpr int ANIME_FRAME_NUM = 4;
 
 	// 死んでから動き始めるまでの時間
 	constexpr int DIEAD_MOVE_INTERVAL = 60 * 5;
@@ -59,7 +57,7 @@ void PinkyEnemy::Update()
 		// 敵が死んでいる状態で指定の位置に存在する場合にイジケ状態を解除
 		if (indexX_ == 10 && indexY_ == 10)
 		{
-			isIzike_ = false;
+		//	isIzike_ = false;
 			isMove_ = false;
 			isIntrusion_ = true;
 		}
@@ -136,7 +134,24 @@ void PinkyEnemy::Update()
 
 	// アニメーション処理
 	idX_ = (idX_ + 1) % (ANIME_FRAME_SPEED * ANIME_FRAME_NUM);				// 通常処理
-	idY_ = (idY_ + 1) % (IZIKE_ANIME_FRAME_SPEED * IZIKE_ANIME_FRAME_NUM);	//イジケ用処理
+}
+
+void PinkyEnemy::Draw()
+{
+	int imgX = (idX_ / ANIME_FRAME_SPEED) * WIDTH;
+
+	// 通常時の表示
+	if (isEnabled_)
+	{
+
+		int imgY = DirectReturnNum(HEIGHT);
+
+		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
+			imgX, imgY,							// 切り取り左上
+			WIDTH, HEIGHT,						// 幅、高さ
+			SCALE, 0,							// 拡大率、回転角度
+			handle_, true);						// 画像のハンドル、透過するか
+	}
 }
 
 void PinkyEnemy::SetInit()

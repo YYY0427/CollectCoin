@@ -16,5 +16,6 @@ void OptionScene::Update(const InputState& input)
 
 void OptionScene::Draw()
 {
-	DrawString(300, 200, L"OptionScene", GetColor(255, 255, 255));
+	DrawString(100, 100, L"óVÇ—ï˚ê‡ñæ", GetColor(255, 255, 255));
+
 }

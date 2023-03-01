@@ -30,7 +30,7 @@ public:
 	/// <summary>
 	/// •`‰æ
 	/// </summary>
-	virtual void Draw();
+	virtual void Draw() = 0;
 
 
 	// Œ»İi‚ñ‚Å‚¢‚é•ûŒü‚Ö‚Ì“–‚½‚è”»’è
@@ -81,7 +81,7 @@ public:
 	/// Œü‚¢‚Ä‚¢‚é•ûŒü‚É‚æ‚Á‚Ä’l‚ğ•Ô‚·
 	/// </summary>
 	/// <returns>‰æ‘œ‚ÌyÀ•W</returns>
-	virtual int DirectReturnNum();
+	virtual int DirectReturnNum(int chipSize);
 
 	// •ûŒü
 	enum 
@@ -96,10 +96,10 @@ public:
 	// “G‚Ìí—Ş
 	enum 
 	{
-		blinky,
-		inky, 
-		cryde,
-		pinky,
+		skeleton,
+		slime, 
+		ghost,
+		golem,
 		enemy_num
 	};
 protected:

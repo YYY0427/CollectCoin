@@ -13,14 +13,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// 画面サイズの設定
 	SetGraphMode(Game::kScreenWidth, Game::kScreenHeight, Game::kColorDepth);
 
+	// ウインドウ名設定
+	SetMainWindowText(L"パックマン");
+
 	// 初期化
 	if (DxLib_Init() == -1) 
 	{
 		return -1;
 	}
-
-	// ウインドウ名設定
-	SetMainWindowText(L"パックマン");
 
 	SetDrawScreen(DX_SCREEN_BACK);
 

@@ -12,7 +12,7 @@ class Player
 {
 public:
 	// コンストラクタ
-	Player(int handle, int deadH);
+	Player(int normalH, int waponH, int deadH, int indexX, int indexY);
 
 	//デストラクタ
 	~Player(){};
@@ -97,8 +97,10 @@ private:
 
 	//プレイヤーの画像
 	int handle_;
-	int deathHandle_;
-
+	int normalH_;
+	int waponH_;
+	int deathH_;
+	
 	// 移動インターバル用タイマー
 	int moveTimer_;
 
@@ -145,4 +147,6 @@ private:
 
 	// 特定のブロックに侵入可能か
 	bool isIntrusion_;
+
+	int imgY_;
 };

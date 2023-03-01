@@ -20,6 +20,8 @@ public:
 	/// </summary>
 	virtual void Update()override;
 
+	virtual void Draw()override;
+
 	virtual void SetInit()override;
 private:
 };

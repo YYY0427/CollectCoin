@@ -17,29 +17,71 @@
 #include "../Game/Map.h"
 #include <DxLib.h>
 
+namespace
+{
+	// プレイヤーの初期位置
+	constexpr int PLAYER_START_INDEX_X = 9;
+	constexpr int PLAYER_START_INDEX_Y = 16;
+
+	// 敵(スケルトン)の初期位置
+	constexpr int SKELETON_START_INDEX_X = 9;
+	constexpr int SKELETON_START_INDEX_Y = 8;
+
+	// 敵(スライム)の初期位置
+	constexpr int SLIME_START_INDEX_X = 8;
+	constexpr int SLIME_START_INDEX_Y = 10;
+
+	// 敵(幽霊)の初期位置
+	constexpr int GHOST_START_INDEX_X = 9;
+	constexpr int GHOST_START_INDEX_Y = 10;
+
+	// 敵(ゴーレム)の初期位置
+	constexpr int GOLEM_START_INDEX_X = 10;
+	constexpr int GOLEM_START_INDEX_Y = 10;
+}
+
 GameplayingScene::GameplayingScene(SceneManager& manager) :
 	Scene(manager),
 	updateFunc_(&GameplayingScene::FadeInUpdate),
 	life_(3),
 	timer_(0),
-	clearOrOver_(false)
+	clearOrOver_(false),
+	faideEnabled_(false)
 {
-	int playerH = my::MyLoadGraph(L"Data/img/game/man.png");
+	int nowaponPlayerH = my::MyLoadGraph(L"Data/img/game/nowapon-player.png");
+	int waponPlayerH = my::MyLoadGraph(L"Data/img/game/wapon-player.png");
+	int deadPlayerH = my::MyLoadGraph(L"Data/img/game/player-deth.png");
+
+	int skeletonH = my::MyLoadGraph(L"Data/img/game/skeleton_walk.png");
+ 	int slimeH = my::MyLoadGraph(L"Data/img/game/slime.png");
+	int ghostH = my::MyLoadGraph(L"Data/img/game/whiteGhost.png");
+	int golemH = my::MyLoadGraph(L"Data/img/game/golem.png");
+
+	int mapChipH = my::MyLoadGraph(L"Data/img/game/mapchip.png");
 	hartH_ = my::MyLoadGraph(L"Data/img/game/hart.png");
-	int deadPlayerH = my::MyLoadGraph(L"Data/img/game/PacmanDeath16.png");
-	int blinkyEnemyH = my::MyLoadGraph(L"Data/img/game/blinky.png");
-	int inkyEnemyH = my::MyLoadGraph(L"Data/img/game/inky.png");
-	int crydeEnemyH = my::MyLoadGraph(L"Data/img/game/cryde.png");
-	int pinkyEnemyH = my::MyLoadGraph(L"Data/img/game/pinky.png");
 
-	pEnemy_[EnemyBase::blinky] = std::make_shared<BlinkyEnemy>(blinkyEnemyH, 9, 8);
-	pEnemy_[EnemyBase::inky] = std::make_shared<InkyEnemy>(inkyEnemyH, 8, 10);
-	pEnemy_[EnemyBase::cryde] = std::make_shared<CrydeEnemy>(crydeEnemyH, 9, 10);
-	pEnemy_[EnemyBase::pinky] = std::make_shared<PinkyEnemy>(pinkyEnemyH, 10, 10);
 
-	pPlayer_ = std::make_shared<Player>(playerH, deadPlayerH);
+	pEnemy_[EnemyBase::skeleton] = std::make_shared<BlinkyEnemy>(
+								skeletonH,					// 画像ハンドル
+								SKELETON_START_INDEX_X,		// 初期座標X
+								SKELETON_START_INDEX_Y);	// 初期座標Y
+	pEnemy_[EnemyBase::slime] = std::make_shared<InkyEnemy>(
+								slimeH,						// 画像ハンドル
+								SLIME_START_INDEX_X,		// 初期座標X
+								SLIME_START_INDEX_Y);		// 初期座標Y
+	pEnemy_[EnemyBase::ghost] = std::make_shared<CrydeEnemy>(
+								ghostH,						// 画像ハンドル
+								GHOST_START_INDEX_X,		// 初期座標X
+								GHOST_START_INDEX_Y);		// 初期座標Y
+	pEnemy_[EnemyBase::golem] = std::make_shared<PinkyEnemy>(
+								golemH,						// 画像ハンドル
+								GOLEM_START_INDEX_X,		// 初期座標X
+								GOLEM_START_INDEX_Y);		// 初期座標Y
+
+	pPlayer_ = std::make_shared<Player>(nowaponPlayerH, waponPlayerH, deadPlayerH,
+								PLAYER_START_INDEX_X, PLAYER_START_INDEX_Y);
 	pField_ = std::make_shared<Field>();
-	pMap_ = std::make_shared<Map>();
+	pMap_ = std::make_shared<Map>(mapChipH);
 
 	for (auto& enemy : pEnemy_)
 	{
@@ -57,7 +99,6 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	}
 }
 
-
 void GameplayingScene::FadeInUpdate(const InputState& input)
 {
 	for (auto& enemy : pEnemy_)
@@ -70,12 +111,7 @@ void GameplayingScene::FadeInUpdate(const InputState& input)
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_)) / static_cast<float>(fade_interval);
 	if (--fadeTimer_ == 0)
 	{
-		for (auto& enemy : pEnemy_)
-		{
-			enemy->SetEnabled(true);
-		}
-
-		pPlayer_->SetEnabled(true);
+		faideEnabled_ = true;
 
 		fadeValue_ = 0;
 
@@ -85,6 +121,18 @@ void GameplayingScene::FadeInUpdate(const InputState& input)
 
 void GameplayingScene::NormalUpdate(const InputState& input)
 {
+	if (faideEnabled_)
+	{
+		for (auto& enemy : pEnemy_)
+		{
+			enemy->SetEnabled(true);
+		}
+
+		pPlayer_->SetEnabled(true);
+
+		faideEnabled_ = false;
+	}
+
 	pField_->Updata();
 
 	pPlayer_->Update(input);
@@ -176,17 +224,22 @@ void GameplayingScene::Update(const InputState& input)
 
 void GameplayingScene::Draw()
 {
-
+	// マップの描画
 	pMap_->Draw();
+
+	// フィールド(剣、コイン)の描画
 	pField_->Draw();
 
+	// プレイヤーの描画
 	pPlayer_->Draw();
 
+	// 敵の描画
 	for (auto& enemy : pEnemy_)
 	{
 		enemy->Draw();
 	}
 
+	// 残機の描画
 	for (int i = 0; i < life_; i++)
 	{
 		int x = Game::kScreenWidth / 2 + 100 + (i * 40);
@@ -208,7 +261,12 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 
 void GameplayingScene::GameOverUpdate(const InputState& input)
 {
-	updateFunc_ = &GameplayingScene::FadeOutUpdate;
+	pPlayer_->DeadUpdate();
+
+	if (pPlayer_->GetAnimeEnd())
+	{
+		updateFunc_ = &GameplayingScene::FadeOutUpdate;
+	}
 }
 
 void GameplayingScene::PlayerDeadUpdate(const InputState& input)
@@ -217,7 +275,7 @@ void GameplayingScene::PlayerDeadUpdate(const InputState& input)
 
 	if (pPlayer_->GetAnimeEnd())
 	{
-		a_ = true;
+		isAnimeEnd_ = true;
 		updateFunc_ = &GameplayingScene::FadeOutUpdate;
 	}
 }
@@ -228,18 +286,20 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 
 	fadeTimer_++;
 
-	// ゲーム
+	// ゲームオーバー
 	if (fadeTimer_ > fade_interval && !clearOrOver_ && life_ == 0)
 	{
-		manager_.ChangeScene(new GameoverScene(manager_));
+		manager_.ChangeScene(new TitleScene(manager_));
 		return;
 	}
+	// ゲームクリアー
 	else if (fadeTimer_ > fade_interval && clearOrOver_)
 	{
 		manager_.ChangeScene(new GameclearScene(manager_));
 		return;
 	}
-	else if (fadeTimer_ > fade_interval && a_)
+	// 残機が１減った
+	else if (fadeTimer_ > fade_interval && isAnimeEnd_)
 	{
 		for (auto& enemy : pEnemy_)
 		{
@@ -247,6 +307,7 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 			enemy->SetInit();
 		}
 
+		// 初期化
 		pPlayer_->Init();
 
 		pField_->Init();
@@ -259,7 +320,7 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 
 void GameplayingScene::SetInit()
 {
-	a_ = false;
+	isAnimeEnd_ = false;
 	fadeTimer_ = fade_interval;
 	fadeValue_ = 255;
 	timer_ = 0;

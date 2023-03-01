@@ -84,44 +84,6 @@ EnemyBase::EnemyBase() :
 	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_Y);
 }
 
-void EnemyBase::Draw()
-{
-	int imgX = (idX_ / ANIME_FRAME_SPEED) * WIDTH;
-
-	// 通常時の表示
-	if (isEnabled_ && !isIzike_)
-	{
-
-		int imgY = DirectReturnNum();
-
-		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
-			imgX, imgY,							// 切り取り左上
-			WIDTH, HEIGHT,						// 幅、高さ
-			SCALE, 0,							// 拡大率、回転角度
-			handle_, true);						// 画像のハンドル、透過するか
-	}
-	// プレイヤーがパワーエサを取得した時の表示
-	if (isEnabled_ && isIzike_)
-	{
-		if (!isFlash_)
-		{
-			flashingImgY_ = 0;
-		}
-		else
-		{
-			flashingImgY_ = (idY_ / IZIKE_ANIME_FRAME_SPEED) * 16;
-		}
-
-		int imgY = flashingImgY_;
-
-		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
-			imgX, imgY,							// 切り取り左上
-			WIDTH, HEIGHT,						// 幅、高さ
-			SCALE, 0,							// 拡大率、回転角度
-			izikeHandle_, true);				// 画像のハンドル、透過するか
-	}
-}
-
 void EnemyBase::Init()
 {
 	moveTimer_ = 0;
@@ -306,22 +268,22 @@ void EnemyBase::MoveSwitch(int startInterval, int deadInterval)
 	}
 }
 
-int EnemyBase::DirectReturnNum()
+int EnemyBase::DirectReturnNum(int chipSize)
 {
 	int imgY = 0;
 	switch (moveDirection_)
 	{
 	case up:
-		imgY = 32;
+		imgY = 0 * chipSize;
 		break;
 	case down:
-		imgY = 48;
+		imgY = 1 * chipSize;
 		break;
 	case left:
-		imgY = 16;
+		imgY = 2 * chipSize;
 		break;
 	case right:
-		imgY = 0;
+		imgY = 3 * chipSize;
 		break;
 	default:
 		break;
