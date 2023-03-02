@@ -93,7 +93,10 @@ private:
 	int kX_;
 	int kY_;
 
-	int turnFlag_;
+	bool isTurnFlag_;
+	bool isFlash_;
+
+	int timer_;
 
 	//ƒvƒŒƒCƒ„[‚Ì‰æ‘œ
 	int handle_;

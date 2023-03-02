@@ -48,18 +48,31 @@ private:
 	int fadeTimer_ = fade_interval;
 	int fadeValue_ = 255;
 
-	int clearOrOver_;
+	// 文字のハンドル
+	int gameOverH_;
+	int gameClearH_;
 
-	int hartH_;
+	// 画像のハンドル
+	int lifeH_;
 
+	// ゲームオーバーか
+	bool isGameOver_;
+
+	// ゲームクリアか
+	bool isGameClear_;
+
+	// フェイドイン中か
+	bool faideEnabled_;
+
+	// アニメーションが終了したか
 	bool isAnimeEnd_;
 
 	int timer_;
 
+	int gameOverTimer_;
+
 	// 残機
 	int life_;
-
-	bool faideEnabled_;
 
 	// フェイドイン
 	void FadeInUpdate(const InputState& input);
@@ -72,8 +85,6 @@ private:
 
 	// プレイヤー死亡時の演出
 	void PlayerDeadUpdate(const InputState& input);
-
-	void BoxAnimeUpdate(const InputState& input);
 
 	// 敵が死んだときの演出
 	void EnemyDeadUpdate(const InputState& input);

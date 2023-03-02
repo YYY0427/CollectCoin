@@ -27,8 +27,8 @@ namespace
 	// パワーエサを取得した場合持続時間(何秒か)
 	constexpr int FEED_DURATION = 60 * 8;
 
-	// 敵をフラッシュさせる割合
-	constexpr float FLASH_RATIO = 0.6f;
+	// プレイヤーを残り何割でフラッシュさせるかの割合
+	constexpr float FLASH_RATIO = 0.7f;
 
 	// 1枚に必要なフレーム数
 	constexpr int ANIME_FRAME_SPEED = 10;		// 通常時
@@ -52,13 +52,15 @@ Player::Player(int normalH, int waponH, int deadH, int indexX, int indexY) :
 	deadImgIdx_(0),
 	wantMoveDirection_(0),
 	imgY_(0),
+	timer_(0),
 	isPowerFeed_(false),
 	isDead_(false),
 	isAnimeEnd_(false),
 	isPowerFeed2_(false),
 	isEnabled_(true),
 	isIntrusion_(false),
-	turnFlag_(false)
+	isTurnFlag_(false),
+	isFlash_(false)
 {
 	indexX_ = indexX;
 	indexY_ = indexY;
@@ -102,7 +104,8 @@ void Player::Init()
 	isPowerFeed2_ = false;
 	isEnabled_ = true;
 	isIntrusion_ = false;
-	turnFlag_ = false;
+	isTurnFlag_ = false;
+	isFlash_ = false;
 }
 
 void Player::Update(const InputState& input)
@@ -237,17 +240,24 @@ void Player::Update(const InputState& input)
 
 void Player::Draw()
 {
-	// プレイヤーが敵と当たったか
 	if (!isDead_ && isEnabled_)
 	{
+		if (isFlash_)
+		{
+			if ((powerFeedTimer_ / 10) % 2 == 0)
+			{
+				return;
+			}
+		}
+
 		int imgX = (imgIdX_ / ANIME_FRAME_SPEED) * WIDTH;
 
 		// プレイヤー画像の表示
 		DrawRectRotaGraph(pos_.x, pos_.y - 5,		// 座標
 						imgX, imgY_,				// 切り取り左上
-						WIDTH, HEIGHT,			// 幅、高さ
-						SCALE, 0.0f,			// 拡大率、回転角度
-						handle_, true, turnFlag_);			// 画像のハンドル、透過するか
+						WIDTH, HEIGHT,				// 幅、高さ
+						SCALE, 0.0f,				// 拡大率、回転角度
+						handle_, true, isTurnFlag_);	// 画像のハンドル、透過するか
 	}
 	else if(isDead_ && isEnabled_)
 	{
@@ -267,8 +277,10 @@ void Player::Draw()
 						  imgX, 0,							// 切り取り左上
 						  WIDTH, HEIGHT,					// 幅、高さ
 						  SCALE, 0,							// 拡大率、回転角度
-						  deathH_, true);				// 画像のハンドル、透過するか
+						  deathH_, true);					// 画像のハンドル、透過するか
 	}
+
+	
 }
 
 void Player::DeadUpdate()
@@ -352,17 +364,12 @@ void Player::SpeedCalculation()
 		// powerFeedTimerがFEED_DURATIONの特定の割合に達したら敵のアニメーションを変更
 		if ((FEED_DURATION * FLASH_RATIO) < powerFeedTimer_)
 		{
-			for (auto& enemy : pEnemy_)
-			{
-				enemy->SetFlash (true);	// 敵の点滅を開始
-			}	
+			// プレイヤーの点滅を開始
+			isFlash_ = true;
 		}
 		else
 		{
-			for (auto& enemy : pEnemy_)
-			{
-				enemy->SetFlash(false);	
-			}
+			isFlash_ = false;
 		}
 
 		// タイマーが指定した時間を経過した場合元の速度に戻す
@@ -372,9 +379,10 @@ void Player::SpeedCalculation()
 			powerFeedTimer_ = 0;
 			isPowerFeed_ = false;
 
+			isFlash_ = false;
+
 			for (auto& enemy : pEnemy_)
 			{
-				enemy->SetFlash(false);
 				enemy->SetIzike(false);
 			}
 

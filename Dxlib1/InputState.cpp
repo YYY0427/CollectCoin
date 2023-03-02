@@ -11,7 +11,7 @@ InputState::InputState()
 										{InputCategory::pad, PAD_INPUT_B } };		// 戻るボタン
 
 	defaultMapTable_[InputType::pause] = { {InputCategory::keybd, KEY_INPUT_P},
-										{InputCategory::pad, PAD_INPUT_L }};		// ポーズボタン
+										{InputCategory::pad, PAD_INPUT_C }};		// ポーズボタン
 
 
 	defaultMapTable_[InputType::keyconf] = { {InputCategory::keybd, KEY_INPUT_K},

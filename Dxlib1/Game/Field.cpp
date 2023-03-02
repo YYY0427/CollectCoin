@@ -6,7 +6,7 @@
 
 namespace
 {
-	//マップデータ
+	// マップデータ
 	int mapData[Field::MAP_HEIGHT][Field::MAP_WIDTH] =
 	{
 		// 0 : なにもなし
@@ -351,7 +351,7 @@ int Field::BlinkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 		}
 	}
 
-	if (pEnemy_[0]->GetIzike())
+	if (pEnemy_[0]->GetIzike() && !SpornInOrAuto(enemyIndexY, enemyIndexX))
 	{
 		if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] < mapData2[y - 1][x])
 		{
@@ -433,7 +433,7 @@ int Field::PinkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 				}
 			}
 		}
-		if (pEnemy_[3]->GetIzike())
+		if (pEnemy_[3]->GetIzike() && !SpornInOrAuto(enemyIndexY, enemyIndexX))
 		{
 			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] < mapData2[y + 1][x])
 			{
@@ -538,7 +538,7 @@ int Field::InkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 			}
 		}
 
-		if (pEnemy_[1]->GetIzike())
+		if (pEnemy_[1]->GetIzike() && !SpornInOrAuto(enemyIndexY, enemyIndexX))
 		{
 			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] < mapData2[y - 1][x])
 			{
@@ -634,7 +634,7 @@ int Field::CrydeMove(int enemyIndexY, int enemyIndexX, bool flag)
 			}
 		}
 		// リスポーン地点にいる状態でイジケ状態の場合逃げずにリスポーン地点からでる
-		if (pEnemy_[2]->GetIzike())
+		if (pEnemy_[2]->GetIzike() && !SpornInOrAuto(enemyIndexY, enemyIndexX))
 		{
 			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] < mapData2[y - 1][x])
 			{

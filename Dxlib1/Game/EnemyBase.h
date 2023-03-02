@@ -69,9 +69,6 @@ public:
 	// 敵がイジケ状態かをセット
 	void SetIzike(bool isIzike) { isIzike_ = isIzike; }
 
-	// 敵を白く光らせるか
-	void SetFlash(bool isFlash) { isFlash_ = isFlash; }
-
 	// 縄張りモードと追跡モードの切り替え
 	void ModeSwitch();
 	
@@ -157,9 +154,6 @@ protected:
 
 	// イジケ状態か
 	bool isIzike_;
-
-	// フラッシュさせるか
-	bool isFlash_;
 
 	// 追跡モードかどうか
 	bool isTracking_;

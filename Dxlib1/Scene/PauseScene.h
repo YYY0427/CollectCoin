@@ -10,11 +10,14 @@ class SceneManager;
 
 class PauseScene : public Scene
 {
-private:
 public:
 	PauseScene(SceneManager& manager);
-	~PauseScene();
+	virtual ~PauseScene(){};
+
 	virtual void Update(const InputState& input)override;
+
 	void Draw();
+private:
+	int selectionH_;
 };
 

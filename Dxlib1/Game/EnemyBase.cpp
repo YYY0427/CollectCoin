@@ -66,7 +66,6 @@ EnemyBase::EnemyBase() :
 	isEnabled_(true),
 	isDead_(false),
 	isIzike_(false),
-	isFlash_(false),
 	isTracking_(false),
 	isIntrusion_(true)
 {
@@ -100,7 +99,6 @@ void EnemyBase::Init()
 	isEnabled_ = true;
 	isDead_ = false;
 	isIzike_ = false;
-	isFlash_ = false; 
 	isTracking_ = false;
 	isIntrusion_ = false;
 }
@@ -113,7 +111,10 @@ bool EnemyBase::Colision(int direction)
 		if (pField_->IsBlock(indexY_ - 1, indexX_))	return true;
 		break;
 	case down:
-		if (pField_->IsBlock(indexY_ + 1, indexX_))	return true;
+	/*	if (pField_->IsBlock(indexY_ + 1, indexX_))	return true;
+		break;*/
+		if (pField_->IsBlock(indexY_ + 1, indexX_) ||
+			!pField_->Intrusion(indexY_ + 1, indexX_, isIntrusion_))	return true;
 		break;
 	case left:
 		if (pField_->IsBlock(indexY_, indexX_ - 1))	return true;
@@ -286,6 +287,7 @@ int EnemyBase::DirectReturnNum(int chipSize)
 		imgY = 3 * chipSize;
 		break;
 	default:
+		imgY = 4 * chipSize;
 		break;
 	}
 	return imgY;

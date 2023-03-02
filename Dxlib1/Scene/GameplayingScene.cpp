@@ -45,9 +45,13 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	updateFunc_(&GameplayingScene::FadeInUpdate),
 	life_(3),
 	timer_(0),
-	clearOrOver_(false),
+	gameOverTimer_(0),
+	isGameClear_(false),
 	faideEnabled_(false)
 {
+	gameOverH_ = CreateFontToHandle(NULL, 20, 10);
+	gameClearH_ = CreateFontToHandle(NULL, 20, 10);
+
 	int nowaponPlayerH = my::MyLoadGraph(L"Data/img/game/nowapon-player.png");
 	int waponPlayerH = my::MyLoadGraph(L"Data/img/game/wapon-player.png");
 	int deadPlayerH = my::MyLoadGraph(L"Data/img/game/player-deth.png");
@@ -58,7 +62,7 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	int golemH = my::MyLoadGraph(L"Data/img/game/golem.png");
 
 	int mapChipH = my::MyLoadGraph(L"Data/img/game/mapchip.png");
-	hartH_ = my::MyLoadGraph(L"Data/img/game/hart.png");
+	lifeH_ = my::MyLoadGraph(L"Data/img/game/hart.png");
 
 
 	pEnemy_[EnemyBase::skeleton] = std::make_shared<BlinkyEnemy>(
@@ -132,7 +136,7 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 
 		faideEnabled_ = false;
 	}
-
+	
 	pField_->Updata();
 
 	pPlayer_->Update(input);
@@ -162,9 +166,18 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 					enemy->SetEnabled(false);
 				}
 
-				// ゲームオーバー演出移行
-				updateFunc_ = &GameplayingScene::PlayerDeadUpdate;
 				fadeColor_ = 0xff0000;
+
+				// 残機がなかった場合
+				if (life_ <= 0)
+				{
+					updateFunc_ = &GameplayingScene::GameOverUpdate;
+				}
+				else if (life_ > 0)
+				{
+					// プレイヤー死亡演出移行
+					updateFunc_ = &GameplayingScene::PlayerDeadUpdate;
+				}
 			}
 			// 敵がイジケ状態の場合に敵と当たった場合敵を殺す
 			else
@@ -233,6 +246,24 @@ void GameplayingScene::Draw()
 	// プレイヤーの描画
 	pPlayer_->Draw();
 
+	// ゲームオーバー
+	if (isGameOver_)
+	{
+		int width = GetDrawStringWidthToHandle(L"GAME OVER", 9, gameOverH_);
+
+		// ゲームオーバー文字の表示
+		DrawStringToHandle((Game::kScreenWidth / 2) - (width / 2), Game::kScreenHeight / 2 + 40,
+			L"GAME OVER", 0xffffff, gameOverH_, false);
+	}
+	if (isGameClear_)
+	{
+		int width = GetDrawStringWidthToHandle(L"GAME CLEAR", 10, gameOverH_);
+
+		// ゲームクリア文字の表示
+		DrawStringToHandle((Game::kScreenWidth / 2) - (width / 2), Game::kScreenHeight / 2 + 40,
+			L"GAME CLEAR", 0xffffff, gameClearH_, false);
+	}
+	
 	// 敵の描画
 	for (auto& enemy : pEnemy_)
 	{
@@ -244,7 +275,7 @@ void GameplayingScene::Draw()
 	{
 		int x = Game::kScreenWidth / 2 + 100 + (i * 40);
 
-		DrawRectRotaGraph(x, Game::kScreenHeight - 16, 0, 0, 16, 16, 2.0f, 0.0f, hartH_, true);
+		DrawRectRotaGraph(x, Game::kScreenHeight - 16, 0, 0, 16, 16, 2.0f, 0.0f, lifeH_, true);
 	}
 
 	DrawString(0, 0, L"GamePlayingScene", 0xffffff, true);
@@ -256,16 +287,25 @@ void GameplayingScene::Draw()
 
 void GameplayingScene::GameClearUpdate(const InputState& input)
 {
+	isGameClear_ = true;
 	updateFunc_ = &GameplayingScene::FadeOutUpdate;
 }
 
 void GameplayingScene::GameOverUpdate(const InputState& input)
 {
-	pPlayer_->DeadUpdate();
-
-	if (pPlayer_->GetAnimeEnd())
+	if (!pPlayer_->GetAnimeEnd())
 	{
-		updateFunc_ = &GameplayingScene::FadeOutUpdate;
+		pPlayer_->DeadUpdate();
+	}
+	else
+	{
+		isGameOver_ = true;
+		gameOverTimer_++;
+
+		if (gameOverTimer_ % 180 == 0)
+		{
+			updateFunc_ = &GameplayingScene::FadeOutUpdate;
+		}
 	}
 }
 
@@ -275,7 +315,6 @@ void GameplayingScene::PlayerDeadUpdate(const InputState& input)
 
 	if (pPlayer_->GetAnimeEnd())
 	{
-		isAnimeEnd_ = true;
 		updateFunc_ = &GameplayingScene::FadeOutUpdate;
 	}
 }
@@ -287,19 +326,19 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 	fadeTimer_++;
 
 	// ゲームオーバー
-	if (fadeTimer_ > fade_interval && !clearOrOver_ && life_ == 0)
+	if (fadeTimer_ > fade_interval && isGameOver_)
 	{
 		manager_.ChangeScene(new TitleScene(manager_));
 		return;
 	}
 	// ゲームクリアー
-	else if (fadeTimer_ > fade_interval && clearOrOver_)
+	else if (fadeTimer_ > fade_interval && isGameClear_)
 	{
 		manager_.ChangeScene(new GameclearScene(manager_));
 		return;
 	}
 	// 残機が１減った
-	else if (fadeTimer_ > fade_interval && isAnimeEnd_)
+	else if (fadeTimer_ > fade_interval && life_ > 0)
 	{
 		for (auto& enemy : pEnemy_)
 		{
@@ -320,7 +359,6 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 
 void GameplayingScene::SetInit()
 {
-	isAnimeEnd_ = false;
 	fadeTimer_ = fade_interval;
 	fadeValue_ = 255;
 	timer_ = 0;
