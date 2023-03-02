@@ -6,7 +6,7 @@
 namespace 
 {
 	//マップデータ
-	constexpr int mapData[Field::MAP_HEIGHT][Field::MAP_WIDTH] =
+	constexpr int mapData_[Field::MAP_HEIGHT][Field::MAP_WIDTH] =
 	{
 		{24,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,16},
 		{24,8,8,8,8,8,8,8,8,7,8,8,8,8,8,8,8,8,16},
@@ -62,7 +62,7 @@ void Map::DrawMap()
 		for (int x = 0; x < Field::MAP_WIDTH; x++) 
 		{
 
-			const int chipNo = mapData[y][x];
+			const int chipNo = mapData_[y][x];
 
 			assert(0 <= chipNo);
 			assert(chipNo < ChipNum());

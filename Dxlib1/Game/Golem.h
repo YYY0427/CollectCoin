@@ -4,12 +4,18 @@
 /// <summary>
 /// æ‰ñ‚è‚·‚é“G
 /// </summary>
-class PinkyEnemy : public EnemyBase
+class Golem : public EnemyBase
 {
 public:
-	PinkyEnemy(int handle, int indexX, int indexY);
+	// ‰æ‘œ‚Ì•
+	static constexpr int WIDTH = 32;
 
-	virtual ~PinkyEnemy(){}
+	// ‰æ‘œ‚Ì‚‚³
+	static constexpr int HEIGHT = 32;
+
+	Golem(int handle, int indexX, int indexY);
+
+	virtual ~Golem(){}
 	/// <summary>
 	/// XV
 	/// </summary>

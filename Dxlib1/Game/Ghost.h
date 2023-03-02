@@ -4,12 +4,18 @@
 /// <summary>
 /// ˆêŠÑ«‚ª‚È‚¢“G
 /// </summary>
-class CrydeEnemy : public EnemyBase
+class Ghost : public EnemyBase
 {
 public:
-	CrydeEnemy(int handle, int indexX, int indexY);
+	// ‰æ‘œ‚Ì•
+	static constexpr int WIDTH = 25;
 
-	virtual ~CrydeEnemy(){}
+	// ‰æ‘œ‚Ì‚‚³
+	static constexpr int HEIGHT = 25;
+
+	Ghost(int handle, int indexX, int indexY);
+
+	virtual ~Ghost(){}
 
 	/// <summary>
 	/// XV

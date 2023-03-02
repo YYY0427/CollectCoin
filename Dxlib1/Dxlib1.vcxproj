@@ -151,12 +151,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Game\InkyEnemy.cpp" />
-    <ClCompile Include="Game\PinkyEnemy.cpp" />
-    <ClCompile Include="Game\CrydeEnemy.cpp" />
+    <ClCompile Include="Game\BackGround.cpp" />
+    <ClCompile Include="Game\Slime.cpp" />
+    <ClCompile Include="Game\Golem.cpp" />
+    <ClCompile Include="Game\Ghost.cpp" />
     <ClCompile Include="Game\Map.cpp" />
     <ClCompile Include="Scene\GameclearScene.cpp" />
-    <ClCompile Include="Game\BlinkyEnemy.cpp" />
+    <ClCompile Include="Game\Skeleton.cpp" />
     <ClCompile Include="DrawFunctions.cpp" />
     <ClCompile Include="Game\EnemyBase.cpp" />
     <ClCompile Include="Game\Field.cpp" />
@@ -175,12 +176,13 @@
     <ClCompile Include="vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game\InkyEnemy.h" />
-    <ClInclude Include="Game\PinkyEnemy.h" />
-    <ClInclude Include="Game\CrydeEnemy.h" />
+    <ClInclude Include="Game\BackGround.h" />
+    <ClInclude Include="Game\Slime.h" />
+    <ClInclude Include="Game\Golem.h" />
+    <ClInclude Include="Game\Ghost.h" />
     <ClInclude Include="Game\Map.h" />
     <ClInclude Include="Scene\GameclearScene.h" />
-    <ClInclude Include="Game\BlinkyEnemy.h" />
+    <ClInclude Include="Game\Skeleton.h" />
     <ClInclude Include="DrawFunctions.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Game\EnemyBase.h" />

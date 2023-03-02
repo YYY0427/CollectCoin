@@ -72,7 +72,7 @@
     <ClCompile Include="InputState.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Game\BlinkyEnemy.cpp">
+    <ClCompile Include="Game\Skeleton.cpp">
       <Filter>ソース ファイル\Game\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Game\EnemyBase.cpp">
@@ -81,13 +81,13 @@
     <ClCompile Include="Scene\GameclearScene.cpp">
       <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Game\PinkyEnemy.cpp">
+    <ClCompile Include="Game\Golem.cpp">
       <Filter>ソース ファイル\Game\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="Game\InkyEnemy.cpp">
+    <ClCompile Include="Game\Slime.cpp">
       <Filter>ソース ファイル\Game\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="Game\CrydeEnemy.cpp">
+    <ClCompile Include="Game\Ghost.cpp">
       <Filter>ソース ファイル\Game\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Game\Field.cpp">
@@ -97,6 +97,9 @@
       <Filter>ソース ファイル\Game</Filter>
     </ClCompile>
     <ClCompile Include="Game\Map.cpp">
+      <Filter>ソース ファイル\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\BackGround.cpp">
       <Filter>ソース ファイル\Game</Filter>
     </ClCompile>
   </ItemGroup>
@@ -146,7 +149,7 @@
     <ClInclude Include="InputState.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Game\BlinkyEnemy.h">
+    <ClInclude Include="Game\Skeleton.h">
       <Filter>ヘッダー ファイル\Game\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Game\EnemyBase.h">
@@ -155,16 +158,19 @@
     <ClInclude Include="Scene\GameclearScene.h">
       <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Game\PinkyEnemy.h">
+    <ClInclude Include="Game\Golem.h">
       <Filter>ヘッダー ファイル\Game\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="Game\CrydeEnemy.h">
+    <ClInclude Include="Game\Ghost.h">
       <Filter>ヘッダー ファイル\Game\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="Game\InkyEnemy.h">
+    <ClInclude Include="Game\Slime.h">
       <Filter>ヘッダー ファイル\Game\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Game\Map.h">
+      <Filter>ヘッダー ファイル\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\BackGround.h">
       <Filter>ヘッダー ファイル\Game</Filter>
     </ClInclude>
   </ItemGroup>

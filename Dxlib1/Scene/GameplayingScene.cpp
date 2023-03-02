@@ -8,13 +8,14 @@
 #include "PauseScene.h"
 #include"../Game/Player.h"
 #include "../Game/Field.h"
-#include "../Game/BlinkyEnemy.h"
-#include "../Game/InkyEnemy.h"
-#include "../Game/CrydeEnemy.h"
-#include "../Game/PinkyEnemy.h"
+#include "../Game/Skeleton.h"
+#include "../Game/Slime.h"
+#include "../Game/Ghost.h"
+#include "../Game/Golem.h"
 #include "../Game/EnemyBase.h"
 #include "../Game.h"
 #include "../Game/Map.h"
+#include "../Game/BackGround.h"
 #include <DxLib.h>
 
 namespace
@@ -43,14 +44,16 @@ namespace
 GameplayingScene::GameplayingScene(SceneManager& manager) :
 	Scene(manager),
 	updateFunc_(&GameplayingScene::FadeInUpdate),
-	life_(3),
+	life_(1),
 	timer_(0),
 	gameOverTimer_(0),
+	preparTimer_(0),
 	isGameClear_(false),
 	faideEnabled_(false)
 {
 	gameOverH_ = CreateFontToHandle(NULL, 20, 10);
 	gameClearH_ = CreateFontToHandle(NULL, 20, 10);
+	readyH_ = CreateFontToHandle(NULL, 20, 10);
 
 	int nowaponPlayerH = my::MyLoadGraph(L"Data/img/game/nowapon-player.png");
 	int waponPlayerH = my::MyLoadGraph(L"Data/img/game/wapon-player.png");
@@ -62,22 +65,23 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	int golemH = my::MyLoadGraph(L"Data/img/game/golem.png");
 
 	int mapChipH = my::MyLoadGraph(L"Data/img/game/mapchip.png");
+	int backGraph = my::MyLoadGraph(L"Data/img/game/Gray.png");
 	lifeH_ = my::MyLoadGraph(L"Data/img/game/hart.png");
 
 
-	pEnemy_[EnemyBase::skeleton] = std::make_shared<BlinkyEnemy>(
+	pEnemy_[EnemyBase::skeleton] = std::make_shared<Skeleton>(
 								skeletonH,					// 画像ハンドル
 								SKELETON_START_INDEX_X,		// 初期座標X
 								SKELETON_START_INDEX_Y);	// 初期座標Y
-	pEnemy_[EnemyBase::slime] = std::make_shared<InkyEnemy>(
+	pEnemy_[EnemyBase::slime] = std::make_shared<Slime>(
 								slimeH,						// 画像ハンドル
 								SLIME_START_INDEX_X,		// 初期座標X
 								SLIME_START_INDEX_Y);		// 初期座標Y
-	pEnemy_[EnemyBase::ghost] = std::make_shared<CrydeEnemy>(
+	pEnemy_[EnemyBase::ghost] = std::make_shared<Ghost>(
 								ghostH,						// 画像ハンドル
 								GHOST_START_INDEX_X,		// 初期座標X
 								GHOST_START_INDEX_Y);		// 初期座標Y
-	pEnemy_[EnemyBase::golem] = std::make_shared<PinkyEnemy>(
+	pEnemy_[EnemyBase::golem] = std::make_shared<Golem>(
 								golemH,						// 画像ハンドル
 								GOLEM_START_INDEX_X,		// 初期座標X
 								GOLEM_START_INDEX_Y);		// 初期座標Y
@@ -86,6 +90,7 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 								PLAYER_START_INDEX_X, PLAYER_START_INDEX_Y);
 	pField_ = std::make_shared<Field>();
 	pMap_ = std::make_shared<Map>(mapChipH);
+	pBackGround_ = std::make_shared<BackGround>(backGraph);
 
 	for (auto& enemy : pEnemy_)
 	{
@@ -119,12 +124,13 @@ void GameplayingScene::FadeInUpdate(const InputState& input)
 
 		fadeValue_ = 0;
 
-		updateFunc_ = &GameplayingScene::NormalUpdate;
+		preparTimer_ = 120;
+		updateFunc_ = &GameplayingScene::PrepareUpdate;
 	}
 }
 
 void GameplayingScene::NormalUpdate(const InputState& input)
-{
+{	
 	if (faideEnabled_)
 	{
 		for (auto& enemy : pEnemy_)
@@ -136,7 +142,9 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 
 		faideEnabled_ = false;
 	}
-	
+
+	pBackGround_->Update();
+
 	pField_->Updata();
 
 	pPlayer_->Update(input);
@@ -149,7 +157,7 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 	for (auto& enemy : pEnemy_)
 	{
 		// プレイヤーと敵の当たり判定
-		if (Colision(enemy))
+		if (Colision(enemy, enemy->GetSizeX(), enemy->GetSizeY()))
 		{
 			// 敵がイジケ状態ではないときに敵と当たった場合
 			if (!enemy->GetIzike())
@@ -237,6 +245,9 @@ void GameplayingScene::Update(const InputState& input)
 
 void GameplayingScene::Draw()
 {
+	// 背景の描画
+	pBackGround_->Draw();
+
 	// マップの描画
 	pMap_->Draw();
 
@@ -245,6 +256,12 @@ void GameplayingScene::Draw()
 
 	// プレイヤーの描画
 	pPlayer_->Draw();
+
+	// 敵の描画
+	for (auto& enemy : pEnemy_)
+	{
+		enemy->Draw();
+	}
 
 	// ゲームオーバー
 	if (isGameOver_)
@@ -255,19 +272,21 @@ void GameplayingScene::Draw()
 		DrawStringToHandle((Game::kScreenWidth / 2) - (width / 2), Game::kScreenHeight / 2 + 40,
 			L"GAME OVER", 0xffffff, gameOverH_, false);
 	}
+	// ゲームクリア
 	if (isGameClear_)
 	{
-		int width = GetDrawStringWidthToHandle(L"GAME CLEAR", 10, gameOverH_);
+		int width = GetDrawStringWidthToHandle(L"GAME CLEAR!!!", 13, gameOverH_);
 
 		// ゲームクリア文字の表示
 		DrawStringToHandle((Game::kScreenWidth / 2) - (width / 2), Game::kScreenHeight / 2 + 40,
-			L"GAME CLEAR", 0xffffff, gameClearH_, false);
+			L"GAME CLEAR!!!", 0xffffff, gameClearH_, false);
 	}
-	
-	// 敵の描画
-	for (auto& enemy : pEnemy_)
+	if (preparTimer_ > 0)
 	{
-		enemy->Draw();
+		int width = GetDrawStringWidthToHandle(L"REDY?", 5, readyH_);
+		// ゲームクリア文字の表示
+		DrawStringToHandle((Game::kScreenWidth / 2) - (width / 2), Game::kScreenHeight / 2 + 40,
+			L"REDY?", 0xffffff, readyH_, false);
 	}
 
 	// 残機の描画
@@ -277,8 +296,6 @@ void GameplayingScene::Draw()
 
 		DrawRectRotaGraph(x, Game::kScreenHeight - 16, 0, 0, 16, 16, 2.0f, 0.0f, lifeH_, true);
 	}
-
-	DrawString(0, 0, L"GamePlayingScene", 0xffffff, true);
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
@@ -357,6 +374,16 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 	}
 }
 
+void GameplayingScene::PrepareUpdate(const InputState& input)
+{
+	preparTimer_--;
+	if (preparTimer_ <= 0)
+	{
+		updateFunc_ = &GameplayingScene::NormalUpdate;
+		preparTimer_ = 0;
+	}
+}
+
 void GameplayingScene::SetInit()
 {
 	fadeTimer_ = fade_interval;
@@ -364,17 +391,17 @@ void GameplayingScene::SetInit()
 	timer_ = 0;
 }
 
-bool GameplayingScene::Colision(std::shared_ptr<EnemyBase>enemy)
+bool GameplayingScene::Colision(std::shared_ptr<EnemyBase>enemy, int width, int height)
 {
 	float playerLeft = pPlayer_->GetPos().x;
-	float playerRight = pPlayer_->GetPos().x + 16.0f;
+	float playerRight = pPlayer_->GetPos().x + width;
 	float playerTop = pPlayer_->GetPos().y;
-	float playerBottom = pPlayer_->GetPos().y + 16.0f;
+	float playerBottom = pPlayer_->GetPos().y + width;
 
 	float enemyLeft = enemy->GetPos().x;
-	float enemyRight = enemy->GetPos().x + 16.0f;
+	float enemyRight = enemy->GetPos().x + height;
 	float enemyTop = enemy->GetPos().y;
-	float enemyBottom = enemy->GetPos().y + 16.0f;
+	float enemyBottom = enemy->GetPos().y + height;
 
 	if (playerLeft > enemyRight)	return false;
 	if (playerRight < enemyLeft)	return false;

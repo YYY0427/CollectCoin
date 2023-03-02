@@ -1,4 +1,4 @@
-#include "CrydeEnemy.h"
+#include "Golem.h"
 #include "../DrawFunctions.h"
 #include "Player.h"
 #include "Field.h"
@@ -9,14 +9,10 @@
 
 namespace
 {
-	// 画像の幅
-	constexpr int WIDTH = 25;
-
-	// 画像の高さ
-	constexpr int HEIGHT = 25;
+	
 
 	// 画像の拡大率
-	constexpr float SCALE = 2.0f;
+	constexpr float SCALE = 2.3f;
 
 	// 通常のプレイヤーの移動スピード
 	constexpr float NORMAL_SPEED = 1.6f;
@@ -37,19 +33,17 @@ namespace
 	constexpr int DIEAD_MOVE_INTERVAL = 60 * 5;
 
 	// ゲームスタート時から動き始めるまでの時間
-	constexpr int STARET_MOVE_INTEVAL = 60 * 4;
+	constexpr int STARET_MOVE_INTEVAL = 60 * 12;
 }
 
-CrydeEnemy::CrydeEnemy(int handle, int indexX, int indexY)
+Golem::Golem(int handle, int indexX, int indexY)
 {
 	handle_ = handle;
 	indexX_ = indexX;
 	indexY_ = indexY;
-
-	isIntrusion_ = true;
 }
 
-void CrydeEnemy::Update()
+void Golem::Update()
 {
 	// 死んだ場合初期化
 	if (isDead_)
@@ -65,6 +59,7 @@ void CrydeEnemy::Update()
 		}
 	}
 
+	// 移動するか移動しないかの切り替え
 	MoveSwitch(STARET_MOVE_INTEVAL, DIEAD_MOVE_INTERVAL);
 
 	// 縄張りモードと追跡モードの切り替え
@@ -77,6 +72,7 @@ void CrydeEnemy::Update()
 	kX_ = indexX_;
 	kY_ = indexY_;
 
+	// スピードによって移動のインターバルを変更
 	moveInterval_ = Field::CHIP_SIZE / speed_;
 
 	// 移動のインターバル
@@ -104,7 +100,7 @@ void CrydeEnemy::Update()
 			};
 		}
 
-		moveDirection_ = pField_->CrydeMove(indexY_, indexX_, isIntrusion_);
+		moveDirection_ = pField_->PinkyMove(indexY_, indexX_, isIntrusion_);
 
 		moveTimer_ = 0;
 	}
@@ -136,7 +132,7 @@ void CrydeEnemy::Update()
 	idX_ = (idX_ + 1) % (ANIME_FRAME_SPEED * ANIME_FRAME_NUM);				// 通常処理
 }
 
-void CrydeEnemy::Draw()
+void Golem::Draw()
 {
 	int imgX = (idX_ / ANIME_FRAME_SPEED) * WIDTH;
 
@@ -146,7 +142,7 @@ void CrydeEnemy::Draw()
 
 		int imgY = DirectReturnNum(HEIGHT);
 
-		DrawRectRotaGraph(pos_.x, pos_.y - 5,	// 座標
+		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
 			imgX, imgY,							// 切り取り左上
 			WIDTH, HEIGHT,						// 幅、高さ
 			SCALE, 0,							// 拡大率、回転角度
@@ -154,8 +150,8 @@ void CrydeEnemy::Draw()
 	}
 }
 
-void CrydeEnemy::SetInit()
+void Golem::SetInit()
 {
-	indexX_ = 9;
+	indexX_ = 10;
 	indexY_ = 10;
 }

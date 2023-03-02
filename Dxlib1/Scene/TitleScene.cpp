@@ -128,17 +128,17 @@ void TitleScene::Draw()
 
 	int width1 = GetDrawStringWidthToHandle(L"GAME START", 10, startH_);
 	int width2 = GetDrawStringWidthToHandle(L"OPTION", 6, optionH_);
-	int width3 = GetDrawStringWidthToHandle(L"EXSIT", 5, exsitH_);
-	int width4 = GetDrawStringWidthToHandle(L"SORD MAN", 8, titleH_);
+	int width3 = GetDrawStringWidthToHandle(L"EXIT", 4, exsitH_);
+	int width4 = GetDrawStringWidthToHandle(L"SWORDS MAN", 10, titleH_);
 
 	DrawStringToHandle((Game::kScreenWidth / 2) - (width1 / 2), Game::kScreenHeight / 2 + 150,
 		L"GAME START", 0xffffff, startH_, false);
 	DrawStringToHandle((Game::kScreenWidth / 2) - (width2 / 2), Game::kScreenHeight / 2 + 225,
 		L"OPTION", 0xffffff, optionH_, false);
 	DrawStringToHandle((Game::kScreenWidth / 2) - (width3 / 2), Game::kScreenHeight / 2 + 300,
-		L"EXSIT", 0xffffff, exsitH_, false);
+		L"EXIT", 0xffffff, exsitH_, false);
 
-	DrawStringToHandle((Game::kScreenWidth / 2) - (width4 / 2), 100, L"SORD MAN", 0xffffff, titleH_, false);
+	DrawStringToHandle((Game::kScreenWidth / 2) - (width4 / 2), 100, L"SWORDS MAN", 0xffffff, titleH_, false);
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);

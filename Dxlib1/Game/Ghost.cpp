@@ -1,4 +1,4 @@
-#include "BlinkyEnemy.h"
+#include "Ghost.h"
 #include "../DrawFunctions.h"
 #include "Player.h"
 #include "Field.h"
@@ -9,19 +9,15 @@
 
 namespace
 {
-	// 画像の幅
-	constexpr int WIDTH = 32;
-
-	// 画像の高さ
-	constexpr int HEIGHT = 32;
+	
 
 	// 画像の拡大率
 	constexpr float SCALE = 2.0f;
 
-	// 通常の移動スピード
+	// 通常のプレイヤーの移動スピード
 	constexpr float NORMAL_SPEED = 1.6f;
 
-	// プレイヤーがパワーエサを取得した場合の移動スピード(何倍か)
+	// パワーエサを取得した場合の移動スピード(何倍か)
 	constexpr float GET_FEED_SPEED = 1.2f;
 
 	// パワーエサを取得した場合持続時間(何秒か)
@@ -32,18 +28,24 @@ namespace
 
 	// アニメーション枚数
 	constexpr int ANIME_FRAME_NUM = 4;
+
+	// 死んでから動き始めるまでの時間
+	constexpr int DIEAD_MOVE_INTERVAL = 60 * 5;
+
+	// ゲームスタート時から動き始めるまでの時間
+	constexpr int STARET_MOVE_INTEVAL = 60 * 4;
 }
 
-BlinkyEnemy::BlinkyEnemy(int handle, int indexX, int indexY)
+Ghost::Ghost(int handle, int indexX, int indexY)
 {
 	handle_ = handle;
 	indexX_ = indexX;
 	indexY_ = indexY;
 
-	isMove_ = true;
+	isIntrusion_ = true;
 }
 
-void BlinkyEnemy::Update()
+void Ghost::Update()
 {
 	// 死んだ場合初期化
 	if (isDead_)
@@ -54,9 +56,12 @@ void BlinkyEnemy::Update()
 		if (indexX_ == 10 && indexY_ == 10)
 		{
 		//	isIzike_ = false;
+			isMove_ = false;
 			isIntrusion_ = true;
 		}
 	}
+
+	MoveSwitch(STARET_MOVE_INTEVAL, DIEAD_MOVE_INTERVAL);
 
 	// 縄張りモードと追跡モードの切り替え
 	ModeSwitch();
@@ -95,7 +100,7 @@ void BlinkyEnemy::Update()
 			};
 		}
 
-		moveDirection_ = pField_->BlinkyMove(indexY_, indexX_, isIntrusion_);
+		moveDirection_ = pField_->CrydeMove(indexY_, indexX_, isIntrusion_);
 
 		moveTimer_ = 0;
 	}
@@ -127,7 +132,7 @@ void BlinkyEnemy::Update()
 	idX_ = (idX_ + 1) % (ANIME_FRAME_SPEED * ANIME_FRAME_NUM);				// 通常処理
 }
 
-void BlinkyEnemy::Draw()
+void Ghost::Draw()
 {
 	int imgX = (idX_ / ANIME_FRAME_SPEED) * WIDTH;
 
@@ -137,7 +142,7 @@ void BlinkyEnemy::Draw()
 
 		int imgY = DirectReturnNum(HEIGHT);
 
-		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
+		DrawRectRotaGraph(pos_.x, pos_.y - 5,	// 座標
 			imgX, imgY,							// 切り取り左上
 			WIDTH, HEIGHT,						// 幅、高さ
 			SCALE, 0,							// 拡大率、回転角度
@@ -145,10 +150,8 @@ void BlinkyEnemy::Draw()
 	}
 }
 
-void BlinkyEnemy::SetInit()
+void Ghost::SetInit()
 {
-	isMove_ = true;
-	
 	indexX_ = 9;
-	indexY_ = 8;
+	indexY_ = 10;
 }

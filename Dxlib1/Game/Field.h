@@ -81,7 +81,10 @@ public:
 	int CrydeMove(int enemyIndexY, int enemyIndexX, bool flag);
 private:
 	std::shared_ptr<Player> pPlayer_;
+
 	std::shared_ptr<EnemyBase> pEnemy_[EnemyBase::enemy_num];
+
+	int mapData_[Field::MAP_HEIGHT][Field::MAP_WIDTH];
 
 	int mapData2[Field::MAP_HEIGHT][Field::MAP_WIDTH];
 
@@ -89,7 +92,6 @@ private:
 	bool isDraw_;
 
 	// ‰æ‘œ‚Ìƒnƒ“ƒhƒ‹
-	int handle_;
 	int coinH_;
 	int sordH_;
 

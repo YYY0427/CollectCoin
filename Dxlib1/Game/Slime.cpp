@@ -1,4 +1,4 @@
-#include "PinkyEnemy.h"
+#include "Slime.h"
 #include "../DrawFunctions.h"
 #include "Player.h"
 #include "Field.h"
@@ -9,11 +9,7 @@
 
 namespace
 {
-	// 画像の幅
-	constexpr int WIDTH = 32;
 
-	// 画像の高さ
-	constexpr int HEIGHT = 32;
 
 	// 画像の拡大率
 	constexpr float SCALE = 2.0f;
@@ -28,26 +24,26 @@ namespace
 	constexpr int FEED_DURATION = 10;
 
 	// 1枚に必要なフレーム数
-	constexpr int ANIME_FRAME_SPEED = 10;
+	constexpr int ANIME_FRAME_SPEED = 8;
 
 	// アニメーション枚数
-	constexpr int ANIME_FRAME_NUM = 4;
+	constexpr int ANIME_FRAME_NUM = 7;
 
 	// 死んでから動き始めるまでの時間
 	constexpr int DIEAD_MOVE_INTERVAL = 60 * 5;
 
 	// ゲームスタート時から動き始めるまでの時間
-	constexpr int STARET_MOVE_INTEVAL = 60 * 12;
+	constexpr int STARET_MOVE_INTEVAL = 60 * 8;
 }
 
-PinkyEnemy::PinkyEnemy(int handle, int indexX, int indexY)
+Slime::Slime(int handle, int indexX, int indexY)
 {
 	handle_ = handle;
 	indexX_ = indexX;
 	indexY_ = indexY;
 }
 
-void PinkyEnemy::Update()
+void Slime::Update()
 {
 	// 死んだ場合初期化
 	if (isDead_)
@@ -63,7 +59,6 @@ void PinkyEnemy::Update()
 		}
 	}
 
-	// 移動するか移動しないかの切り替え
 	MoveSwitch(STARET_MOVE_INTEVAL, DIEAD_MOVE_INTERVAL);
 
 	// 縄張りモードと追跡モードの切り替え
@@ -76,7 +71,6 @@ void PinkyEnemy::Update()
 	kX_ = indexX_;
 	kY_ = indexY_;
 
-	// スピードによって移動のインターバルを変更
 	moveInterval_ = Field::CHIP_SIZE / speed_;
 
 	// 移動のインターバル
@@ -104,7 +98,7 @@ void PinkyEnemy::Update()
 			};
 		}
 
-		moveDirection_ = pField_->PinkyMove(indexY_, indexX_, isIntrusion_);
+		moveDirection_ = pField_->InkyMove(indexY_, indexX_, isIntrusion_);
 
 		moveTimer_ = 0;
 	}
@@ -136,7 +130,7 @@ void PinkyEnemy::Update()
 	idX_ = (idX_ + 1) % (ANIME_FRAME_SPEED * ANIME_FRAME_NUM);				// 通常処理
 }
 
-void PinkyEnemy::Draw()
+void Slime::Draw()
 {
 	int imgX = (idX_ / ANIME_FRAME_SPEED) * WIDTH;
 
@@ -154,8 +148,8 @@ void PinkyEnemy::Draw()
 	}
 }
 
-void PinkyEnemy::SetInit()
+void Slime::SetInit()
 {
-	indexX_ = 10;
+	indexX_ = 8;
 	indexY_ = 10;
 }

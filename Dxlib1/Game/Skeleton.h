@@ -9,11 +9,17 @@ class Player;
 /// <summary>
 /// 粘着タイプ敵
 /// </summary>
-class BlinkyEnemy : public EnemyBase
+class Skeleton : public EnemyBase
 {
 public:
-	BlinkyEnemy(int handle, int indexX, int indexY);
-	virtual ~BlinkyEnemy(){}
+	// 画像の幅
+	static constexpr int WIDTH = 32;
+
+	// 画像の高さ
+	static constexpr int HEIGHT = 32;
+
+	Skeleton(int handle, int indexX, int indexY);
+	virtual ~Skeleton(){}
 
 	/// <summary>
 	/// 更新

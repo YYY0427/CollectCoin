@@ -13,6 +13,14 @@ class Field;
 class EnemyBase
 {
 public:
+
+	// 画像の幅
+	static constexpr int WIDTH = 16;
+
+	// 画像の高さ
+	static constexpr int HEIGHT = 16;
+
+
 	EnemyBase();
 	virtual ~EnemyBase(){}
 
@@ -51,14 +59,15 @@ public:
 	virtual void SetInit() = 0;
 
 	// 敵の座標の取得
-	Vec2 GetSize()const { return size_; }
 	Vec2 GetPos() const { return pos_; }
 
 	bool GetIzike()const { return isIzike_; }
 	bool GetTracking()const { return isTracking_; }
+	bool GetMove() const { return isMove_; }
 	int  GetIndexY()const { return indexY_; }
 	int  GetIndexX()const { return indexX_; }
-	bool GetMove() const { return isMove_; }
+	int GetSizeX() const { return WIDTH; }
+	int GetSizeY() const { return HEIGHT; }
 
 	// 敵の表示を消すか消さないかをセット
 	void SetEnabled(bool isEnabled) { isEnabled_ = isEnabled; }

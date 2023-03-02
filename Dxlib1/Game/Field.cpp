@@ -6,17 +6,16 @@
 
 namespace
 {
-	// マップデータ
-	int mapData[Field::MAP_HEIGHT][Field::MAP_WIDTH] =
-	{
-		// 0 : なにもなし
-		// 8 : なにもなし
-		// 1 : エサ
-		// 2 : 壁
-		// 3 : 宝箱 
-		// 7 : 扉(中からは出れて、外からは入れない)
+	// 0 : なにもなし
+	// 8 : なにもなし
+	// 1 : エサ
+	// 2 : 壁
+	// 3 : 宝箱 
+	// 7 : 扉(中からは出れて、外からは入れない)
 
-		{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, 
+	constexpr int mapData[Field::MAP_HEIGHT][Field::MAP_WIDTH] =
+	{
+		{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
 		{ 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
 		{ 2, 1, 2, 2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 1, 2 },
 		{ 2, 3, 2, 2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 3, 2 },
@@ -39,6 +38,7 @@ namespace
 		{ 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
 		{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
 	};
+
 
 	// 点滅スピード
 	constexpr int FLASH_SPEED = 20;
@@ -71,6 +71,22 @@ Field::Field() :
 	sordH_ = my::MyLoadGraph(L"Data/img/game/sord.png");
 
 	coinH_ = my::MyLoadGraph(L"Data/img/game/coin.png");
+
+	for (int y = 0; y < Field::MAP_HEIGHT; y++)
+	{
+		for (int x = 0; x < Field::MAP_WIDTH; x++)
+		{
+			mapData2[y][x] = 0;
+		}
+	}
+
+	for (int y = 0; y < Field::MAP_HEIGHT; y++)
+	{
+		for (int x = 0; x < Field::MAP_WIDTH; x++)
+		{
+			mapData_[y][x] = mapData[y][x];
+		}
+	}
 }
 
 void Field::Init()
@@ -103,7 +119,7 @@ void Field::Draw()
 		for (int x = 0; x < MAP_WIDTH; x++)
 		{
 			// コインの描画
-			if (mapData[y][x] == 1)
+			if (mapData_[y][x] == 1)
 			{
 				int imgX = (imgIdX_ / COIN_FRAME_SPEED) * 8;
 				DrawRectRotaGraph(x * CHIP_SIZE + 16 + DISPLAY_POS_X, y * CHIP_SIZE + 16 + DISPLAY_POS_Y,
@@ -118,13 +134,13 @@ void Field::Draw()
 					GetColor(0, 0, 255), false);
 			}*/
 			// 宝箱の描画
-			if (mapData[y][x] == 3)
+			if (mapData_[y][x] == 3)
 			{
 				int imgX = (sordIdx_ / BOX_FRAME_SPEED) * 16;
 				DrawRectRotaGraph(x * CHIP_SIZE + 16 + DISPLAY_POS_X, y * CHIP_SIZE + 16 + DISPLAY_POS_Y,
 					imgX, 0, 16, 16, 2.0f, 0.0f, sordH_, true);
 			}
-			if (mapData[y][x] == 7)
+			if (mapData_[y][x] == 7)
 			{
 				DrawBox(
 					x * CHIP_SIZE + DISPLAY_POS_X, y * CHIP_SIZE + DISPLAY_POS_Y,
@@ -142,7 +158,7 @@ bool Field::IsGameClearCheck()
 	{
 		for (int x = 0; x < MAP_WIDTH; x++)
 		{
-			if (mapData[y][x] == 1 || mapData[y][x] == 3)
+			if (mapData_[y][x] == 1 || mapData_[y][x] == 3)
 			{
 				return false;
 			}
@@ -154,7 +170,7 @@ bool Field::IsGameClearCheck()
 // ブロックがあるかどうか
 bool Field::IsBlock(int y, int x)
 {
-	if (mapData[y][x] == 2)	
+	if (mapData_[y][x] == 2)	
 		return true;
 	
 	return false;
@@ -163,9 +179,9 @@ bool Field::IsBlock(int y, int x)
 // エサがあるかどうか
 bool Field::IsFeed(int y, int x)
 {
-	if (mapData[y][x] == 1)
+	if (mapData_[y][x] == 1)
 	{
-		mapData[y][x] = 0;
+		mapData_[y][x] = 0;
 		return true;
 	}
 
@@ -175,9 +191,9 @@ bool Field::IsFeed(int y, int x)
 // 宝箱があるかどうか
 bool Field::IsPowerFeed(int y, int x)
 {
-	if (mapData[y][x] == 3)
+	if (mapData_[y][x] == 3)
 	{
-		mapData[y][x] = 0;
+		mapData_[y][x] = 0;
 		return true;
 	}
 	return false;
@@ -204,7 +220,7 @@ void Field::MoveDataSet(int goalY, int goalX)
 	{
 		for (int x = 0; x < MAP_WIDTH; x++)
 		{
-			if (mapData[y][x] != 2 && mapData[y][x] != 8)
+			if (mapData_[y][x] != 2 && mapData_[y][x] != 8)
 			{
 				mapData2[y][x] = 0;
 			}
@@ -299,7 +315,7 @@ bool Field::Intrusion(int y, int x, bool flag)
 	// flagがtrueの場合通れる
 	if (!flag)
 	{
-		if (mapData[y][x] == 7)
+		if (mapData_[y][x] == 7)
 		{
 			// 通れない
 			return false;

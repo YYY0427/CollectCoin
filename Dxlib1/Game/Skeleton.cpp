@@ -1,4 +1,4 @@
-#include "InkyEnemy.h"
+#include "Skeleton.h"
 #include "../DrawFunctions.h"
 #include "Player.h"
 #include "Field.h"
@@ -9,45 +9,35 @@
 
 namespace
 {
-	// 画像の幅
-	constexpr int WIDTH = 32;
-
-	// 画像の高さ
-	constexpr int HEIGHT = 32;
-
 	// 画像の拡大率
 	constexpr float SCALE = 2.0f;
 
-	// 通常のプレイヤーの移動スピード
+	// 通常の移動スピード
 	constexpr float NORMAL_SPEED = 1.6f;
 
-	// パワーエサを取得した場合の移動スピード(何倍か)
+	// プレイヤーがパワーエサを取得した場合の移動スピード(何倍か)
 	constexpr float GET_FEED_SPEED = 1.2f;
 
 	// パワーエサを取得した場合持続時間(何秒か)
 	constexpr int FEED_DURATION = 10;
 
 	// 1枚に必要なフレーム数
-	constexpr int ANIME_FRAME_SPEED = 8;
+	constexpr int ANIME_FRAME_SPEED = 10;
 
 	// アニメーション枚数
-	constexpr int ANIME_FRAME_NUM = 7;
-
-	// 死んでから動き始めるまでの時間
-	constexpr int DIEAD_MOVE_INTERVAL = 60 * 5;
-
-	// ゲームスタート時から動き始めるまでの時間
-	constexpr int STARET_MOVE_INTEVAL = 60 * 8;
+	constexpr int ANIME_FRAME_NUM = 4;
 }
 
-InkyEnemy::InkyEnemy(int handle, int indexX, int indexY)
+Skeleton::Skeleton(int handle, int indexX, int indexY)
 {
 	handle_ = handle;
 	indexX_ = indexX;
 	indexY_ = indexY;
+
+	isMove_ = true;
 }
 
-void InkyEnemy::Update()
+void Skeleton::Update()
 {
 	// 死んだ場合初期化
 	if (isDead_)
@@ -58,12 +48,9 @@ void InkyEnemy::Update()
 		if (indexX_ == 10 && indexY_ == 10)
 		{
 		//	isIzike_ = false;
-			isMove_ = false;
 			isIntrusion_ = true;
 		}
 	}
-
-	MoveSwitch(STARET_MOVE_INTEVAL, DIEAD_MOVE_INTERVAL);
 
 	// 縄張りモードと追跡モードの切り替え
 	ModeSwitch();
@@ -102,7 +89,7 @@ void InkyEnemy::Update()
 			};
 		}
 
-		moveDirection_ = pField_->InkyMove(indexY_, indexX_, isIntrusion_);
+		moveDirection_ = pField_->BlinkyMove(indexY_, indexX_, isIntrusion_);
 
 		moveTimer_ = 0;
 	}
@@ -134,7 +121,7 @@ void InkyEnemy::Update()
 	idX_ = (idX_ + 1) % (ANIME_FRAME_SPEED * ANIME_FRAME_NUM);				// 通常処理
 }
 
-void InkyEnemy::Draw()
+void Skeleton::Draw()
 {
 	int imgX = (idX_ / ANIME_FRAME_SPEED) * WIDTH;
 
@@ -152,8 +139,10 @@ void InkyEnemy::Draw()
 	}
 }
 
-void InkyEnemy::SetInit()
+void Skeleton::SetInit()
 {
-	indexX_ = 8;
-	indexY_ = 10;
+	isMove_ = true;
+	
+	indexX_ = 9;
+	indexY_ = 8;
 }

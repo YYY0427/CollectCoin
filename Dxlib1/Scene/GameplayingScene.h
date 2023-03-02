@@ -9,6 +9,7 @@ class Player;	//プレイヤークラス
 class Field;	
 class EnemyBase;
 class Map;
+class BackGround;
 
 /// <summary>
 /// ゲーム中シーン
@@ -26,7 +27,7 @@ public:
 	// 死亡時の初期化
 	void SetInit();
 
-	bool Colision(std::shared_ptr<EnemyBase>enemy);
+	bool Colision(std::shared_ptr<EnemyBase>enemy, int width, int height);
 
 private:
 	//プレイヤー
@@ -40,6 +41,8 @@ private:
 
 	std::shared_ptr<Map> pMap_;
 
+	std::shared_ptr<BackGround> pBackGround_;
+
 	//フェードの色(デフォ黒)
 	unsigned int  fadeColor_ = 0x000000; 
 
@@ -51,6 +54,7 @@ private:
 	// 文字のハンドル
 	int gameOverH_;
 	int gameClearH_;
+	int readyH_;
 
 	// 画像のハンドル
 	int lifeH_;
@@ -69,6 +73,8 @@ private:
 
 	int timer_;
 
+	int preparTimer_;
+
 	int gameOverTimer_;
 
 	// 残機
@@ -82,6 +88,8 @@ private:
 
 	// フェイドアウト
 	void FadeOutUpdate(const InputState& input);
+
+	void PrepareUpdate(const InputState& input);
 
 	// プレイヤー死亡時の演出
 	void PlayerDeadUpdate(const InputState& input);

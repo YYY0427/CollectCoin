@@ -4,12 +4,18 @@
 /// <summary>
 /// ‹C‚Ü‚®‚ê‚È“G
 /// </summary>
-class InkyEnemy : public EnemyBase
+class Slime : public EnemyBase
 {
 public:
-	InkyEnemy(int handle, int indexX, int indexY);
+	// ‰æ‘œ‚Ì•
+	static constexpr int WIDTH = 32;
 
-	virtual ~InkyEnemy(){}
+	// ‰æ‘œ‚Ì‚‚³
+	static constexpr int HEIGHT = 32;
+
+	Slime(int handle, int indexX, int indexY);
+
+	virtual ~Slime(){}
 	/// <summary>
 	/// XV
 	/// </summary>

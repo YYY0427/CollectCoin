@@ -8,12 +8,6 @@
 
 namespace
 {
-	// ‰æ‘œ‚Ì•
-	constexpr int WIDTH = 16;
-
-	// ‰æ‘œ‚Ì‚‚³
-	constexpr int HEIGHT = 16;
-
 	// ‰æ‘œ‚ÌŠg‘å—¦
 	constexpr float SCALE = 2.0f;
 

@@ -2,7 +2,7 @@
 #include "Field.h"
 #include "../DrawFunctions.h"
 #include "../InputState.h"
-#include "BlinkyEnemy.h"
+#include "Skeleton.h"
 #include "../game.h"
 #include "EnemyBase.h"
 #include <DxLib.h>
@@ -36,7 +36,7 @@ namespace
 
 	// アニメーション枚数
 	constexpr int ANIME_FRAME_NUM = 8;			// 通常時
-	constexpr int DEAD_ANIME_FRAME_NUM = 8;	// 死亡時
+	constexpr int DEAD_ANIME_FRAME_NUM = 8;		// 死亡時
 }
 
 Player::Player(int normalH, int waponH, int deadH, int indexX, int indexY) :
