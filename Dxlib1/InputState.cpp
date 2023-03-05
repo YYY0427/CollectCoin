@@ -172,7 +172,7 @@ void InputState::SaveKeyInfo() const
 
 void InputState::LoadKeyInfo() 
 {
-	int handle = FileRead_open(L"key.info");
+	int handle = FileRead_open("key.info");
 
 	if (handle == 0)
 	{

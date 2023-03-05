@@ -9,8 +9,6 @@
 
 namespace
 {
-	
-
 	// ‰æ‘œ‚ÌŠg‘å—¦
 	constexpr float SCALE = 2.0f;
 

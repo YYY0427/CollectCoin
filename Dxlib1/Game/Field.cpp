@@ -68,9 +68,9 @@ Field::Field() :
 	crydeGoalY_ = 20;
 	crydeGoalX_ = 17;
 
-	sordH_ = my::MyLoadGraph(L"Data/img/game/sord.png");
+	sordH_ = my::MyLoadGraph("Data/img/game/sord.png");
 
-	coinH_ = my::MyLoadGraph(L"Data/img/game/coin.png");
+	coinH_ = my::MyLoadGraph("Data/img/game/coin.png");
 
 	for (int y = 0; y < Field::MAP_HEIGHT; y++)
 	{

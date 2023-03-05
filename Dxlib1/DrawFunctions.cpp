@@ -10,12 +10,12 @@ namespace my
 /// <param name="path">パス文字列</param>
 /// <returns>画像のハンドル</returns>
 
-int MyLoadGraph(const TCHAR* path)
-{
-	int handle = LoadGraph(path);
-	assert(handle >= 0);
-	return handle;
-}
+	int MyLoadGraph(const TCHAR* path)
+	{
+		int handle = LoadGraph(path);
+		assert(handle >= 0);
+		return handle;
+	}
 }//end of namespace my
 
 

@@ -42,7 +42,7 @@ GameclearScene::GameclearScene(SceneManager& manager) :
 	Scene(manager),
 	updateFunc_(&GameclearScene::FadeInUpdate)
 {
-	gameOverH_ = my::MyLoadGraph(L"Data/img/GameOver.png");
+	gameOverH_ = my::MyLoadGraph("Data/img/GameOver.png");
 }
 
 
@@ -53,7 +53,7 @@ void GameclearScene::Update(const InputState& input)
 
 void GameclearScene::Draw()
 {
-	DrawString(0, 0, L"GameclearScene", 0xffffff, true);
+	DrawString(0, 0, "GameclearScene", 0xffffff, true);
 	DrawRotaGraph(320, 240, 0.5, 0.0, gameOverH_, true);
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
 	DrawBox(0, 0, 640, 480, fadeColor_, true);

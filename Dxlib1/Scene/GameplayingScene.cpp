@@ -39,6 +39,15 @@ namespace
 	// 敵(ゴーレム)の初期位置
 	constexpr int GOLEM_START_INDEX_X = 10;
 	constexpr int GOLEM_START_INDEX_Y = 10;
+
+	// 準備中
+	const char* const REDY_STRING = "REDEY";
+
+	// ゲームクリアー
+	const char* const GAMECLEAR_STRING = "GAME CLEAR!!!";
+
+	// ゲームオーバー文字列
+	const char* const GAMEOVER_STRING = "GAME OVER!!!";
 }
 
 GameplayingScene::GameplayingScene(SceneManager& manager) :
@@ -51,22 +60,22 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	isGameClear_(false),
 	faideEnabled_(false)
 {
-	gameOverH_ = CreateFontToHandle(NULL, 20, 10);
-	gameClearH_ = CreateFontToHandle(NULL, 20, 10);
-	readyH_ = CreateFontToHandle(NULL, 20, 10);
+	gameOverH_ = CreateFontToHandle("PixelMplus10", 20, 10);
+	gameClearH_ = CreateFontToHandle("PixelMplus10", 20, 10);
+	readyH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 
-	int nowaponPlayerH = my::MyLoadGraph(L"Data/img/game/nowapon-player.png");
-	int waponPlayerH = my::MyLoadGraph(L"Data/img/game/wapon-player.png");
-	int deadPlayerH = my::MyLoadGraph(L"Data/img/game/player-deth.png");
+	int nowaponPlayerH = my::MyLoadGraph("Data/img/game/nowapon-player.png");
+	int waponPlayerH = my::MyLoadGraph("Data/img/game/wapon-player.png");
+	int deadPlayerH = my::MyLoadGraph("Data/img/game/player-deth.png");
 
-	int skeletonH = my::MyLoadGraph(L"Data/img/game/skeleton_walk.png");
- 	int slimeH = my::MyLoadGraph(L"Data/img/game/slime.png");
-	int ghostH = my::MyLoadGraph(L"Data/img/game/whiteGhost.png");
-	int golemH = my::MyLoadGraph(L"Data/img/game/golem.png");
+	int skeletonH = my::MyLoadGraph("Data/img/game/skeleton_walk.png");
+ 	int slimeH = my::MyLoadGraph("Data/img/game/slime.png");
+	int ghostH = my::MyLoadGraph("Data/img/game/whiteGhost.png");
+	int golemH = my::MyLoadGraph("Data/img/game/golem.png");
 
-	int mapChipH = my::MyLoadGraph(L"Data/img/game/mapchip.png");
-	int backGraph = my::MyLoadGraph(L"Data/img/game/Gray.png");
-	lifeH_ = my::MyLoadGraph(L"Data/img/game/hart.png");
+	int mapChipH = my::MyLoadGraph("Data/img/game/mapchip.png");
+	int backGraph = my::MyLoadGraph("Data/img/game/Gray.png");
+	lifeH_ = my::MyLoadGraph("Data/img/game/hart.png");
 
 
 	pEnemy_[EnemyBase::skeleton] = std::make_shared<Skeleton>(
@@ -106,6 +115,11 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 		pPlayer_->SetEnemy(pEnemy_[i], i);
 		pField_->SetEnemy(pEnemy_[i], i);
 	}
+}
+
+GameplayingScene::~GameplayingScene()
+{
+	
 }
 
 void GameplayingScene::FadeInUpdate(const InputState& input)
@@ -266,27 +280,27 @@ void GameplayingScene::Draw()
 	// ゲームオーバー
 	if (isGameOver_)
 	{
-		int width = GetDrawStringWidthToHandle(L"GAME OVER", 9, gameOverH_);
+		int width = GetDrawStringWidthToHandle(GAMEOVER_STRING, strlen(GAMEOVER_STRING), gameOverH_);
 
 		// ゲームオーバー文字の表示
 		DrawStringToHandle((Game::kScreenWidth / 2) - (width / 2), Game::kScreenHeight / 2 + 40,
-			L"GAME OVER", 0xffffff, gameOverH_, false);
+			GAMEOVER_STRING, 0xffffff, gameOverH_, false);
 	}
 	// ゲームクリア
 	if (isGameClear_)
 	{
-		int width = GetDrawStringWidthToHandle(L"GAME CLEAR!!!", 13, gameOverH_);
+		int width = GetDrawStringWidthToHandle(GAMECLEAR_STRING, strlen(GAMECLEAR_STRING), gameOverH_);
 
 		// ゲームクリア文字の表示
 		DrawStringToHandle((Game::kScreenWidth / 2) - (width / 2), Game::kScreenHeight / 2 + 40,
-			L"GAME CLEAR!!!", 0xffffff, gameClearH_, false);
+			GAMECLEAR_STRING, 0xffffff, gameClearH_, false);
 	}
 	if (preparTimer_ > 0)
 	{
-		int width = GetDrawStringWidthToHandle(L"REDY?", 5, readyH_);
+		int width = GetDrawStringWidthToHandle(REDY_STRING, strlen(REDY_STRING), readyH_);
 		// ゲームクリア文字の表示
 		DrawStringToHandle((Game::kScreenWidth / 2) - (width / 2), Game::kScreenHeight / 2 + 40,
-			L"REDY?", 0xffffff, readyH_, false);
+			REDY_STRING, 0xffffff, readyH_, false);
 	}
 
 	// 残機の描画

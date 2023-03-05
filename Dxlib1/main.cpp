@@ -14,13 +14,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	SetGraphMode(Game::kScreenWidth, Game::kScreenHeight, Game::kColorDepth);
 
 	// ウインドウ名設定
-	SetMainWindowText(L"パックマン");
+	SetMainWindowText("パックマン");
 
 	// 初期化
 	if (DxLib_Init() == -1) 
 	{
 		return -1;
 	}
+
+	// ********** フォントのロード **********
+	LPCSTR font_path = "Data/font/PixelMplus10-Regular.ttf"; // 読み込むフォントファイルのパス
+	if (AddFontResourceEx(font_path, FR_PRIVATE, NULL) > 0)
+	{
+	}
+	else
+	{
+		// フォント読込エラー処理
+		MessageBox(NULL, "フォント読込失敗", " ", MB_OK);	// メッセージボックスを使って警告表示
+	}
+
 
 	SetDrawScreen(DX_SCREEN_BACK);
 
@@ -50,6 +62,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		{
 
 		}
+	}
+
+	// ********** フォントのアンロード **********
+	if (RemoveFontResourceEx(font_path, FR_PRIVATE, NULL))
+	{
+	}
+	else
+	{
+		MessageBox(NULL, "remove failure", "", MB_OK);
 	}
 
 	DxLib_End();

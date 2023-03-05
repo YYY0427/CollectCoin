@@ -9,15 +9,24 @@
 
 namespace
 {
-	constexpr int fade_interval = 60;
+	// タイトル
+	const char* const TITLE_STRING = "SWORD MAN";
+
+	// 選択肢
+	const char* const SELECTON1_STRING = "GAME START";
+	const char* const SELECTON2_STRING = "OPTION";
+	const char* const SELECTON3_STRING = "EXIT";
 
 	// 選択肢の数
 	constexpr int SELECTION_NUM = 3;
+
+	// フェードする速さ
+	constexpr int FAIDE_INTERVAL = 60;
 }
 
 void TitleScene::FadeInUpdate(const InputState& input)
 {
-	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
+	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(FAIDE_INTERVAL));
 
 	if (--fadeTimer_ == 0)
 	{
@@ -75,21 +84,21 @@ void TitleScene::NormalUpdate(const InputState& input)
 
 void TitleScene::FadeOutUpdate(const InputState& input)
 {
-	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
+	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(FAIDE_INTERVAL));
 
 	fadeTimer_++;
 
-	if (fadeTimer_ == fade_interval && decisionIndex_ == start)
+	if (fadeTimer_ == FAIDE_INTERVAL && decisionIndex_ == start)
 	{
 		manager_.ChangeScene(new GameplayingScene(manager_));
 		return;
 	}
-	else if (fadeTimer_ == fade_interval && decisionIndex_ == option)
+	else if (fadeTimer_ == FAIDE_INTERVAL && decisionIndex_ == option)
 	{
 		manager_.ChangeScene(new OptionScene(manager_));
 		return;
 	}
-	else if (fadeTimer_ == fade_interval && decisionIndex_ == exsit)
+	else if (fadeTimer_ == FAIDE_INTERVAL && decisionIndex_ == exsit)
 	{
 		DxLib_End();
 	}
@@ -98,14 +107,14 @@ void TitleScene::FadeOutUpdate(const InputState& input)
 TitleScene::TitleScene(SceneManager& manager) :
 	Scene(manager),
 	updateFunc_(&TitleScene::FadeInUpdate),
-	fadeTimer_(fade_interval),
+	fadeTimer_(FAIDE_INTERVAL),
 	fadeValue_(255),
 	currentInputIndex_(0),
 	decisionIndex_(0)
 {
-	normalSelectionH_ = CreateFontToHandle(NULL, 30, 10);
-	selectionH_ = CreateFontToHandle(NULL, 40, 10);
-	titleH_ = CreateFontToHandle(NULL, 150, 10);
+	normalSelectionH_ = CreateFontToHandle("PixelMplus10", 30, 10);
+	selectionH_ = CreateFontToHandle("PixelMplus10", 40, 10);
+	titleH_ = CreateFontToHandle("PixelMplus10", 150, 10);
 
 	startH_ = normalSelectionH_;
 	optionH_ = normalSelectionH_;
@@ -124,21 +133,21 @@ void TitleScene::Update(const InputState& input)
 
 void TitleScene::Draw()
 {
-	DrawString(0, 0, L"TitleScene", 0xffffff, true);
+	DrawString(0, 0, TITLE_STRING, 0xffffff, true);
 
-	int width1 = GetDrawStringWidthToHandle(L"GAME START", 10, startH_);
-	int width2 = GetDrawStringWidthToHandle(L"OPTION", 6, optionH_);
-	int width3 = GetDrawStringWidthToHandle(L"EXIT", 4, exsitH_);
-	int width4 = GetDrawStringWidthToHandle(L"SWORDS MAN", 10, titleH_);
+	int width1 = GetDrawStringWidthToHandle(SELECTON1_STRING, strlen(SELECTON1_STRING), startH_);
+	int width2 = GetDrawStringWidthToHandle(SELECTON2_STRING, strlen(SELECTON2_STRING), optionH_);
+	int width3 = GetDrawStringWidthToHandle(SELECTON3_STRING, strlen(SELECTON3_STRING), exsitH_);
+	int width4 = GetDrawStringWidthToHandle(TITLE_STRING, strlen(TITLE_STRING) , titleH_);
 
 	DrawStringToHandle((Game::kScreenWidth / 2) - (width1 / 2), Game::kScreenHeight / 2 + 150,
-		L"GAME START", 0xffffff, startH_, false);
+		SELECTON1_STRING, 0xffffff, startH_, false);
 	DrawStringToHandle((Game::kScreenWidth / 2) - (width2 / 2), Game::kScreenHeight / 2 + 225,
-		L"OPTION", 0xffffff, optionH_, false);
+		SELECTON2_STRING, 0xffffff, optionH_, false);
 	DrawStringToHandle((Game::kScreenWidth / 2) - (width3 / 2), Game::kScreenHeight / 2 + 300,
-		L"EXIT", 0xffffff, exsitH_, false);
+		SELECTON3_STRING, 0xffffff, exsitH_, false);
 
-	DrawStringToHandle((Game::kScreenWidth / 2) - (width4 / 2), 100, L"SWORDS MAN", 0xffffff, titleH_, false);
+	DrawStringToHandle((Game::kScreenWidth / 2) - (width4 / 2), 100, TITLE_STRING, 0xffffff, titleH_, false);
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);

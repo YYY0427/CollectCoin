@@ -18,7 +18,7 @@ class GameplayingScene : public Scene
 {
 public:
 	GameplayingScene(SceneManager& manager);
-	~GameplayingScene(){};
+	~GameplayingScene();
 
 	void Update(const InputState& input);
 

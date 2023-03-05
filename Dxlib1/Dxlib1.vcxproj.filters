@@ -45,9 +45,6 @@
     <ClCompile Include="Scene\GameplayingScene.cpp">
       <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\KeyConfigScene.cpp">
-      <Filter>ソース ファイル\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Scene\OptionScene.cpp">
       <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
@@ -120,9 +117,6 @@
       <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Scene\GameplayingScene.h">
-      <Filter>ヘッダー ファイル\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\KeyConfigScene.h">
       <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Scene\OptionScene.h">
