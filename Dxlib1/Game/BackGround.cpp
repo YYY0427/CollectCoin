@@ -23,15 +23,12 @@ void BackGround::Update()
 
 void BackGround::Draw()
 {
-	for (int z = 0; z < 2; z++)
+	for (int y = 0; y < height_ + 1; y++)
 	{
-		for (int y = 0; y < height_ + 1; y++)
+		for (int x = 0; x < width_ + 1; x++)
 		{
-			for (int x = 0; x < width_ + 1; x++)
-			{
-				DrawRotaGraph(x * size_.x, y * size_.y + scroll_, 1.0f, 0.0f, handle_, true);
-				DrawRotaGraph(x * size_.x, y * size_.y - Game::kScreenHeight + scroll_, 1.0f, 0.0f, handle_, true);
-			}
+			DrawRotaGraph(x * size_.x, y * size_.y + scroll_, 1.0f, 0.0f, handle_, true);
+			DrawRotaGraph(x * size_.x, y * size_.y - Game::kScreenHeight + scroll_, 1.0f, 0.0f, handle_, true);
 		}
 	}
 }
