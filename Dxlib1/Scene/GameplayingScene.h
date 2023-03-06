@@ -76,6 +76,7 @@ private:
 	int preparTimer_;
 
 	int gameOverTimer_;
+	int gameClearTimer_;
 
 	// Žc‹@
 	int life_;

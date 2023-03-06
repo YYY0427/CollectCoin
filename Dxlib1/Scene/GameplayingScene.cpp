@@ -53,9 +53,10 @@ namespace
 GameplayingScene::GameplayingScene(SceneManager& manager) :
 	Scene(manager),
 	updateFunc_(&GameplayingScene::FadeInUpdate),
-	life_(1),
+	life_(3),
 	timer_(0),
 	gameOverTimer_(0),
+	gameClearTimer_(0),
 	preparTimer_(0),
 	isGameClear_(false),
 	faideEnabled_(false)
@@ -308,8 +309,15 @@ void GameplayingScene::Draw()
 	{
 		int x = Game::kScreenWidth / 2 + 100 + (i * 40);
 
-		DrawRectRotaGraph(x, Game::kScreenHeight - 16, 0, 0, 16, 16, 2.0f, 0.0f, lifeH_, true);
+		DrawRectRotaGraph(x, Game::kScreenHeight - 30, 0, 0, 16, 16, 2.0f, 0.0f, lifeH_, true);
 	}
+
+	/*for (int i = life_; i >= life_; i--)
+	{
+		int x = Game::kScreenWidth / 2 + 100 + (i * 40);
+
+		DrawRectRotaGraph(x, Game::kScreenHeight - 30, 0, 0, 16, 16, 2.0f, 0.0f, lifeH_, true);
+	}*/
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
@@ -319,7 +327,11 @@ void GameplayingScene::Draw()
 void GameplayingScene::GameClearUpdate(const InputState& input)
 {
 	isGameClear_ = true;
-	updateFunc_ = &GameplayingScene::FadeOutUpdate;
+	gameClearTimer_++;
+	if (gameClearTimer_ % 180 == 0)
+	{
+		updateFunc_ = &GameplayingScene::FadeOutUpdate;
+	}
 }
 
 void GameplayingScene::GameOverUpdate(const InputState& input)
@@ -365,7 +377,7 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 	// ゲームクリアー
 	else if (fadeTimer_ > fade_interval && isGameClear_)
 	{
-		manager_.ChangeScene(new GameclearScene(manager_));
+		manager_.ChangeScene(new TitleScene(manager_));
 		return;
 	}
 	// 残機が１減った
@@ -403,6 +415,7 @@ void GameplayingScene::SetInit()
 	fadeTimer_ = fade_interval;
 	fadeValue_ = 255;
 	timer_ = 0;
+
 }
 
 bool GameplayingScene::Colision(std::shared_ptr<EnemyBase>enemy, int width, int height)

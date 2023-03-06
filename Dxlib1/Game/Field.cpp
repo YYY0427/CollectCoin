@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "../DrawFunctions.h"
 #include "EnemyBase.h"
+#include "../game.h"
 #include <DxLib.h>
 
 namespace
@@ -54,6 +55,7 @@ namespace
 Field::Field() :
 	imgIdX_(0),
 	sordIdx_(0),
+	coin_(0),
 	isDraw_(true)
 {
 	pinkyGoalX_ = 1;
@@ -71,6 +73,8 @@ Field::Field() :
 	sordH_ = my::MyLoadGraph("Data/img/game/sord.png");
 
 	coinH_ = my::MyLoadGraph("Data/img/game/coin.png");
+
+	stringH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 
 	for (int y = 0; y < Field::MAP_HEIGHT; y++)
 	{
@@ -125,15 +129,7 @@ void Field::Draw()
 				DrawRectRotaGraph(x * CHIP_SIZE + 16 + DISPLAY_POS_X, y * CHIP_SIZE + 16 + DISPLAY_POS_Y,
 					imgX, 0, 8, 8, 2.0f, 0.0f, coinH_, true);
 			}
-			// •Ç‚Ì•`‰æ
-			/*if (mapData[y][x] == 2)
-			{
-				DrawBox(
-					x * CHIP_SIZE + DISPLAY_POS_X, y * CHIP_SIZE + DISPLAY_POS_Y,
-					x * CHIP_SIZE + CHIP_SIZE + DISPLAY_POS_X, y * CHIP_SIZE + CHIP_SIZE + DISPLAY_POS_Y,
-					GetColor(0, 0, 255), false);
-			}*/
-			// •ó” ‚Ì•`‰æ
+			// Œ•‚Ì•`‰æ
 			if (mapData_[y][x] == 3)
 			{
 				int imgX = (sordIdx_ / BOX_FRAME_SPEED) * 16;
@@ -147,8 +143,36 @@ void Field::Draw()
 					x * CHIP_SIZE + CHIP_SIZE + DISPLAY_POS_X, y * CHIP_SIZE + (CHIP_SIZE / 4) + DISPLAY_POS_Y,
 					GetColor(255, 255, 0), true);
 			}
+			// •Ç‚Ì•`‰æ
+			/*if (mapData[y][x] == 2)
+			{
+				DrawBox(
+					x * CHIP_SIZE + DISPLAY_POS_X, y * CHIP_SIZE + DISPLAY_POS_Y,
+					x * CHIP_SIZE + CHIP_SIZE + DISPLAY_POS_X, y * CHIP_SIZE + CHIP_SIZE + DISPLAY_POS_Y,
+					GetColor(0, 0, 255), false);
+			}*/
 		}
 	}
+
+	// Žc‚è‚ÌƒRƒCƒ“‚Ì–‡”
+	DrawRectRotaGraph(Game::kScreenWidth / 2 - 130, Game::kScreenHeight - 30, 0, 0, 8, 8, 3.0f, 0.0f, coinH_, true);
+	DrawFormatStringToHandle(Game::kScreenWidth / 2 - 100, Game::kScreenHeight - 40, 0x000000, stringH_, "%d / %d\n", coin_, LestCoin());
+}
+
+int Field::LestCoin()
+{
+	int coin = 0;
+	for (int y = 0; y < MAP_HEIGHT; y++)
+	{
+		for (int x = 0; x < MAP_WIDTH; x++)
+		{
+			if (mapData[y][x] == 1)
+			{
+				coin++;
+			}
+		}
+	}
+	return coin;
 }
 
 // ƒQ[ƒ€ƒNƒŠƒA”»’è
@@ -158,7 +182,7 @@ bool Field::IsGameClearCheck()
 	{
 		for (int x = 0; x < MAP_WIDTH; x++)
 		{
-			if (mapData_[y][x] == 1 || mapData_[y][x] == 3)
+			if (mapData_[y][x] == 1)
 			{
 				return false;
 			}
@@ -181,6 +205,7 @@ bool Field::IsFeed(int y, int x)
 {
 	if (mapData_[y][x] == 1)
 	{
+		coin_++;
 		mapData_[y][x] = 0;
 		return true;
 	}

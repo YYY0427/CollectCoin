@@ -9,15 +9,6 @@
 
 namespace
 {
-	// 画像の幅
-	constexpr int WIDTH = 32;
-
-	// 画像の高さ
-	constexpr int HEIGHT = 32;
-
-	// 画像の拡大率
-	constexpr float SCALE = 2.0f;
-
 	// 通常のプレイヤーの移動スピード(何倍か)
 	constexpr float NORMAL_SPEED = 1.4f;
 
@@ -29,14 +20,6 @@ namespace
 
 	// プレイヤーを残り何割でフラッシュさせるかの割合
 	constexpr float FLASH_RATIO = 0.7f;
-
-	// 1枚に必要なフレーム数
-	constexpr int ANIME_FRAME_SPEED = 10;		// 通常時
-	constexpr int DEAD_ANIME_FRAME_SPEED = 10;	// 死亡時
-
-	// アニメーション枚数
-	constexpr int ANIME_FRAME_NUM = 8;			// 通常時
-	constexpr int DEAD_ANIME_FRAME_NUM = 8;		// 死亡時
 }
 
 Player::Player(int normalH, int waponH, int deadH, int indexX, int indexY) :

@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene.h"
+#include "../vec2.h"
 
 class InputState;
 
@@ -22,13 +23,38 @@ private:
 		exsit
 	};
 
-	int startH_;
-	int optionH_;
-	int exsitH_;
+	int playerH_;
+	bool isTurnFlag_;
+	bool isEnabled_;
+
+	// 座標
+	Vec2 pos_;
+
+	// 画像ハンドル
+	int sordH_;
+	int nowaponPlayerH_;
+	int waponPlayerH_;
+	int skeletonH_;
+	int slimeH_;
+	int ghostH_;
+	int golemH_;
+
+	// 画像インデックス
+	int playerImgIdx_;
+	int skeletonImgIdx_;
+	int slimeImgIdx_;
+	int ghostImgIdx_;
+	int golemImgIdx_;
+
+	int imgY_;
 
 	// 選択肢の文字ハンドル
 	int normalSelectionH_;
 	int selectionH_;
+
+	int startH_;
+	int optionH_;
+	int exsitH_;
 
 	// タイトル名ハンドル
 	int titleH_;

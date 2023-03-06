@@ -39,6 +39,8 @@ public:
 	void SetEnemy(std::shared_ptr<EnemyBase>enemy, int i) { pEnemy_[i] = enemy; }
 	void SetPlayer(std::shared_ptr<Player>player) { pPlayer_ = player; }
 
+	int LestCoin();
+
 	// ゲームクリアチェック判定
 	bool IsGameClearCheck();
 
@@ -90,6 +92,9 @@ private:
 
 	// 表示するかどうか
 	bool isDraw_;
+
+	int coin_;
+	int stringH_;
 
 	// 画像のハンドル
 	int coinH_;

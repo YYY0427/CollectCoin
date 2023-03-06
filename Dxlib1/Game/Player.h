@@ -11,6 +11,23 @@ class EnemyBase;
 class Player
 {
 public:
+	// 画像の幅
+	static constexpr int WIDTH = 32;
+
+	// 画像の高さ
+	static constexpr int HEIGHT = 32;
+
+	// 画像の拡大率
+	static constexpr float SCALE = 2.0f;
+
+	// 1枚に必要なフレーム数
+	static constexpr int ANIME_FRAME_SPEED = 8;		// 通常時
+	static constexpr int DEAD_ANIME_FRAME_SPEED = 10;	// 死亡時
+
+	// アニメーション枚数
+	static constexpr int ANIME_FRAME_NUM = 8;			// 通常時
+	static constexpr int DEAD_ANIME_FRAME_NUM = 8;		// 死亡時
+
 	// コンストラクタ
 	Player(int normalH, int waponH, int deadH, int indexX, int indexY);
 

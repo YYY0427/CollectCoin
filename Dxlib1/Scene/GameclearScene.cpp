@@ -42,7 +42,6 @@ GameclearScene::GameclearScene(SceneManager& manager) :
 	Scene(manager),
 	updateFunc_(&GameclearScene::FadeInUpdate)
 {
-	gameOverH_ = my::MyLoadGraph("Data/img/GameOver.png");
 }
 
 

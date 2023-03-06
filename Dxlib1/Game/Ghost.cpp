@@ -9,9 +9,6 @@
 
 namespace
 {
-	// 画像の拡大率
-	constexpr float SCALE = 2.0f;
-
 	// 通常のプレイヤーの移動スピード
 	constexpr float NORMAL_SPEED = 1.6f;
 
@@ -20,12 +17,6 @@ namespace
 
 	// パワーエサを取得した場合持続時間(何秒か)
 	constexpr int FEED_DURATION = 10;
-
-	// 1枚に必要なフレーム数
-	constexpr int ANIME_FRAME_SPEED = 10;
-
-	// アニメーション枚数
-	constexpr int ANIME_FRAME_NUM = 4;
 
 	// 死んでから動き始めるまでの時間
 	constexpr int DIEAD_MOVE_INTERVAL = 60 * 5;
