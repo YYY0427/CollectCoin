@@ -56,6 +56,11 @@ private:
 	int optionH_;
 	int exsitH_;
 
+	// サウンドハンドル
+	int cursorSoundH_;
+	int decisionSoundH_;
+	int bgmSoundH_;
+
 	// タイトル名ハンドル
 	int titleH_;
 

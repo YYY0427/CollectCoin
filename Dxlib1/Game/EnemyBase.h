@@ -64,10 +64,13 @@ public:
 	bool GetIzike()const { return isIzike_; }
 	bool GetTracking()const { return isTracking_; }
 	bool GetMove() const { return isMove_; }
+	bool GetDoor() const { return isDoor_; }
 	int  GetIndexY()const { return indexY_; }
 	int  GetIndexX()const { return indexX_; }
 	int GetSizeX() const { return WIDTH; }
 	int GetSizeY() const { return HEIGHT; }
+
+	void SetDoor(bool isDoor) { isDoor_ = isDoor; }
 
 	// 敵の表示を消すか消さないかをセット
 	void SetEnabled(bool isEnabled) { isEnabled_ = isEnabled; }
@@ -176,4 +179,6 @@ protected:
 	bool isIntrusion_;
 
 	int moveTimer2_;
+
+	bool isDoor_;
 };

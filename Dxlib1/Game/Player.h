@@ -21,15 +21,17 @@ public:
 	static constexpr float SCALE = 2.0f;
 
 	// 1枚に必要なフレーム数
-	static constexpr int ANIME_FRAME_SPEED = 8;		// 通常時
+	static constexpr int ANIME_FRAME_SPEED = 8;			// 通常時
 	static constexpr int DEAD_ANIME_FRAME_SPEED = 10;	// 死亡時
+	static constexpr int ATTACK_ANIME_FRAME_SPEED = 10;	// 攻撃時
 
 	// アニメーション枚数
 	static constexpr int ANIME_FRAME_NUM = 8;			// 通常時
 	static constexpr int DEAD_ANIME_FRAME_NUM = 8;		// 死亡時
+	static constexpr int ATTACK_ANIME_FRAME_NUM = 6;	// 攻撃時
 
 	// コンストラクタ
-	Player(int normalH, int waponH, int deadH, int indexX, int indexY);
+	Player(int normalH, int waponH, int deadH, int attackH, int powerDownSoundHint, int indexX, int indexY);
 
 	//デストラクタ
 	~Player(){};
@@ -38,13 +40,13 @@ public:
 	void SetEnemy(std::shared_ptr<EnemyBase>enemy, int i) { pEnemy_[i] = enemy; }
 	void SetField(std::shared_ptr<Field>field) { pField_ = field; }
 
+	// 初期化
 	void Init();
 
 	// 処理
-	void Update(const InputState& input);
-
-	// 敵が死んだ場合の処理 
-	void DeadUpdate();
+	void Update(const InputState& input);	// ノーマル
+	void DeadUpdate();						// プレイヤーが死んだ場合の処理 
+	void EnemyKillUpdate();					// 敵を倒したときの処理
 
 	// 描画
 	void Draw();
@@ -58,27 +60,21 @@ public:
 	// インデックス座標を座標に変換
 	void PosCalculation();
 
-	// プレイヤーの座標の取得
+	// 外から値を見る
 	Vec2 GetSize() const { return deathImgSize_; }
 	Vec2 GetPos() const { return pos_; }
-
 	int GetIndexX() const { return indexX_; }
-
 	int GetIndexY() const { return indexY_; }
-
-	// パワーエサを取得したかどうか
 	bool GetPowerFeed() const { return isPowerFeed_; }
-
 	bool GetDead() const { return isDead_; }
-
-	// 死亡設定
-	void SetDead(bool isDead) { isDead_ = isDead; }
-
-	// 存在設定
-	void SetEnabled(bool isEnabled) { isEnabled_ = isEnabled; }
-
-	// 死亡時のアニメーションの終了するかどうかを取得
 	bool GetAnimeEnd() const { return isAnimeEnd_; }
+
+	// 外からの値の設定
+	void SetAnimeEnd(bool isAnimeEnd) { isAnimeEnd_ = isAnimeEnd; }
+	void SetKill(bool enemyKill) { enemyKill_ = enemyKill; }
+	void SetAttackIdx(int attackImgIdx) { attackImgIdx_ = attackImgIdx; }
+	void SetDead(bool isDead) { isDead_ = isDead; }
+	void SetEnabled(bool isEnabled) { isEnabled_ = isEnabled; }
 
 	// 方向
 	enum Direct
@@ -98,9 +94,14 @@ private:
 	std::shared_ptr<EnemyBase> pEnemy_[EnemyBase::enemy_num];
 
 	Vec2 deathImgSize_;
+	Vec2 attackImgSize_;
 	
+	int powerDownSoundH_;
+
 	// プレイヤーの座標
 	Vec2 pos_;
+
+	bool enemyKill_;
 
 	//プレイヤーのインデックス座標
 	int indexX_;
@@ -120,13 +121,15 @@ private:
 	int normalH_;
 	int waponH_;
 	int deathH_;
-	
+	int attackH_;
+
 	// 移動インターバル用タイマー
 	int moveTimer_;
 
 	// 表示する画像のインデックス
 	int imgIdX_;
 	int deadImgIdx_;
+	int attackImgIdx_;
 
 	// 画像の方向の切り替え
 	float angle_;

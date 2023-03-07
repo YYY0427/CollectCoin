@@ -22,7 +22,7 @@ namespace
 	constexpr float FLASH_RATIO = 0.7f;
 }
 
-Player::Player(int normalH, int waponH, int deadH, int indexX, int indexY) :
+Player::Player(int normalH, int waponH, int deadH, int attackH, int powerDownSoundH, int indexX, int indexY) :
 	angle_(0.0f),
 	kX_(0), kY_(0),
 	moveTimer_(0),
@@ -33,6 +33,7 @@ Player::Player(int normalH, int waponH, int deadH, int indexX, int indexY) :
 	speed2_(1.0f),
 	imgIdX_(0),
 	deadImgIdx_(0),
+	attackImgIdx_(0),
 	wantMoveDirection_(0),
 	imgY_(0),
 	timer_(0),
@@ -43,7 +44,8 @@ Player::Player(int normalH, int waponH, int deadH, int indexX, int indexY) :
 	isEnabled_(true),
 	isIntrusion_(false),
 	isTurnFlag_(false),
-	isFlash_(false)
+	isFlash_(false),
+	enemyKill_(false)
 {
 	indexX_ = indexX;
 	indexY_ = indexY;
@@ -51,11 +53,15 @@ Player::Player(int normalH, int waponH, int deadH, int indexX, int indexY) :
 	normalH_ = normalH;
 	waponH_ = waponH;
 	deathH_ = deadH;
+	attackH_ = attackH;
+
+	powerDownSoundH_ = powerDownSoundH;
 
 	handle_ = normalH_;
 
 	// 画像サイズの取得
 	GetGraphSizeF(deathH_, &deathImgSize_.x, &deathImgSize_.y);
+	GetGraphSizeF(attackH_, &attackImgSize_.x, &attackImgSize_.y);
 
 	// インデックスの座標から初期座標を求める
 	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_X);
@@ -80,6 +86,7 @@ void Player::Init()
 	speed2_ = 1.0f;
 	imgIdX_ = 0;
 	deadImgIdx_ = 0;
+	attackImgIdx_ = 0;
 	wantMoveDirection_ = 0;
 	isPowerFeed_ = false;
 	isDead_ = false;
@@ -223,7 +230,7 @@ void Player::Update(const InputState& input)
 
 void Player::Draw()
 {
-	if (!isDead_ && isEnabled_)
+	if (!isDead_ && isEnabled_ && !enemyKill_)
 	{
 		if (isFlash_)
 		{
@@ -242,10 +249,10 @@ void Player::Draw()
 						SCALE, 0.0f,				// 拡大率、回転角度
 						handle_, true, isTurnFlag_);	// 画像のハンドル、透過するか
 	}
-	else if(isDead_ && isEnabled_)
+	else if(isDead_ && isEnabled_ && !enemyKill_)
 	{
 		// 画像のインデックスを計算
-		int imgX = (deadImgIdx_ / DEAD_ANIME_FRAME_SPEED) * 32;
+		int imgX = (deadImgIdx_ / DEAD_ANIME_FRAME_SPEED) * WIDTH;
 
 		// アニメーション画像の右端まで表示した場合
 		if (imgX >= deathImgSize_.x - WIDTH)
@@ -262,8 +269,26 @@ void Player::Draw()
 						  SCALE, 0,							// 拡大率、回転角度
 						  deathH_, true);					// 画像のハンドル、透過するか
 	}
+	else if (enemyKill_ && isEnabled_)
+	{
+		// 画像のインデックスを計算
+		int imgX = (attackImgIdx_ / ATTACK_ANIME_FRAME_SPEED) * WIDTH;
 
-	
+		// アニメーション画像の右端まで表示した場合
+		if (imgX >= attackImgSize_.x - WIDTH)
+		{
+			// アニメーション終了フラグを立てる
+			isAnimeEnd_ = true;
+		}
+
+		// ゲームオーバー時の画像を表示
+		DrawRectRotaGraph(pos_.x,							// 座標
+			pos_.y,
+			imgX, imgY_,							// 切り取り左上
+			WIDTH, HEIGHT,					// 幅、高さ
+			SCALE, 0,							// 拡大率、回転角度
+			attackH_, true);					// 画像のハンドル、透過するか
+	}
 }
 
 void Player::DeadUpdate()
@@ -273,6 +298,11 @@ void Player::DeadUpdate()
 		// アニメーション処理
 		deadImgIdx_ = (deadImgIdx_ + 1) % (DEAD_ANIME_FRAME_SPEED * DEAD_ANIME_FRAME_NUM);
 	}
+}
+
+void Player::EnemyKillUpdate()
+{
+	attackImgIdx_ = (attackImgIdx_ + 1) % (ATTACK_ANIME_FRAME_SPEED * ATTACK_ANIME_FRAME_NUM);
 }
 
 bool Player::Colision(int direction)
@@ -368,6 +398,8 @@ void Player::SpeedCalculation()
 			{
 				enemy->SetIzike(false);
 			}
+
+			PlaySoundMem(powerDownSoundH_, DX_PLAYTYPE_BACK);
 
 			// プレイヤー画像を変更
 			handle_ = normalH_;

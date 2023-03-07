@@ -9,9 +9,9 @@ namespace
 {
 	// 0 : なにもなし
 	// 8 : なにもなし
-	// 1 : エサ
+	// 1 : コイン
 	// 2 : 壁
-	// 3 : 宝箱 
+	// 3 : 剣 
 	// 7 : 扉(中からは出れて、外からは入れない)
 
 	constexpr int mapData[Field::MAP_HEIGHT][Field::MAP_WIDTH] =
@@ -48,15 +48,17 @@ namespace
 	constexpr int COIN_FRAME_NUM = 4;		
 	constexpr int COIN_FRAME_SPEED = 15;
 
-	constexpr int BOX_FRAME_NUM = 3;
-	constexpr int BOX_FRAME_SPEED = 20;
+	constexpr int DOOR_FRAME_NUM = 4;
+	constexpr int DOOR_FRAME_SPEED = 50;
 }
 
-Field::Field() :
-	imgIdX_(0),
-	sordIdx_(0),
+Field::Field(int coinSoundH, int sordSoundH) :
+	coinImgIdx_(0),
+	doorImgIdx_(0),
 	coin_(0),
-	isDraw_(true)
+	isDraw_(true),
+	closeDoor_(false),
+	openDoor_(false)
 {
 	pinkyGoalX_ = 1;
 	pinkyGoalY_ = 1;
@@ -64,15 +66,20 @@ Field::Field() :
 	blinkyGoalX_ = 17;
 	blinkyGoalY_ = 1;
 
-	InkyGoalX_ = 1;
+	inkyGoalX_ = 1;
 	inkyGoalY_ = 20;
 
 	crydeGoalY_ = 20;
 	crydeGoalX_ = 17;
 
+	coinSoundH_ = coinSoundH;
+	sordSoundH_ = sordSoundH;
+
 	sordH_ = my::MyLoadGraph("Data/img/game/sord.png");
 
 	coinH_ = my::MyLoadGraph("Data/img/game/coin.png");
+
+	doorH_ = my::MyLoadGraph("Data/img/game/door.png");
 
 	stringH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 
@@ -101,7 +108,7 @@ void Field::Init()
 	blinkyGoalX_ = 17;
 	blinkyGoalY_ = 1;
 
-	InkyGoalX_ = 1;
+	inkyGoalX_ = 1;
 	inkyGoalY_ = 20;
 
 	crydeGoalY_ = 20;
@@ -113,7 +120,34 @@ void Field::Init()
 void Field::Updata()
 {
 	// アニメーション処理
-	imgIdX_ = (imgIdX_ + 1) % (COIN_FRAME_SPEED * COIN_FRAME_NUM);
+	coinImgIdx_ = (coinImgIdx_ + 1) % (COIN_FRAME_SPEED * COIN_FRAME_NUM);
+	doorImgIdx_ = (doorImgIdx_ + 1) % (DOOR_FRAME_SPEED * DOOR_FRAME_NUM);
+
+	/*for (auto& enemy : pEnemy_)
+	{
+		if (enemy->GetDoor())
+		{
+			openDoor_ = true;
+		}
+		if (openDoor_)
+		{
+			doorImgIdx_++;
+			if (doorImgIdx_ == (DOOR_FRAME_NUM - 1) * DOOR_FRAME_SPEED)
+			{
+				openDoor_ = false;
+				enemy->SetDoor(false);
+				closeDoor_ = true;
+			}
+		}
+		if (closeDoor_)
+		{
+			doorImgIdx_--;
+			if (doorImgIdx_ <= 0)
+			{
+				closeDoor_ = false;
+			}
+		}
+	}*/
 }
 
 void Field::Draw()
@@ -125,23 +159,22 @@ void Field::Draw()
 			// コインの描画
 			if (mapData_[y][x] == 1)
 			{
-				int imgX = (imgIdX_ / COIN_FRAME_SPEED) * 8;
+				int imgX = (coinImgIdx_ / COIN_FRAME_SPEED) * 8;
 				DrawRectRotaGraph(x * CHIP_SIZE + 16 + DISPLAY_POS_X, y * CHIP_SIZE + 16 + DISPLAY_POS_Y,
 					imgX, 0, 8, 8, 2.0f, 0.0f, coinH_, true);
 			}
 			// 剣の描画
 			if (mapData_[y][x] == 3)
 			{
-				int imgX = (sordIdx_ / BOX_FRAME_SPEED) * 16;
 				DrawRectRotaGraph(x * CHIP_SIZE + 16 + DISPLAY_POS_X, y * CHIP_SIZE + 16 + DISPLAY_POS_Y,
-					imgX, 0, 16, 16, 2.0f, 0.0f, sordH_, true);
+					0, 0, 16, 16, 2.0f, 0.0f, sordH_, true);
 			}
+			// 扉の描画
 			if (mapData_[y][x] == 7)
 			{
-				DrawBox(
-					x * CHIP_SIZE + DISPLAY_POS_X, y * CHIP_SIZE + DISPLAY_POS_Y,
-					x * CHIP_SIZE + CHIP_SIZE + DISPLAY_POS_X, y * CHIP_SIZE + (CHIP_SIZE / 4) + DISPLAY_POS_Y,
-					GetColor(255, 255, 0), true);
+				int imgX = (doorImgIdx_ / DOOR_FRAME_SPEED) * 16;
+				DrawRectRotaGraph(x * CHIP_SIZE + 16 + DISPLAY_POS_X, y * CHIP_SIZE + 16 + DISPLAY_POS_Y,
+					imgX, 0, 16, 16, 2.0f, 0.0f, doorH_, true);
 			}
 			// 壁の描画
 			/*if (mapData[y][x] == 2)
@@ -200,12 +233,13 @@ bool Field::IsBlock(int y, int x)
 	return false;
 }
 
-// エサがあるかどうか
+// コインがあるかどうか
 bool Field::IsFeed(int y, int x)
 {
 	if (mapData_[y][x] == 1)
 	{
 		coin_++;
+		PlaySoundMem(coinSoundH_, DX_PLAYTYPE_BACK);
 		mapData_[y][x] = 0;
 		return true;
 	}
@@ -213,11 +247,12 @@ bool Field::IsFeed(int y, int x)
 	return false;
 }
 
-// 宝箱があるかどうか
+// 剣があるかどうか
 bool Field::IsPowerFeed(int y, int x)
 {
 	if (mapData_[y][x] == 3)
 	{
+		PlaySoundMem(sordSoundH_, DX_PLAYTYPE_BACK);
 		mapData_[y][x] = 0;
 		return true;
 	}
@@ -531,49 +566,49 @@ int Field::InkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 		else if (!pEnemy_[1]->GetTracking())
 		{
 			// 縄張りモード
-			MoveDataSet(inkyGoalY_, InkyGoalX_);
+			MoveDataSet(inkyGoalY_, inkyGoalX_);
 
-			if (pEnemy_[1]->GetIndexY() == inkyGoalY_ && pEnemy_[1]->GetIndexX() == InkyGoalX_)
+			if (pEnemy_[1]->GetIndexY() == inkyGoalY_ && pEnemy_[1]->GetIndexX() == inkyGoalX_)
 			{
-				if (InkyGoalX_ == 1 && inkyGoalY_ == 20)
+				if (inkyGoalX_ == 1 && inkyGoalY_ == 20)
 				{
-					InkyGoalX_ = 8;
+					inkyGoalX_ = 8;
 					inkyGoalY_ = 20;
 				}
-				else if (InkyGoalX_ == 8 && inkyGoalY_ == 20)
+				else if (inkyGoalX_ == 8 && inkyGoalY_ == 20)
 				{
-					InkyGoalX_ = 8;
+					inkyGoalX_ = 8;
 					inkyGoalY_ = 18;
 
 				}
-				else if (InkyGoalX_ == 8 && inkyGoalY_ == 18)
+				else if (inkyGoalX_ == 8 && inkyGoalY_ == 18)
 				{
-					InkyGoalX_ = 6;
+					inkyGoalX_ = 6;
 					inkyGoalY_ = 18;
 				}
-				else if (InkyGoalX_ == 6 && inkyGoalY_ == 18)
+				else if (inkyGoalX_ == 6 && inkyGoalY_ == 18)
 				{
-					InkyGoalX_ = 6;
+					inkyGoalX_ = 6;
 					inkyGoalY_ = 16;
 				}
-				else if (InkyGoalX_ == 6 && inkyGoalY_ == 16)
+				else if (inkyGoalX_ == 6 && inkyGoalY_ == 16)
 				{
-					InkyGoalX_ = 4;
+					inkyGoalX_ = 4;
 					inkyGoalY_ = 16;
 				}
-				else if (InkyGoalX_ == 4 && inkyGoalY_ == 16)
+				else if (inkyGoalX_ == 4 && inkyGoalY_ == 16)
 				{
-					InkyGoalX_ = 4;
+					inkyGoalX_ = 4;
 					inkyGoalY_ = 18;
 				}
-				else if (InkyGoalX_ == 4 && inkyGoalY_ == 18)
+				else if (inkyGoalX_ == 4 && inkyGoalY_ == 18)
 				{
-					InkyGoalX_ = 1;
+					inkyGoalX_ = 1;
 					inkyGoalY_ = 18;
 				}
-				else if (InkyGoalX_ == 1 && inkyGoalY_ == 18)
+				else if (inkyGoalX_ == 1 && inkyGoalY_ == 18)
 				{
-					InkyGoalX_ = 1;
+					inkyGoalX_ = 1;
 					inkyGoalY_ = 20;
 				}
 			}

@@ -78,6 +78,11 @@ private:
 	int gameOverTimer_;
 	int gameClearTimer_;
 
+	bool enemyKill_;
+	int killSoundH_;
+	int enemyAttackSoundH_;
+	int bgmSoundH_;
+
 	// Žc‹@
 	int life_;
 

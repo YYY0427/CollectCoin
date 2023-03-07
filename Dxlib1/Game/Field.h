@@ -22,7 +22,7 @@ public:
 	static constexpr int DISPLAY_POS_Y = 100;
 
 	// コンストラクタ
-	Field();
+	Field(int coinSoundH, int sordSoundH);
 	 
 	// デストラクタ
 	virtual ~Field(){}
@@ -39,6 +39,7 @@ public:
 	void SetEnemy(std::shared_ptr<EnemyBase>enemy, int i) { pEnemy_[i] = enemy; }
 	void SetPlayer(std::shared_ptr<Player>player) { pPlayer_ = player; }
 
+	// マップデータのコインの合計枚数の集計
 	int LestCoin();
 
 	// ゲームクリアチェック判定
@@ -96,12 +97,19 @@ private:
 	int coin_;
 	int stringH_;
 
+	bool openDoor_;
+	bool closeDoor_;
+
+	int coinSoundH_;
+	int sordSoundH_;
+
 	// 画像のハンドル
 	int coinH_;
 	int sordH_;
+	int doorH_;
 
-	int imgIdX_;
-	int sordIdx_;
+	int coinImgIdx_;
+	int doorImgIdx_;
 
 	int pinkyGoalY_;
 	int pinkyGoalX_;
@@ -110,7 +118,7 @@ private:
 	int blinkyGoalX_;
 
 	int inkyGoalY_;
-	int InkyGoalX_;
+	int inkyGoalX_;
 
 	int crydeGoalY_;
 	int crydeGoalX_;

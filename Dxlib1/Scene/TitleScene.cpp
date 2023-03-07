@@ -32,13 +32,13 @@ namespace
 	constexpr int SELECTION_NUM = 3;
 
 	// フェードする速さ
-	constexpr int FAIDE_INTERVAL = 30;
+	constexpr int FAIDE_INTERVAL = 60;
 }
 
 void TitleScene::FadeInUpdate(const InputState& input)
 {
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(FAIDE_INTERVAL));
-
+	ChangeVolumeSoundMem(255 - fadeValue_, bgmSoundH_);
 	if (--fadeTimer_ == 0)
 	{
 		updateFunc_ = &TitleScene::NormalUpdate;
@@ -79,10 +79,12 @@ void TitleScene::NormalUpdate(const InputState& input)
 	//選択肢を上下で回す処理
 	if (input.IsTriggered(InputType::up))
 	{
+		PlaySoundMem(cursorSoundH_, DX_PLAYTYPE_BACK);
 		currentInputIndex_ = ((currentInputIndex_ - 1) + SELECTION_NUM) % SELECTION_NUM;
 	}
 	else if (input.IsTriggered(InputType::down))
 	{
+		PlaySoundMem(cursorSoundH_, DX_PLAYTYPE_BACK);
 		currentInputIndex_ = (currentInputIndex_ + 1) % SELECTION_NUM;
 	}
 
@@ -104,6 +106,7 @@ void TitleScene::NormalUpdate(const InputState& input)
 	//次へのボタンが押されたら次のシーンへ行く
 	if (input.IsTriggered(InputType::next))
 	{
+		PlaySoundMem(decisionSoundH_, DX_PLAYTYPE_BACK);
 		if (currentInputIndex_ == start)
 		{
 			decisionIndex_ = start;
@@ -123,22 +126,26 @@ void TitleScene::NormalUpdate(const InputState& input)
 
 void TitleScene::FadeOutUpdate(const InputState& input)
 {
-	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(FAIDE_INTERVAL));
-
 	fadeTimer_++;
+	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(FAIDE_INTERVAL));
+	ChangeVolumeSoundMem(255 - fadeValue_, bgmSoundH_);
+	ChangeVolumeSoundMem(255 - fadeValue_, decisionSoundH_);
 
 	if (fadeTimer_ == FAIDE_INTERVAL && decisionIndex_ == start)
 	{
+		StopSoundMem(bgmSoundH_);
 		manager_.ChangeScene(new GameplayingScene(manager_));
 		return;
 	}
 	else if (fadeTimer_ == FAIDE_INTERVAL && decisionIndex_ == option)
 	{
+		StopSoundMem(bgmSoundH_);
 		manager_.ChangeScene(new OptionScene(manager_));
 		return;
 	}
 	else if (fadeTimer_ == FAIDE_INTERVAL && decisionIndex_ == exsit)
 	{
+		StopSoundMem(bgmSoundH_);
 		DxLib_End();
 	}
 }
@@ -165,16 +172,21 @@ TitleScene::TitleScene(SceneManager& manager) :
 	selectionH_ = CreateFontToHandle("PixelMplus10", 40, 10);
 	titleH_ = CreateFontToHandle("PixelMplus10", 150, 10);
 
+	cursorSoundH_ = my::MyLoadSound("Data/sound/cursor2.wav");
+	decisionSoundH_ = my::MyLoadSound("Data/sound/decision.wav");
+	bgmSoundH_ = my::MyLoadSound("Data/sound/titleBgm.wav");
+
 	startH_ = normalSelectionH_;
 	optionH_ = normalSelectionH_;
 	exsitH_ = normalSelectionH_;
 
 	playerH_ = nowaponPlayerH_;
+
+	PlaySoundMem(bgmSoundH_, DX_PLAYTYPE_LOOP);
 }
 
 TitleScene::~TitleScene()
 {
-
 }
 
 void TitleScene::Update(const InputState& input)
@@ -202,7 +214,6 @@ void TitleScene::Draw()
 	{
 		// 剣の表示
 		DrawRectRotaGraph(Game::kScreenWidth - 200, Game::kScreenHeight / 2 - 32, 0, 0, 16, 16, 3.0f, 0.0f, sordH_, true);
-
 	}
 
 	// プレイヤー画像の表示

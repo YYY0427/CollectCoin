@@ -53,7 +53,7 @@ namespace
 GameplayingScene::GameplayingScene(SceneManager& manager) :
 	Scene(manager),
 	updateFunc_(&GameplayingScene::FadeInUpdate),
-	life_(3),
+	life_(1),
 	timer_(0),
 	gameOverTimer_(0),
 	gameClearTimer_(0),
@@ -61,13 +61,23 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	isGameClear_(false),
 	faideEnabled_(false)
 {
+	// フォントの作成
 	gameOverH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 	gameClearH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 	readyH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 
+	// サウンドのロード
+	int coinSoundH = my::MyLoadSound("Data/sound/coin.wav");
+	int sordSoundH = my::MyLoadSound("Data/sound/sord.wav");
+	int powerDownSoundH = my::MyLoadSound("Data/sound/powerDown.wav");
+	killSoundH_ = my::MyLoadSound("Data/sound/kill.wav");
+	enemyAttackSoundH_ = my::MyLoadSound("Data/sound/enemyAttack.wav");
+
+	// 画像のロード
 	int nowaponPlayerH = my::MyLoadGraph("Data/img/game/nowapon-player.png");
 	int waponPlayerH = my::MyLoadGraph("Data/img/game/wapon-player.png");
 	int deadPlayerH = my::MyLoadGraph("Data/img/game/player-deth.png");
+	int attackPlayerH = my::MyLoadGraph("Data/img/game/player-attack.png");
 
 	int skeletonH = my::MyLoadGraph("Data/img/game/skeleton_walk.png");
  	int slimeH = my::MyLoadGraph("Data/img/game/slime.png");
@@ -96,9 +106,9 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 								GOLEM_START_INDEX_X,		// 初期座標X
 								GOLEM_START_INDEX_Y);		// 初期座標Y
 
-	pPlayer_ = std::make_shared<Player>(nowaponPlayerH, waponPlayerH, deadPlayerH,
-								PLAYER_START_INDEX_X, PLAYER_START_INDEX_Y);
-	pField_ = std::make_shared<Field>();
+	pPlayer_ = std::make_shared<Player>(nowaponPlayerH, waponPlayerH, deadPlayerH, attackPlayerH,
+										powerDownSoundH, PLAYER_START_INDEX_X, PLAYER_START_INDEX_Y);
+	pField_ = std::make_shared<Field>(coinSoundH, sordSoundH);
 	pMap_ = std::make_shared<Map>(mapChipH);
 	pBackGround_ = std::make_shared<BackGround>(backGraph);
 
@@ -133,6 +143,7 @@ void GameplayingScene::FadeInUpdate(const InputState& input)
 	pPlayer_->SetEnabled(false);
 
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_)) / static_cast<float>(fade_interval);
+	ChangeVolumeSoundMem(255 - fadeValue_, bgmSoundH_);
 	if (--fadeTimer_ == 0)
 	{
 		faideEnabled_ = true;
@@ -183,13 +194,15 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 				// プレイヤーの死亡フラグを立てる
 				pPlayer_->SetDead(true);
 
-				// すべての敵を消す
-				for (auto& enemy : pEnemy_)
-				{
-					enemy->SetEnabled(false);
-				}
+				//// すべての敵を消す
+				//for (auto& enemy : pEnemy_)
+				//{
+				//	enemy->SetEnabled(false);
+				//}
 
 				fadeColor_ = 0xff0000;
+
+				PlaySoundMem(enemyAttackSoundH_, DX_PLAYTYPE_BACK);
 
 				// 残機がなかった場合
 				if (life_ <= 0)
@@ -208,11 +221,7 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 				// 敵の死亡フラグを立てる
 				enemy->SetDead(true);
 
-				// プレイヤーとあたった敵を消す
-				enemy->SetEnabled(false);
-
-				// 敵を消す
-				pPlayer_->SetEnabled(false);
+				PlaySoundMem(killSoundH_, DX_PLAYTYPE_BACK);
 
 				updateFunc_ = &GameplayingScene::EnemyDeadUpdate;
 			}
@@ -236,18 +245,15 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 
 void GameplayingScene::EnemyDeadUpdate(const InputState& input)
 {
-	timer_++;
+	pPlayer_->SetKill(true);
 
-	if (timer_ % 60 == 0)
+	pPlayer_->EnemyKillUpdate();
+
+	if (pPlayer_->GetAnimeEnd())
 	{
-		for (auto& enemy : pEnemy_)
-		{
-			enemy->SetEnabled(true);
-		}
-
-		pPlayer_->SetEnabled(true);
-
-		timer_ = 0;
+		pPlayer_->SetAnimeEnd(false);
+		pPlayer_->SetKill(false);
+		pPlayer_->SetAttackIdx(0);
 
 		updateFunc_ = &GameplayingScene::NormalUpdate;
 	}
@@ -269,14 +275,14 @@ void GameplayingScene::Draw()
 	// フィールド(剣、コイン)の描画
 	pField_->Draw();
 
-	// プレイヤーの描画
-	pPlayer_->Draw();
-
 	// 敵の描画
 	for (auto& enemy : pEnemy_)
 	{
 		enemy->Draw();
 	}
+
+	// プレイヤーの描画
+	pPlayer_->Draw();
 
 	// ゲームオーバー
 	if (isGameOver_)
@@ -299,7 +305,7 @@ void GameplayingScene::Draw()
 	if (preparTimer_ > 0)
 	{
 		int width = GetDrawStringWidthToHandle(REDY_STRING, strlen(REDY_STRING), readyH_);
-		// ゲームクリア文字の表示
+		// 準備中文字の表示
 		DrawStringToHandle((Game::kScreenWidth / 2) - (width / 2), Game::kScreenHeight / 2 + 40,
 			REDY_STRING, 0xffffff, readyH_, false);
 	}
@@ -311,13 +317,6 @@ void GameplayingScene::Draw()
 
 		DrawRectRotaGraph(x, Game::kScreenHeight - 30, 0, 0, 16, 16, 2.0f, 0.0f, lifeH_, true);
 	}
-
-	/*for (int i = life_; i >= life_; i--)
-	{
-		int x = Game::kScreenWidth / 2 + 100 + (i * 40);
-
-		DrawRectRotaGraph(x, Game::kScreenHeight - 30, 0, 0, 16, 16, 2.0f, 0.0f, lifeH_, true);
-	}*/
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
@@ -336,25 +335,43 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 
 void GameplayingScene::GameOverUpdate(const InputState& input)
 {
-	if (!pPlayer_->GetAnimeEnd())
+	if (timer_++ > 60)
 	{
-		pPlayer_->DeadUpdate();
-	}
-	else
-	{
-		isGameOver_ = true;
-		gameOverTimer_++;
-
-		if (gameOverTimer_ % 180 == 0)
+		// すべての敵を消す
+		for (auto& enemy : pEnemy_)
 		{
-			updateFunc_ = &GameplayingScene::FadeOutUpdate;
+			enemy->SetEnabled(false);
+		}
+
+		if (!pPlayer_->GetAnimeEnd())
+		{
+			pPlayer_->DeadUpdate();
+		}
+		else
+		{
+			isGameOver_ = true;
+			gameOverTimer_++;
+
+			if (gameOverTimer_ % 180 == 0)
+			{
+				updateFunc_ = &GameplayingScene::FadeOutUpdate;
+			}
 		}
 	}
 }
 
 void GameplayingScene::PlayerDeadUpdate(const InputState& input)
 {
-	pPlayer_->DeadUpdate();
+	if (timer_++ > 60)
+	{
+		// すべての敵を消す
+		for (auto& enemy : pEnemy_)
+		{
+			enemy->SetEnabled(false);
+		}
+
+		pPlayer_->DeadUpdate();
+	}
 
 	if (pPlayer_->GetAnimeEnd())
 	{
@@ -364,9 +381,10 @@ void GameplayingScene::PlayerDeadUpdate(const InputState& input)
 
 void GameplayingScene::FadeOutUpdate(const InputState& input)
 {
+	fadeTimer_++;
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
 
-	fadeTimer_++;
+	ChangeVolumeSoundMem(255 - fadeValue_, bgmSoundH_);
 
 	// ゲームオーバー
 	if (fadeTimer_ > fade_interval && isGameOver_)

@@ -61,7 +61,8 @@ EnemyBase::EnemyBase() :
 	isDead_(false),
 	isIzike_(false),
 	isTracking_(false),
-	isIntrusion_(true)
+	isIntrusion_(true),
+	isDoor_(false)
 {
 	// ‰æ‘œ‚Ìƒ[ƒh
 	izikeHandle_ = my::MyLoadGraph("Data/img/game/izike.png");
@@ -248,6 +249,8 @@ void EnemyBase::MoveSwitch(int startInterval, int deadInterval)
 			moveTimer2_ = 0;
 
 			isMove_ = true;
+
+			isDoor_ = true;
 		}
 	}
 	else if (!isMove_ && isDead_)
@@ -259,6 +262,8 @@ void EnemyBase::MoveSwitch(int startInterval, int deadInterval)
 			moveTimer2_ = 0;
 
 			isMove_ = true;
+
+			isDoor_ = true;
 		}
 	}
 }
