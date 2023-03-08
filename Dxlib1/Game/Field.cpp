@@ -3,6 +3,7 @@
 #include "../DrawFunctions.h"
 #include "EnemyBase.h"
 #include "../game.h"
+#include "../SoundManager.h"
 #include <DxLib.h>
 
 namespace
@@ -52,7 +53,7 @@ namespace
 	constexpr int DOOR_FRAME_SPEED = 50;
 }
 
-Field::Field(int coinSoundH, int sordSoundH) :
+Field::Field() :
 	coinImgIdx_(0),
 	doorImgIdx_(0),
 	coin_(0),
@@ -71,9 +72,6 @@ Field::Field(int coinSoundH, int sordSoundH) :
 
 	crydeGoalY_ = 20;
 	crydeGoalX_ = 17;
-
-	coinSoundH_ = coinSoundH;
-	sordSoundH_ = sordSoundH;
 
 	sordH_ = my::MyLoadGraph("Data/img/game/sord.png");
 
@@ -239,7 +237,7 @@ bool Field::IsFeed(int y, int x)
 	if (mapData_[y][x] == 1)
 	{
 		coin_++;
-		PlaySoundMem(coinSoundH_, DX_PLAYTYPE_BACK);
+		SoundManager::GetInstance().Play("coin");
 		mapData_[y][x] = 0;
 		return true;
 	}
@@ -252,7 +250,7 @@ bool Field::IsPowerFeed(int y, int x)
 {
 	if (mapData_[y][x] == 3)
 	{
-		PlaySoundMem(sordSoundH_, DX_PLAYTYPE_BACK);
+		SoundManager::GetInstance().Play("powerUp");
 		mapData_[y][x] = 0;
 		return true;
 	}

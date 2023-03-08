@@ -79,10 +79,8 @@ private:
 	int gameClearTimer_;
 
 	bool enemyKill_;
-	int killSoundH_;
-	int enemyAttackSoundH_;
-	int bgmSoundH_;
 
+	bool playerDeadSound_;
 	// Žc‹@
 	int life_;
 

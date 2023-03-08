@@ -31,7 +31,7 @@ public:
 	static constexpr int ATTACK_ANIME_FRAME_NUM = 6;	// 攻撃時
 
 	// コンストラクタ
-	Player(int normalH, int waponH, int deadH, int attackH, int powerDownSoundHint, int indexX, int indexY);
+	Player(int normalH, int waponH, int deadH, int attackH, int indexX, int indexY);
 
 	//デストラクタ
 	~Player(){};
@@ -95,8 +95,6 @@ private:
 
 	Vec2 deathImgSize_;
 	Vec2 attackImgSize_;
-	
-	int powerDownSoundH_;
 
 	// プレイヤーの座標
 	Vec2 pos_;

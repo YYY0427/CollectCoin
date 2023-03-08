@@ -5,6 +5,7 @@
 #include "Skeleton.h"
 #include "../game.h"
 #include "EnemyBase.h"
+#include "../SoundManager.h"
 #include <DxLib.h>
 
 namespace
@@ -22,7 +23,7 @@ namespace
 	constexpr float FLASH_RATIO = 0.7f;
 }
 
-Player::Player(int normalH, int waponH, int deadH, int attackH, int powerDownSoundH, int indexX, int indexY) :
+Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int indexY) :
 	angle_(0.0f),
 	kX_(0), kY_(0),
 	moveTimer_(0),
@@ -54,8 +55,6 @@ Player::Player(int normalH, int waponH, int deadH, int attackH, int powerDownSou
 	waponH_ = waponH;
 	deathH_ = deadH;
 	attackH_ = attackH;
-
-	powerDownSoundH_ = powerDownSoundH;
 
 	handle_ = normalH_;
 
@@ -399,7 +398,7 @@ void Player::SpeedCalculation()
 				enemy->SetIzike(false);
 			}
 
-			PlaySoundMem(powerDownSoundH_, DX_PLAYTYPE_BACK);
+			SoundManager::GetInstance().Play("powerDown");
 
 			// プレイヤー画像を変更
 			handle_ = normalH_;

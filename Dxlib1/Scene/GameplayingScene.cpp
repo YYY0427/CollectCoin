@@ -16,6 +16,7 @@
 #include "../Game.h"
 #include "../Game/Map.h"
 #include "../Game/BackGround.h"
+#include "../SoundManager.h"
 #include <DxLib.h>
 
 namespace
@@ -59,19 +60,13 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	gameClearTimer_(0),
 	preparTimer_(0),
 	isGameClear_(false),
-	faideEnabled_(false)
+	faideEnabled_(false),
+	playerDeadSound_(true)
 {
 	// フォントの作成
 	gameOverH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 	gameClearH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 	readyH_ = CreateFontToHandle("PixelMplus10", 20, 10);
-
-	// サウンドのロード
-	int coinSoundH = my::MyLoadSound("Data/sound/coin.wav");
-	int sordSoundH = my::MyLoadSound("Data/sound/sord.wav");
-	int powerDownSoundH = my::MyLoadSound("Data/sound/powerDown.wav");
-	killSoundH_ = my::MyLoadSound("Data/sound/kill.wav");
-	enemyAttackSoundH_ = my::MyLoadSound("Data/sound/enemyAttack.wav");
 
 	// 画像のロード
 	int nowaponPlayerH = my::MyLoadGraph("Data/img/game/nowapon-player.png");
@@ -106,9 +101,8 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 								GOLEM_START_INDEX_X,		// 初期座標X
 								GOLEM_START_INDEX_Y);		// 初期座標Y
 
-	pPlayer_ = std::make_shared<Player>(nowaponPlayerH, waponPlayerH, deadPlayerH, attackPlayerH,
-										powerDownSoundH, PLAYER_START_INDEX_X, PLAYER_START_INDEX_Y);
-	pField_ = std::make_shared<Field>(coinSoundH, sordSoundH);
+	pPlayer_ = std::make_shared<Player>(nowaponPlayerH, waponPlayerH, deadPlayerH, attackPlayerH, PLAYER_START_INDEX_X, PLAYER_START_INDEX_Y);
+	pField_ = std::make_shared<Field>();
 	pMap_ = std::make_shared<Map>(mapChipH);
 	pBackGround_ = std::make_shared<BackGround>(backGraph);
 
@@ -126,6 +120,9 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 		pPlayer_->SetEnemy(pEnemy_[i], i);
 		pField_->SetEnemy(pEnemy_[i], i);
 	}
+
+	SetVolumeMusic(0);
+	PlayMusic("Data/sound/BGM/game.mp3", DX_PLAYTYPE_LOOP);
 }
 
 GameplayingScene::~GameplayingScene()
@@ -142,8 +139,8 @@ void GameplayingScene::FadeInUpdate(const InputState& input)
 
 	pPlayer_->SetEnabled(false);
 
+	SetVolumeMusic(static_cast<int>(255.0f / 60.0f * static_cast<float>(60 - fadeTimer_)));
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_)) / static_cast<float>(fade_interval);
-	ChangeVolumeSoundMem(255 - fadeValue_, bgmSoundH_);
 	if (--fadeTimer_ == 0)
 	{
 		faideEnabled_ = true;
@@ -185,24 +182,20 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 		// プレイヤーと敵の当たり判定
 		if (Colision(enemy, enemy->GetSizeX(), enemy->GetSizeY()))
 		{
-			// 敵がイジケ状態ではないときに敵と当たった場合
+			// プレイヤーがイジケ状態ではないときに敵と当たった場合
 			if (!enemy->GetIzike())
 			{
+				StopMusic();
+
 				// 残機 - 1
 				life_--;
 
 				// プレイヤーの死亡フラグを立てる
 				pPlayer_->SetDead(true);
 
-				//// すべての敵を消す
-				//for (auto& enemy : pEnemy_)
-				//{
-				//	enemy->SetEnabled(false);
-				//}
-
 				fadeColor_ = 0xff0000;
 
-				PlaySoundMem(enemyAttackSoundH_, DX_PLAYTYPE_BACK);
+				SoundManager::GetInstance().Play("enemyAttack");
 
 				// 残機がなかった場合
 				if (life_ <= 0)
@@ -221,7 +214,7 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 				// 敵の死亡フラグを立てる
 				enemy->SetDead(true);
 
-				PlaySoundMem(killSoundH_, DX_PLAYTYPE_BACK);
+				SoundManager::GetInstance().Play("kill");
 
 				updateFunc_ = &GameplayingScene::EnemyDeadUpdate;
 			}
@@ -346,9 +339,16 @@ void GameplayingScene::GameOverUpdate(const InputState& input)
 		if (!pPlayer_->GetAnimeEnd())
 		{
 			pPlayer_->DeadUpdate();
+
+			if (playerDeadSound_)
+			{
+				SoundManager::GetInstance().Play("playerDead");
+				playerDeadSound_ = false;
+			}
 		}
 		else
 		{
+			playerDeadSound_ = true;
 			isGameOver_ = true;
 			gameOverTimer_++;
 
@@ -369,7 +369,7 @@ void GameplayingScene::PlayerDeadUpdate(const InputState& input)
 		{
 			enemy->SetEnabled(false);
 		}
-
+		
 		pPlayer_->DeadUpdate();
 	}
 
@@ -383,8 +383,7 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 {
 	fadeTimer_++;
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
-
-	ChangeVolumeSoundMem(255 - fadeValue_, bgmSoundH_);
+	SetVolumeMusic(255 - fadeValue_);
 
 	// ゲームオーバー
 	if (fadeTimer_ > fade_interval && isGameOver_)

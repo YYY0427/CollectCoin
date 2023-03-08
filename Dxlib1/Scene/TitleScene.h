@@ -1,8 +1,10 @@
 #pragma once
 #include "Scene.h"
 #include "../vec2.h"
+#include <memory>
 
 class InputState;
+class BackGround;
 
 /// <summary>
 /// タイトルシーン
@@ -22,6 +24,8 @@ private:
 		option,
 		exsit
 	};
+
+	std::shared_ptr<BackGround> pBackGround_;
 
 	int playerH_;
 	bool isTurnFlag_;
@@ -55,11 +59,6 @@ private:
 	int startH_;
 	int optionH_;
 	int exsitH_;
-
-	// サウンドハンドル
-	int cursorSoundH_;
-	int decisionSoundH_;
-	int bgmSoundH_;
 
 	// タイトル名ハンドル
 	int titleH_;

@@ -10,6 +10,8 @@
 #include "../Game/Skeleton.h"
 #include "../Game/Slime.h"
 #include "../Game/Player.h"
+#include "../SoundManager.h"
+#include "../Game/BackGround.h"
 #include <DxLib.h>
 
 namespace
@@ -37,8 +39,8 @@ namespace
 
 void TitleScene::FadeInUpdate(const InputState& input)
 {
+	SetVolumeMusic(static_cast<int>(255.0f / 60.0f * static_cast<float>(60 - fadeTimer_)));
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(FAIDE_INTERVAL));
-	ChangeVolumeSoundMem(255 - fadeValue_, bgmSoundH_);
 	if (--fadeTimer_ == 0)
 	{
 		updateFunc_ = &TitleScene::NormalUpdate;
@@ -48,6 +50,8 @@ void TitleScene::FadeInUpdate(const InputState& input)
 
 void TitleScene::NormalUpdate(const InputState& input)
 {
+	pBackGround_->Update();
+
 	if (!isTurnFlag_)
 	{
 		pos_.x += 3;
@@ -79,12 +83,12 @@ void TitleScene::NormalUpdate(const InputState& input)
 	//選択肢を上下で回す処理
 	if (input.IsTriggered(InputType::up))
 	{
-		PlaySoundMem(cursorSoundH_, DX_PLAYTYPE_BACK);
+		SoundManager::GetInstance().Play("cursor");
 		currentInputIndex_ = ((currentInputIndex_ - 1) + SELECTION_NUM) % SELECTION_NUM;
 	}
 	else if (input.IsTriggered(InputType::down))
 	{
-		PlaySoundMem(cursorSoundH_, DX_PLAYTYPE_BACK);
+		SoundManager::GetInstance().Play("cursor");
 		currentInputIndex_ = (currentInputIndex_ + 1) % SELECTION_NUM;
 	}
 
@@ -106,7 +110,7 @@ void TitleScene::NormalUpdate(const InputState& input)
 	//次へのボタンが押されたら次のシーンへ行く
 	if (input.IsTriggered(InputType::next))
 	{
-		PlaySoundMem(decisionSoundH_, DX_PLAYTYPE_BACK);
+		SoundManager::GetInstance().Play("decision");
 		if (currentInputIndex_ == start)
 		{
 			decisionIndex_ = start;
@@ -128,24 +132,22 @@ void TitleScene::FadeOutUpdate(const InputState& input)
 {
 	fadeTimer_++;
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(FAIDE_INTERVAL));
-	ChangeVolumeSoundMem(255 - fadeValue_, bgmSoundH_);
-	ChangeVolumeSoundMem(255 - fadeValue_, decisionSoundH_);
-
+	SetVolumeMusic(255 - fadeValue_);
 	if (fadeTimer_ == FAIDE_INTERVAL && decisionIndex_ == start)
 	{
-		StopSoundMem(bgmSoundH_);
+		StopMusic();
 		manager_.ChangeScene(new GameplayingScene(manager_));
 		return;
 	}
 	else if (fadeTimer_ == FAIDE_INTERVAL && decisionIndex_ == option)
 	{
-		StopSoundMem(bgmSoundH_);
+		StopMusic();
 		manager_.ChangeScene(new OptionScene(manager_));
 		return;
 	}
 	else if (fadeTimer_ == FAIDE_INTERVAL && decisionIndex_ == exsit)
 	{
-		StopSoundMem(bgmSoundH_);
+	
 		DxLib_End();
 	}
 }
@@ -160,6 +162,7 @@ TitleScene::TitleScene(SceneManager& manager) :
 	imgY_(0),
 	pos_(0, Game::kScreenHeight / 2 - Player::HEIGHT)
 {
+	// 画像のロード
 	sordH_ = my::MyLoadGraph("Data/img/game/sord.png");
 	nowaponPlayerH_ = my::MyLoadGraph("Data/img/game/nowapon-player.png");
 	waponPlayerH_ = my::MyLoadGraph("Data/img/game/wapon-player.png");
@@ -171,10 +174,9 @@ TitleScene::TitleScene(SceneManager& manager) :
 	normalSelectionH_ = CreateFontToHandle("PixelMplus10", 30, 10);
 	selectionH_ = CreateFontToHandle("PixelMplus10", 40, 10);
 	titleH_ = CreateFontToHandle("PixelMplus10", 150, 10);
+	int backGraph = my::MyLoadGraph("Data/img/game/Gray.png");
 
-	cursorSoundH_ = my::MyLoadSound("Data/sound/cursor2.wav");
-	decisionSoundH_ = my::MyLoadSound("Data/sound/decision.wav");
-	bgmSoundH_ = my::MyLoadSound("Data/sound/titleBgm.wav");
+	pBackGround_ = std::make_shared<BackGround>(backGraph);
 
 	startH_ = normalSelectionH_;
 	optionH_ = normalSelectionH_;
@@ -182,7 +184,8 @@ TitleScene::TitleScene(SceneManager& manager) :
 
 	playerH_ = nowaponPlayerH_;
 
-	PlaySoundMem(bgmSoundH_, DX_PLAYTYPE_LOOP);
+	SetVolumeMusic(0);
+	PlayMusic("Data/sound/BGM/titleBgm.mp3", DX_PLAYTYPE_LOOP);
 }
 
 TitleScene::~TitleScene()
@@ -200,6 +203,8 @@ void TitleScene::Draw()
 	int width2 = GetDrawStringWidthToHandle(SELECTON2_STRING, strlen(SELECTON2_STRING), optionH_);
 	int width3 = GetDrawStringWidthToHandle(SELECTON3_STRING, strlen(SELECTON3_STRING), exsitH_);
 	int width4 = GetDrawStringWidthToHandle(TITLE_STRING, strlen(TITLE_STRING) , titleH_);
+
+	pBackGround_->Draw();
 
 	DrawStringToHandle((Game::kScreenWidth / 2) - (width1 / 2), Game::kScreenHeight / 2 + 150,
 		SELECTON1_STRING, 0xffffff, startH_, false);

@@ -22,7 +22,7 @@ public:
 	static constexpr int DISPLAY_POS_Y = 100;
 
 	// コンストラクタ
-	Field(int coinSoundH, int sordSoundH);
+	Field();
 	 
 	// デストラクタ
 	virtual ~Field(){}
@@ -99,9 +99,6 @@ private:
 
 	bool openDoor_;
 	bool closeDoor_;
-
-	int coinSoundH_;
-	int sordSoundH_;
 
 	// 画像のハンドル
 	int coinH_;
