@@ -89,7 +89,7 @@ private:
 
 	int mapData_[Field::MAP_HEIGHT][Field::MAP_WIDTH];
 
-	int mapData2[Field::MAP_HEIGHT][Field::MAP_WIDTH];
+	int mapData2_[Field::MAP_HEIGHT][Field::MAP_WIDTH];
 
 	// •\Ž¦‚·‚é‚©‚Ç‚¤‚©
 	bool isDraw_;

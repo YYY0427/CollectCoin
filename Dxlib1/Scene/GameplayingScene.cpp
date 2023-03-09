@@ -274,9 +274,11 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 	// ゲームクリア判定
 	if (pField_->IsGameClearCheck())
 	{
+		// BGMを止める
+		StopMusic();
+
 		// ゲームクリア演出に移行
 		updateFunc_ = &GameplayingScene::GameClearUpdate;
-		fadeColor_ = 0xff0000;
 	}
 }
 
@@ -337,8 +339,6 @@ void GameplayingScene::Draw()
 		// ゲームオーバー文字の表示
 		DrawStringToHandle(width, height,
 			GAMEOVER_STRING, 0xffffff, gameOverH_, false);
-
-	//	DrawBox(width, height, width + stringWidth, height + stringHeight, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	}

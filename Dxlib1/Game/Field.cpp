@@ -41,6 +41,33 @@ namespace
 		{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
 	};
 
+	// デバック用
+	constexpr int mapData1[Field::MAP_HEIGHT][Field::MAP_WIDTH] =
+	{
+		{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
+		{ 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2 },
+		{ 2, 0, 2, 2, 0, 2, 2, 2, 0, 2, 0, 2, 2, 2, 0, 2, 2, 0, 2 },
+		{ 2, 3, 2, 2, 0, 2, 2, 2, 0, 2, 0, 2, 2, 2, 0, 2, 2, 3, 2 },
+		{ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 },
+		{ 2, 0, 2, 2, 0, 2, 0, 2, 2, 2, 2, 2, 0, 2, 0, 2, 2, 0, 2 },
+		{ 2, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 2 },
+		{ 2, 2, 2, 2, 0, 2, 2, 2, 0, 2, 0, 2, 2, 2, 0, 2, 2, 2, 2 },
+		{ 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 8, 8, 8 },
+		{ 2, 2, 2, 2, 0, 2, 0, 2, 2, 7, 2, 2, 0, 2, 0, 2, 2, 2, 2 },
+		{ 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0 },
+		{ 2, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2 },
+		{ 0, 0, 0, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 8, 8, 8 },
+		{ 2, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2 },
+		{ 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2 },
+		{ 2, 0, 2, 2, 0, 2, 2, 2, 0, 2, 0, 2, 2, 2, 0, 2, 2, 0, 2 },
+		{ 2, 3, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 3, 2 },
+		{ 2, 2, 0, 2, 0, 2, 0, 2, 2, 2, 2, 2, 0, 2, 0, 2, 0, 2, 2 },
+		{ 2, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 2 },
+		{ 2, 0, 2, 2, 2, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2, 2, 2, 0, 2 },
+		{ 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 },
+		{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
+	};
+
 
 	// 点滅スピード
 	constexpr int FLASH_SPEED = 20;
@@ -85,7 +112,7 @@ Field::Field() :
 	{
 		for (int x = 0; x < Field::MAP_WIDTH; x++)
 		{
-			mapData2[y][x] = 0;
+			mapData2_[y][x] = 0;
 		}
 	}
 
@@ -93,6 +120,7 @@ Field::Field() :
 	{
 		for (int x = 0; x < Field::MAP_WIDTH; x++)
 		{
+		//	mapData_[y][x] = mapData[y][x];
 			mapData_[y][x] = mapData[y][x];
 		}
 	}
@@ -282,7 +310,7 @@ void Field::MoveDataSet(int goalY, int goalX)
 		{
 			if (mapData_[y][x] != 2 && mapData_[y][x] != 8)
 			{
-				mapData2[y][x] = 0;
+				mapData2_[y][x] = 0;
 			}
 		}
 	}
@@ -296,24 +324,24 @@ void Field::Search(int y, int x, int goalY, int goalX, int pos)
 
 	if (x > 0 && y > 0 && x < MAP_WIDTH - 1 && y < MAP_HEIGHT - 1)
 	{
-		if (mapData2[y - 1][x] == 0 || mapData2[y - 1][x] > pos)
+		if (mapData2_[y - 1][x] == 0 || mapData2_[y - 1][x] > pos)
 		{
-			mapData2[y - 1][x] = pos;
+			mapData2_[y - 1][x] = pos;
 			Search(y - 1, x, goalY, goalX, pos);
 		}
-		if (mapData2[y + 1][x] == 0 || mapData2[y + 1][x] > pos)
+		if (mapData2_[y + 1][x] == 0 || mapData2_[y + 1][x] > pos)
 		{
-			mapData2[y + 1][x] = pos;
+			mapData2_[y + 1][x] = pos;
 			Search(y + 1, x, goalY, goalX, pos);
 		}
-		if (mapData2[y][x - 1] == 0 || mapData2[y][x - 1] > pos)
+		if (mapData2_[y][x - 1] == 0 || mapData2_[y][x - 1] > pos)
 		{
-			mapData2[y][x - 1] = pos;
+			mapData2_[y][x - 1] = pos;
 			Search(y, x - 1, goalY, goalX, pos);
 		}
-		if (mapData2[y][x + 1] == 0 || mapData2[y][x + 1] > pos)
+		if (mapData2_[y][x + 1] == 0 || mapData2_[y][x + 1] > pos)
 		{
-			mapData2[y][x + 1] = pos;
+			mapData2_[y][x + 1] = pos;
 			Search(y, x + 1, goalY, goalX, pos);
 		}
 
@@ -321,11 +349,11 @@ void Field::Search(int y, int x, int goalY, int goalX, int pos)
 		{
 			if (enemy->GetTracking())
 			{
-				mapData2[pPlayer_->GetIndexY()][pPlayer_->GetIndexX()] = 0;
+				mapData2_[pPlayer_->GetIndexY()][pPlayer_->GetIndexX()] = 0;
 			}
 			else
 			{
-				mapData2[goalY][goalX] = 0;
+				mapData2_[goalY][goalX] = 0;
 			}
 		}
 	}
@@ -429,38 +457,38 @@ int Field::BlinkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 
 	if (pEnemy_[0]->GetIzike() && !SpornInOrAuto(enemyIndexY, enemyIndexX))
 	{
-		if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] < mapData2[y - 1][x])
+		if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] < mapData2_[y - 1][x])
 		{
 			return EnemyBase::up;
 		}
-		if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] < mapData2[y + 1][x])
+		if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] < mapData2_[y + 1][x])
 		{
 			return EnemyBase::down;
 		}
-		if (!IsBlock(y, x - 1) && mapData2[y][x] < mapData2[y][x - 1])
+		if (!IsBlock(y, x - 1) && mapData2_[y][x] < mapData2_[y][x - 1])
 		{
 			return EnemyBase::left;
 		}
-		if (!IsBlock(y, x + 1) && mapData2[y][x] < mapData2[y][x + 1])
+		if (!IsBlock(y, x + 1) && mapData2_[y][x] < mapData2_[y][x + 1])
 		{
 			return EnemyBase::right;
 		}
 	}
 	else
 	{
-		if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] > mapData2[y - 1][x])
+		if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] > mapData2_[y - 1][x])
 		{
 			return EnemyBase::up;
 		}
-		if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] > mapData2[y + 1][x])
+		if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] > mapData2_[y + 1][x])
 		{
 			return EnemyBase::down;
 		}
-		if (!IsBlock(y, x - 1) && mapData2[y][x] > mapData2[y][x - 1])
+		if (!IsBlock(y, x - 1) && mapData2_[y][x] > mapData2_[y][x - 1])
 		{
 			return EnemyBase::left;
 		}
-		if (!IsBlock(y, x + 1) && mapData2[y][x] > mapData2[y][x + 1])
+		if (!IsBlock(y, x + 1) && mapData2_[y][x] > mapData2_[y][x + 1])
 		{
 			return EnemyBase::right;
 		}
@@ -511,38 +539,38 @@ int Field::PinkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 		}
 		if (pEnemy_[3]->GetIzike() && !SpornInOrAuto(enemyIndexY, enemyIndexX))
 		{
-			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] < mapData2[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] < mapData2_[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] < mapData2[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] < mapData2_[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y, x + 1) && mapData2[y][x] < mapData2[y][x + 1])
+			if (!IsBlock(y, x + 1) && mapData2_[y][x] < mapData2_[y][x + 1])
 			{
 				return EnemyBase::right;
 			}
-			if (!IsBlock(y, x - 1) && mapData2[y][x] < mapData2[y][x - 1])
+			if (!IsBlock(y, x - 1) && mapData2_[y][x] < mapData2_[y][x - 1])
 			{
 				return EnemyBase::left;
 			}
 		}
 		else
 		{
-			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] > mapData2[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] > mapData2_[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] > mapData2[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] > mapData2_[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y, x + 1) && mapData2[y][x] > mapData2[y][x + 1])
+			if (!IsBlock(y, x + 1) && mapData2_[y][x] > mapData2_[y][x + 1])
 			{
 				return EnemyBase::right;
 			}
-			if (!IsBlock(y, x - 1) && mapData2[y][x] > mapData2[y][x - 1])
+			if (!IsBlock(y, x - 1) && mapData2_[y][x] > mapData2_[y][x - 1])
 			{
 				return EnemyBase::left;
 			}
@@ -616,38 +644,38 @@ int Field::InkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 
 		if (pEnemy_[1]->GetIzike() && !SpornInOrAuto(enemyIndexY, enemyIndexX))
 		{
-			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] < mapData2[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] < mapData2_[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] < mapData2[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] < mapData2_[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y, x - 1) && mapData2[y][x] < mapData2[y][x - 1])
+			if (!IsBlock(y, x - 1) && mapData2_[y][x] < mapData2_[y][x - 1])
 			{
 				return EnemyBase::left;
 			}
-			if (!IsBlock(y, x + 1) && mapData2[y][x] < mapData2[y][x + 1])
+			if (!IsBlock(y, x + 1) && mapData2_[y][x] < mapData2_[y][x + 1])
 			{
 				return EnemyBase::right;
 			}
 		}
 		else
 		{
-			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] > mapData2[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] > mapData2_[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] > mapData2[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] > mapData2_[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y, x - 1) && mapData2[y][x] > mapData2[y][x - 1])
+			if (!IsBlock(y, x - 1) && mapData2_[y][x] > mapData2_[y][x - 1])
 			{
 				return EnemyBase::left;
 			}
-			if (!IsBlock(y, x + 1) && mapData2[y][x] > mapData2[y][x + 1])
+			if (!IsBlock(y, x + 1) && mapData2_[y][x] > mapData2_[y][x + 1])
 			{
 				return EnemyBase::right;
 			}
@@ -712,38 +740,38 @@ int Field::CrydeMove(int enemyIndexY, int enemyIndexX, bool flag)
 		// リスポーン地点にいる状態でイジケ状態の場合逃げずにリスポーン地点からでる
 		if (pEnemy_[2]->GetIzike() && !SpornInOrAuto(enemyIndexY, enemyIndexX))
 		{
-			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] < mapData2[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] < mapData2_[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] < mapData2[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] < mapData2_[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y, x - 1) && mapData2[y][x] < mapData2[y][x - 1])
+			if (!IsBlock(y, x - 1) && mapData2_[y][x] < mapData2_[y][x - 1])
 			{
 				return EnemyBase::left;
 			}
-			if (!IsBlock(y, x + 1) && mapData2[y][x] < mapData2[y][x + 1])
+			if (!IsBlock(y, x + 1) && mapData2_[y][x] < mapData2_[y][x + 1])
 			{
 				return EnemyBase::right;
 			}
 		}
 		else
 		{
-			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2[y][x] > mapData2[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] > mapData2_[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2[y][x] > mapData2[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] > mapData2_[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y, x - 1) && mapData2[y][x] > mapData2[y][x - 1])
+			if (!IsBlock(y, x - 1) && mapData2_[y][x] > mapData2_[y][x - 1])
 			{
 				return EnemyBase::left;
 			}
-			if (!IsBlock(y, x + 1) && mapData2[y][x] > mapData2[y][x + 1])
+			if (!IsBlock(y, x + 1) && mapData2_[y][x] > mapData2_[y][x + 1])
 			{
 				return EnemyBase::right;
 			}
