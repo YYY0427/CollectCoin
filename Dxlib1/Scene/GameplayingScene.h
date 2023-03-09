@@ -51,6 +51,11 @@ private:
 	int fadeTimer_ = fade_interval;
 	int fadeValue_ = 255;
 
+	// ゲームオーバー文字のフェード設定
+	static constexpr int game_over_fade_interval = 60;
+	int gameOverFadeTimer_ = 0;
+	int gameOverFadeValue_ = 0;
+
 	// 文字のハンドル
 	int gameOverH_;
 	int gameClearH_;
@@ -81,6 +86,13 @@ private:
 	bool enemyKill_;
 
 	bool playerDeadSound_;
+
+	int tempScreenH_;
+
+	int quakeTimer_;
+	float quakeX_;
+	float quakeY_;
+
 	// 残機
 	int life_;
 

@@ -115,7 +115,7 @@ void Ghost::Update()
 	}
 
 	// ワープチェック
-	indexX_ = pField_->Worp(kY_, kX_, indexY_, indexX_);
+	indexX_ = pField_->Warp(kY_, kX_, indexY_, indexX_);
 
 	// アニメーション処理
 	idX_ = (idX_ + 1) % (ANIME_FRAME_SPEED * ANIME_FRAME_NUM);				// 通常処理

@@ -56,7 +56,7 @@ public:
 
 	// 指定の位置にプレイヤーがいる場合
 	// 指定の位置にワープさせる
-	int  Worp(int ky, int kx, int x, int y);
+	int  Warp(int ky, int kx, int x, int y);
 
 	// 目的地までの最短経路を探すための準備として、コピーマップの初期化と目的地の場所に0(目印)を設定
 	void MoveDataSet(int playerY, int playerX);

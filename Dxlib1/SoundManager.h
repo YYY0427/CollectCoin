@@ -9,7 +9,7 @@ class SoundManager
 {
 private:
 	std::unordered_map<std::string, int> nameAndHandleTable_;
-	int LoadSoundFile(const char* fileName);
+	int LoadSoundFile(const char* fileName, const char* ext);
 	SoundManager();
 	~SoundManager();
 
@@ -35,4 +35,11 @@ public:
 	/// </summary>
 	/// <param name="name">サウンド名</param>
 	void Play(const char* name);
+
+	/// <summary>
+	/// 指定のサウンドが再生中かチェック
+	/// </summary>
+	/// <param name="name">サウンド名</param>
+	/// <returns> true 再生中  false 再生されていない</returns>
+	bool Check(const char* name);
 };

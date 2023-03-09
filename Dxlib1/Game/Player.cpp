@@ -6,6 +6,7 @@
 #include "../game.h"
 #include "EnemyBase.h"
 #include "../SoundManager.h"
+#include <algorithm>
 #include <DxLib.h>
 
 namespace
@@ -38,6 +39,7 @@ Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int 
 	wantMoveDirection_(0),
 	imgY_(0),
 	timer_(0),
+	soundVolume_(0),
 	isPowerFeed_(false),
 	isDead_(false),
 	isAnimeEnd_(false),
@@ -46,8 +48,12 @@ Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int 
 	isIntrusion_(false),
 	isTurnFlag_(false),
 	isFlash_(false),
-	enemyKill_(false)
+	enemyKill_(false),
+	soundMin_(false)
 {
+	normalBgmVolume_ = 255;
+	powerUpBgmVolume_ = 0;
+
 	indexX_ = indexX;
 	indexY_ = indexY;
 
@@ -57,6 +63,11 @@ Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int 
 	attackH_ = attackH;
 
 	handle_ = normalH_;
+
+	powerUpBgmH_ = LoadSoundMem("Data/sound/BGM/powerUp.mp3");
+
+	ChangeVolumeSoundMem(powerUpBgmVolume_, powerUpBgmH_);
+	PlaySoundMem(powerUpBgmH_, DX_PLAYTYPE_LOOP);
 
 	// 画像サイズの取得
 	GetGraphSizeF(deathH_, &deathImgSize_.x, &deathImgSize_.y);
@@ -217,7 +228,7 @@ void Player::Update(const InputState& input)
 	SpeedCalculation();
 
 	// ワープチェック
-	indexX_ = pField_->Worp(kY_, kX_, indexY_, indexX_);
+	indexX_ = pField_->Warp(kY_, kX_, indexY_, indexX_);
 
 	// 移動している場合処理を行う
 	if (moveDirection_)
@@ -238,7 +249,6 @@ void Player::Draw()
 				return;
 			}
 		}
-
 		int imgX = (imgIdX_ / ANIME_FRAME_SPEED) * WIDTH;
 
 		// プレイヤー画像の表示
@@ -361,6 +371,16 @@ void Player::SpeedCalculation()
 	// 一定時間プレイヤーの移動を速くする
 	if (isPowerFeed_)
 	{
+		// もともと流れていたBGMを小さくしていく
+		SetVolumeMusic(normalBgmVolume_);
+		normalBgmVolume_ -= 2;
+		normalBgmVolume_ = (std::max)(normalBgmVolume_, 0);
+
+		// 新しいBGMを徐々に大きくしていく
+		ChangeVolumeSoundMem(powerUpBgmVolume_, powerUpBgmH_);
+		powerUpBgmVolume_ += 2;
+		powerUpBgmVolume_ = (std::min)(powerUpBgmVolume_, 255);
+
 		// タイマーを開始
 		powerFeedTimer_++;
 
@@ -390,8 +410,8 @@ void Player::SpeedCalculation()
 			// 初期化
 			powerFeedTimer_ = 0;
 			isPowerFeed_ = false;
-
 			isFlash_ = false;
+			soundMin_ = true;
 
 			for (auto& enemy : pEnemy_)
 			{
@@ -406,6 +426,23 @@ void Player::SpeedCalculation()
 			// 元の移動速度に戻す
 			speed_ = NORMAL_SPEED;
 		}
+	}
+	else if(soundMin_ && !isPowerFeed_)
+	{
+		if (normalBgmVolume_ >= 255 && powerUpBgmVolume_ <= 0)
+		{
+			soundMin_ = false;
+		}
+
+		// もともと流れていたBGMを大きくしていく
+		SetVolumeMusic(normalBgmVolume_);
+		normalBgmVolume_ += 2;
+		normalBgmVolume_ = (std::min)(normalBgmVolume_, 255);
+
+		// 新しいBGMを徐々に小さくしていく
+		ChangeVolumeSoundMem(powerUpBgmVolume_, powerUpBgmH_);
+		powerUpBgmVolume_ -= 2;
+		powerUpBgmVolume_ = (std::max)(powerUpBgmVolume_, 0);
 	}
 }
 

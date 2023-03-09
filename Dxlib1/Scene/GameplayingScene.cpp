@@ -18,6 +18,7 @@
 #include "../Game/BackGround.h"
 #include "../SoundManager.h"
 #include <DxLib.h>
+#include <cassert>
 
 namespace
 {
@@ -54,17 +55,29 @@ namespace
 GameplayingScene::GameplayingScene(SceneManager& manager) :
 	Scene(manager),
 	updateFunc_(&GameplayingScene::FadeInUpdate),
-	life_(1),
+	life_(2),
 	timer_(0),
 	gameOverTimer_(0),
 	gameClearTimer_(0),
 	preparTimer_(0),
+	quakeTimer_(0),
+	quakeX_(0.0f),
+	quakeY_(0.0f),
 	isGameClear_(false),
 	faideEnabled_(false),
-	playerDeadSound_(true)
+	playerDeadSound_(false)
 {
+	// 画面幅　画面高　ビット数
+	int sw, sh, bit;
+	// 幅と高さを取得
+	GetScreenState(&sw, &sh, &bit);
+	// 加工用画面を用意
+	tempScreenH_ = MakeScreen(sw, sh);
+	// 作れなっかた場合ここで停止
+	assert(tempScreenH_ >= 0);
+
 	// フォントの作成
-	gameOverH_ = CreateFontToHandle("PixelMplus10", 20, 10);
+	gameOverH_ = CreateFontToHandle("PixelMplus10", 50, 10);
 	gameClearH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 	readyH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 
@@ -185,10 +198,24 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 			// プレイヤーがイジケ状態ではないときに敵と当たった場合
 			if (!enemy->GetIzike())
 			{
+				// BGMを止める
 				StopMusic();
 
 				// 残機 - 1
 				life_--;
+
+				// ゲームオーバーの場合画面の揺れを大きくする
+				if (life_ <= 0)
+				{
+					quakeX_ = 40.0f;
+					quakeY_ = 40.0f;
+					quakeTimer_ = 80;
+				}
+				else
+				{
+					quakeX_ = 20.0f;
+					quakeTimer_ = 60;
+				}
 
 				// プレイヤーの死亡フラグを立てる
 				pPlayer_->SetDead(true);
@@ -196,6 +223,8 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 				fadeColor_ = 0xff0000;
 
 				SoundManager::GetInstance().Play("enemyAttack");
+
+				playerDeadSound_ = true;
 
 				// 残機がなかった場合
 				if (life_ <= 0)
@@ -219,6 +248,21 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 				updateFunc_ = &GameplayingScene::EnemyDeadUpdate;
 			}
 		}
+	}
+
+	if (quakeTimer_ > 0)
+	{
+		quakeX_ = -quakeX_;
+		quakeX_ *= 0.95f;
+		quakeY_ = -quakeY_;
+		quakeY_ *= 0.95f;
+
+		--quakeTimer_;
+	}
+	else
+	{
+		quakeX_ = 0.0f;
+		quakeY_ = 0.0f;
 	}
 
 	// ポーズシーン切り替え
@@ -259,6 +303,9 @@ void GameplayingScene::Update(const InputState& input)
 
 void GameplayingScene::Draw()
 {
+	// 加工用スクリーンハンドルをセット
+	SetDrawScreen(tempScreenH_);
+
 	// 背景の描画
 	pBackGround_->Draw();
 
@@ -280,11 +327,20 @@ void GameplayingScene::Draw()
 	// ゲームオーバー
 	if (isGameOver_)
 	{
-		int width = GetDrawStringWidthToHandle(GAMEOVER_STRING, strlen(GAMEOVER_STRING), gameOverH_);
+		int stringWidth = GetDrawStringWidthToHandle(GAMEOVER_STRING, strlen(GAMEOVER_STRING), gameOverH_);
+		int stringHeight = GetFontSizeToHandle(gameOverH_);
 
+		int width = (Game::kScreenWidth / 2) - (stringWidth / 2);
+		int height = (Game::kScreenHeight / 2) - (stringHeight / 2);
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gameOverFadeValue_);
 		// ゲームオーバー文字の表示
-		DrawStringToHandle((Game::kScreenWidth / 2) - (width / 2), Game::kScreenHeight / 2 + 40,
+		DrawStringToHandle(width, height,
 			GAMEOVER_STRING, 0xffffff, gameOverH_, false);
+
+	//	DrawBox(width, height, width + stringWidth, height + stringHeight, 0x000000, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
 	}
 	// ゲームクリア
 	if (isGameClear_)
@@ -314,6 +370,15 @@ void GameplayingScene::Draw()
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	SetDrawScreen(DX_SCREEN_BACK);
+	DrawGraph(quakeX_, quakeY_, tempScreenH_, false);
+	if (quakeTimer_ > 0)
+	{
+		GraphFilter(tempScreenH_, DX_GRAPH_FILTER_MONO, 0, 7);
+		DrawGraph(quakeX_, quakeY_, tempScreenH_, false);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
 }
 
 void GameplayingScene::GameClearUpdate(const InputState& input)
@@ -328,7 +393,22 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 
 void GameplayingScene::GameOverUpdate(const InputState& input)
 {
-	if (timer_++ > 60)
+	if (quakeTimer_ > 0)
+	{
+		quakeX_ = -quakeX_;
+		quakeX_ *= 0.95f;
+		quakeY_ = -quakeY_;
+		quakeY_ *= 0.95f;
+
+		--quakeTimer_;
+	}
+	else
+	{
+		quakeX_ = 0.0f;
+		quakeY_ = 0.0f;
+	}
+
+	if (timer_++ > 120)
 	{
 		// すべての敵を消す
 		for (auto& enemy : pEnemy_)
@@ -342,19 +422,25 @@ void GameplayingScene::GameOverUpdate(const InputState& input)
 
 			if (playerDeadSound_)
 			{
-				SoundManager::GetInstance().Play("playerDead");
+				SoundManager::GetInstance().Play("gameOver");
 				playerDeadSound_ = false;
 			}
 		}
-		else
+		else if (pPlayer_->GetAnimeEnd() && !SoundManager::GetInstance().Check("gameOver"))
 		{
-			playerDeadSound_ = true;
 			isGameOver_ = true;
-			gameOverTimer_++;
-
-			if (gameOverTimer_ % 180 == 0)
+		}
+		if (isGameOver_)
+		{
+			gameOverFadeValue_ = 255 * (static_cast<float>(gameOverFadeTimer_)) / static_cast<float>(game_over_fade_interval);
+			if (++gameOverFadeTimer_ >= 255)
 			{
-				updateFunc_ = &GameplayingScene::FadeOutUpdate;
+				gameOverFadeValue_ = 255;
+
+				if (gameOverTimer_++ % 180 == 0)
+				{
+					updateFunc_ = &GameplayingScene::FadeOutUpdate;
+				}
 			}
 		}
 	}
@@ -362,6 +448,17 @@ void GameplayingScene::GameOverUpdate(const InputState& input)
 
 void GameplayingScene::PlayerDeadUpdate(const InputState& input)
 {
+	if (quakeTimer_ > 0)
+	{
+		quakeX_ = -quakeX_;
+		quakeX_ *= 0.95f;
+		--quakeTimer_;
+	}
+	else
+	{
+		quakeX_ = 0.0f;
+	}
+
 	if (timer_++ > 60)
 	{
 		// すべての敵を消す
@@ -370,10 +467,19 @@ void GameplayingScene::PlayerDeadUpdate(const InputState& input)
 			enemy->SetEnabled(false);
 		}
 		
-		pPlayer_->DeadUpdate();
+		if (playerDeadSound_)
+		{
+			SoundManager::GetInstance().Play("playerDead");
+			playerDeadSound_ = false;
+		}
+
+		if (!pPlayer_->GetAnimeEnd())
+		{
+			pPlayer_->DeadUpdate();
+		}
 	}
 
-	if (pPlayer_->GetAnimeEnd())
+	if (pPlayer_->GetAnimeEnd() && !SoundManager::GetInstance().Check("playerDead"))
 	{
 		updateFunc_ = &GameplayingScene::FadeOutUpdate;
 	}
@@ -412,6 +518,9 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 		pField_->Init();
 
 		SetInit();
+
+		SetVolumeMusic(0);
+		PlayMusic("Data/sound/BGM/game.mp3", DX_PLAYTYPE_LOOP);
 
 		updateFunc_ = &GameplayingScene::FadeInUpdate;
 	}

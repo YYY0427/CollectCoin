@@ -113,6 +113,14 @@ private:
 	bool isFlash_;
 
 	int timer_;
+	int powerUpBgmH_;
+
+	int soundVolume_;
+
+	int normalBgmVolume_;
+	int powerUpBgmVolume_;
+
+	bool soundMin_;
 
 	//ƒvƒŒƒCƒ„[‚Ì‰æ‘œ
 	int handle_;

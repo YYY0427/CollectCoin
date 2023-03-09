@@ -2,11 +2,11 @@
 #include <DxLib.h>
 #include <cassert>
 
-int SoundManager::LoadSoundFile(const char* fileName)
+int SoundManager::LoadSoundFile(const char* fileName, const char* ext)
 {
 	std::string path = "Data/sound/SE/";
 	path += fileName;
-	path += ".wav";
+	path += ext;
 	int handle = LoadSoundMem(path.c_str());
 	assert(handle >= 0);
 	nameAndHandleTable_[fileName] = handle;
@@ -15,14 +15,16 @@ int SoundManager::LoadSoundFile(const char* fileName)
 
 SoundManager::SoundManager()
 {
-	LoadSoundFile("coin");
-	LoadSoundFile("cursor");
-	LoadSoundFile("decision");
-	LoadSoundFile("kill");
-	LoadSoundFile("enemyAttack");
-	LoadSoundFile("powerUp");
-	LoadSoundFile("powerDown");
-	LoadSoundFile("playerDead");
+	LoadSoundFile("coin", ".wav");
+	LoadSoundFile("cursor", ".wav");
+	LoadSoundFile("decision", ".wav");
+	LoadSoundFile("kill", ".wav");
+	LoadSoundFile("enemyAttack", ".wav");
+	LoadSoundFile("powerUp", ".wav");
+	LoadSoundFile("powerDown", ".wav");
+	LoadSoundFile("warp", ".wav");
+	LoadSoundFile("playerDead", ".wav");
+	LoadSoundFile("gameOver", ".wav");
 }
 
 SoundManager::~SoundManager()
@@ -32,4 +34,10 @@ SoundManager::~SoundManager()
 void SoundManager::Play(const char* name)
 {
 	PlaySoundMem(nameAndHandleTable_[name], DX_PLAYTYPE_BACK);
+}
+
+bool SoundManager::Check(const char* name)
+{
+	bool sound = CheckSoundMem(nameAndHandleTable_[name]);
+	return sound;
 }

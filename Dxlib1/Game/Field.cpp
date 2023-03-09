@@ -257,16 +257,18 @@ bool Field::IsPowerFeed(int y, int x)
 	return false;
 }
 
-int  Field::Worp(int ky, int kx, int indexY, int indexX)
+int  Field::Warp(int ky, int kx, int indexY, int indexX)
 {
 	//前の座標が特定の位置かつ現在の座標が特定の位置ならワープ
 	if (ky == 10 && kx == 1 && indexY == 10 && indexX == 0)
 	{
+		SoundManager::GetInstance().Play("warp");
 		indexX = 18;
 		
 	}
 	if (ky == 10 && kx == 17 && indexY == 10 && indexX == 18)
 	{
+		SoundManager::GetInstance().Play("warp");
 		indexX = 0;
 	}
 	return (indexX);
