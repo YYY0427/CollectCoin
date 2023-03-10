@@ -55,7 +55,7 @@ namespace
 GameplayingScene::GameplayingScene(SceneManager& manager) :
 	Scene(manager),
 	updateFunc_(&GameplayingScene::FadeInUpdate),
-	life_(2),
+	life_(1),
 	timer_(0),
 	gameOverTimer_(0),
 	gameClearTimer_(0),
@@ -134,8 +134,8 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 		pField_->SetEnemy(pEnemy_[i], i);
 	}
 
-	SetVolumeMusic(0);
 	PlayMusic("Data/sound/BGM/game.mp3", DX_PLAYTYPE_LOOP);
+	SetVolumeMusic(0);
 }
 
 GameplayingScene::~GameplayingScene()
@@ -161,6 +161,9 @@ void GameplayingScene::FadeInUpdate(const InputState& input)
 		fadeValue_ = 0;
 
 		preparTimer_ = 120;
+
+	//	SoundManager::GetInstance().Play("gameStart");
+
 		updateFunc_ = &GameplayingScene::PrepareUpdate;
 	}
 }
@@ -200,6 +203,7 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 			{
 				// BGMを止める
 				StopMusic();
+				pPlayer_->StopMusic();
 
 				// 残機 - 1
 				life_--;
@@ -208,7 +212,7 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 				if (life_ <= 0)
 				{
 					quakeX_ = 40.0f;
-					quakeY_ = 40.0f;
+					quakeY_ = 20.0f;
 					quakeTimer_ = 80;
 				}
 				else
@@ -276,6 +280,7 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 	{
 		// BGMを止める
 		StopMusic();
+		pPlayer_->StopMusic();
 
 		// ゲームクリア演出に移行
 		updateFunc_ = &GameplayingScene::GameClearUpdate;
@@ -383,11 +388,26 @@ void GameplayingScene::Draw()
 
 void GameplayingScene::GameClearUpdate(const InputState& input)
 {
-	isGameClear_ = true;
 	gameClearTimer_++;
-	if (gameClearTimer_ % 180 == 0)
+	if (gameClearTimer_ == 60 && !isGameClear_)
 	{
-		updateFunc_ = &GameplayingScene::FadeOutUpdate;
+		SoundManager::GetInstance().Play("gameClear");
+	}
+	else if (gameClearTimer_ > 120 && !SoundManager::GetInstance().Check("gameClear"))
+	{
+		isGameClear_ = true;
+		gameClearTimer_ = 120;
+	}
+
+		pPlayer_->ClearUpdate();
+	if (isGameClear_)
+	{
+		gameClearTimer_ -= 2;
+		if (gameClearTimer_ <= 0)
+		{
+			updateFunc_ = &GameplayingScene::FadeOutUpdate;
+			gameClearTimer_ = 0;
+		}
 	}
 }
 
@@ -522,15 +542,29 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 		SetVolumeMusic(0);
 		PlayMusic("Data/sound/BGM/game.mp3", DX_PLAYTYPE_LOOP);
 
+		pPlayer_->StartMusic();
+
 		updateFunc_ = &GameplayingScene::FadeInUpdate;
 	}
 }
 
 void GameplayingScene::PrepareUpdate(const InputState& input)
 {
+	/*if (!SoundManager::GetInstance().Check("gameStart"))
+	{
+		preparTimer_--;
+	}*/
 	preparTimer_--;
 	if (preparTimer_ <= 0)
 	{
+		/*SetVolumeMusic(static_cast<int>(255.0f / 60.0f * static_cast<float>(60 - bgmFadeTimer_)));
+		bgmFadeValue_ = 255 * (static_cast<float>(bgmFadeTimer_)) / static_cast<float>(bgm_fade_interval);
+		if (--bgmFadeTimer_ == 0)
+		{
+			updateFunc_ = &GameplayingScene::NormalUpdate;
+			preparTimer_ = 0;
+		}*/
+
 		updateFunc_ = &GameplayingScene::NormalUpdate;
 		preparTimer_ = 0;
 	}

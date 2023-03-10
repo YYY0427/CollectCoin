@@ -22,6 +22,12 @@ namespace
 
 	// プレイヤーを残り何割でフラッシュさせるかの割合
 	constexpr float FLASH_RATIO = 0.7f;
+
+	constexpr float GRAVITY = 1.0f;
+
+	constexpr float JUMP_ACC = -10.0f;
+
+	constexpr float QUAKE = 5.0f;
 }
 
 Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int indexY) :
@@ -40,6 +46,7 @@ Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int 
 	imgY_(0),
 	timer_(0),
 	soundVolume_(0),
+	clearTimer_(0),
 	isPowerFeed_(false),
 	isDead_(false),
 	isAnimeEnd_(false),
@@ -49,7 +56,8 @@ Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int 
 	isTurnFlag_(false),
 	isFlash_(false),
 	enemyKill_(false),
-	soundMin_(false)
+	soundMin_(false),
+	vec_(0.0f, 0.0f)
 {
 	normalBgmVolume_ = 255;
 	powerUpBgmVolume_ = 0;
@@ -66,8 +74,7 @@ Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int 
 
 	powerUpBgmH_ = LoadSoundMem("Data/sound/BGM/powerUp.mp3");
 
-	ChangeVolumeSoundMem(powerUpBgmVolume_, powerUpBgmH_);
-	PlaySoundMem(powerUpBgmH_, DX_PLAYTYPE_LOOP);
+	StartMusic();
 
 	// 画像サイズの取得
 	GetGraphSizeF(deathH_, &deathImgSize_.x, &deathImgSize_.y);
@@ -314,6 +321,32 @@ void Player::EnemyKillUpdate()
 	attackImgIdx_ = (attackImgIdx_ + 1) % (ATTACK_ANIME_FRAME_SPEED * ATTACK_ANIME_FRAME_NUM);
 }
 
+void Player::ClearUpdate()
+{
+	static Vec2 pos = pos_;
+	clearTimer_++;
+
+	if (pos.y == pos_.y && clearTimer_ > 80)
+	{
+		vec_.y = JUMP_ACC;
+		clearTimer_ = 0;
+	}
+	
+	vec_.y += GRAVITY;
+
+	/*if (vec_.y > 0)
+	{
+		vec_.x += QUAKE;
+	}*/
+
+	pos_ += vec_;
+
+	if (pos_.y > pos.y)
+	{
+		pos_ = pos;
+	}
+}
+
 bool Player::Colision(int direction)
 {
 	switch (direction)
@@ -470,4 +503,16 @@ void Player::PosCalculation()
 	default:
 		break;
 	};
+}
+
+void Player::StartMusic()
+{
+	powerUpBgmVolume_ = 0;
+	ChangeVolumeSoundMem(powerUpBgmVolume_, powerUpBgmH_);
+	PlaySoundMem(powerUpBgmH_, DX_PLAYTYPE_LOOP);
+}
+
+void Player::StopMusic()
+{
+	StopSoundMem(powerUpBgmH_);
 }

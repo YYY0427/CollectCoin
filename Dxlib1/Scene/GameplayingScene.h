@@ -51,6 +51,11 @@ private:
 	int fadeTimer_ = fade_interval;
 	int fadeValue_ = 255;
 
+	// BGMのフェード設定
+	static constexpr int bgm_fade_interval = 60;
+	int bgmFadeTimer_ = fade_interval;
+	int bgmFadeValue_ = 255;
+
 	// ゲームオーバー文字のフェード設定
 	static constexpr int game_over_fade_interval = 60;
 	int gameOverFadeTimer_ = 0;

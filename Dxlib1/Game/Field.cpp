@@ -121,7 +121,7 @@ Field::Field() :
 		for (int x = 0; x < Field::MAP_WIDTH; x++)
 		{
 		//	mapData_[y][x] = mapData[y][x];
-			mapData_[y][x] = mapData[y][x];
+			mapData_[y][x] = mapData1[y][x];
 		}
 	}
 }
@@ -419,79 +419,82 @@ int Field::BlinkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 	int y = enemyIndexY;
 	int x = enemyIndexX;
 	
-	if (pEnemy_[0]->GetTracking() || pEnemy_[0]->GetIzike())
+	if (pEnemy_[0]->GetMove())
 	{
-		// 追跡モード
-		MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
-	}
-	// 縄張りモードのときの移動
-	else if (!pEnemy_[0]->GetTracking())
-	{
-		// 縄張りモード
-		MoveDataSet(blinkyGoalY_, blinkyGoalX_);
+		if (pEnemy_[0]->GetTracking() || pEnemy_[0]->GetIzike())
+		{
+			// 追跡モード
+			MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
+		}
+		// 縄張りモードのときの移動
+		else if (!pEnemy_[0]->GetTracking())
+		{
+			// 縄張りモード
+			MoveDataSet(blinkyGoalY_, blinkyGoalX_);
 
-		if (pEnemy_[0]->GetIndexY() == blinkyGoalY_ && pEnemy_[0]->GetIndexX() == blinkyGoalX_)
-		{
-			if (blinkyGoalX_ == 17 && blinkyGoalY_ == 1)
+			if (pEnemy_[0]->GetIndexY() == blinkyGoalY_ && pEnemy_[0]->GetIndexX() == blinkyGoalX_)
 			{
-				blinkyGoalX_ = 10;
-				blinkyGoalY_ = 1;
-			}
-			else if (blinkyGoalX_ == 10 && blinkyGoalY_ == 1)
-			{
-				blinkyGoalX_ = 10;
-				blinkyGoalY_ = 4;
+				if (blinkyGoalX_ == 17 && blinkyGoalY_ == 1)
+				{
+					blinkyGoalX_ = 10;
+					blinkyGoalY_ = 1;
+				}
+				else if (blinkyGoalX_ == 10 && blinkyGoalY_ == 1)
+				{
+					blinkyGoalX_ = 10;
+					blinkyGoalY_ = 4;
 
-			}
-			else if (blinkyGoalX_ == 10 && blinkyGoalY_ == 4)
-			{
-				blinkyGoalX_ = 17;
-				blinkyGoalY_ = 4;
-			}
-			else if (blinkyGoalX_ == 17 && blinkyGoalY_ == 4)
-			{
-				blinkyGoalX_ = 17;
-				blinkyGoalY_ = 1;
+				}
+				else if (blinkyGoalX_ == 10 && blinkyGoalY_ == 4)
+				{
+					blinkyGoalX_ = 17;
+					blinkyGoalY_ = 4;
+				}
+				else if (blinkyGoalX_ == 17 && blinkyGoalY_ == 4)
+				{
+					blinkyGoalX_ = 17;
+					blinkyGoalY_ = 1;
+				}
 			}
 		}
-	}
 
-	if (pEnemy_[0]->GetIzike() && !SpornInOrAuto(enemyIndexY, enemyIndexX))
-	{
-		if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] < mapData2_[y - 1][x])
+		if (pEnemy_[0]->GetIzike() && !SpornInOrAuto(enemyIndexY, enemyIndexX))
 		{
-			return EnemyBase::up;
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] < mapData2_[y - 1][x])
+			{
+				return EnemyBase::up;
+			}
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] < mapData2_[y + 1][x])
+			{
+				return EnemyBase::down;
+			}
+			if (!IsBlock(y, x - 1) && mapData2_[y][x] < mapData2_[y][x - 1])
+			{
+				return EnemyBase::left;
+			}
+			if (!IsBlock(y, x + 1) && mapData2_[y][x] < mapData2_[y][x + 1])
+			{
+				return EnemyBase::right;
+			}
 		}
-		if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] < mapData2_[y + 1][x])
+		else
 		{
-			return EnemyBase::down;
-		}
-		if (!IsBlock(y, x - 1) && mapData2_[y][x] < mapData2_[y][x - 1])
-		{
-			return EnemyBase::left;
-		}
-		if (!IsBlock(y, x + 1) && mapData2_[y][x] < mapData2_[y][x + 1])
-		{
-			return EnemyBase::right;
-		}
-	}
-	else
-	{
-		if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] > mapData2_[y - 1][x])
-		{
-			return EnemyBase::up;
-		}
-		if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] > mapData2_[y + 1][x])
-		{
-			return EnemyBase::down;
-		}
-		if (!IsBlock(y, x - 1) && mapData2_[y][x] > mapData2_[y][x - 1])
-		{
-			return EnemyBase::left;
-		}
-		if (!IsBlock(y, x + 1) && mapData2_[y][x] > mapData2_[y][x + 1])
-		{
-			return EnemyBase::right;
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] > mapData2_[y - 1][x])
+			{
+				return EnemyBase::up;
+			}
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] > mapData2_[y + 1][x])
+			{
+				return EnemyBase::down;
+			}
+			if (!IsBlock(y, x - 1) && mapData2_[y][x] > mapData2_[y][x - 1])
+			{
+				return EnemyBase::left;
+			}
+			if (!IsBlock(y, x + 1) && mapData2_[y][x] > mapData2_[y][x + 1])
+			{
+				return EnemyBase::right;
+			}
 		}
 	}
 	return 0;

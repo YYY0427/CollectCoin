@@ -25,6 +25,8 @@ SoundManager::SoundManager()
 	LoadSoundFile("warp", ".wav");
 	LoadSoundFile("playerDead", ".wav");
 	LoadSoundFile("gameOver", ".wav");
+	LoadSoundFile("gameStart", ".ogg");
+	LoadSoundFile("gameClear", ".ogg");
 }
 
 SoundManager::~SoundManager()

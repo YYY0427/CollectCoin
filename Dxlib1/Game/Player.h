@@ -47,6 +47,7 @@ public:
 	void Update(const InputState& input);	// ノーマル
 	void DeadUpdate();						// プレイヤーが死んだ場合の処理 
 	void EnemyKillUpdate();					// 敵を倒したときの処理
+	void ClearUpdate();						// ゲームクリア時の処理
 
 	// 描画
 	void Draw();
@@ -59,6 +60,12 @@ public:
 
 	// インデックス座標を座標に変換
 	void PosCalculation();
+
+	// BGMを鳴らす
+	void StartMusic();
+
+	// BGMを止める
+	void StopMusic();
 
 	// 外から値を見る
 	Vec2 GetSize() const { return deathImgSize_; }
@@ -98,6 +105,10 @@ private:
 
 	// プレイヤーの座標
 	Vec2 pos_;
+
+	Vec2 vec_;
+
+	int clearTimer_;
 
 	bool enemyKill_;
 

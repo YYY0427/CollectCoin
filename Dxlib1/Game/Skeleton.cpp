@@ -17,6 +17,12 @@ namespace
 
 	// パワーエサを取得した場合持続時間(何秒か)
 	constexpr int FEED_DURATION = 10;
+
+	// 死んでから動き始めるまでの時間
+	constexpr int DIEAD_MOVE_INTERVAL = 60 * 3;
+
+	// ゲームスタート時から動き始めるまでの時間
+	constexpr int STARET_MOVE_INTEVAL = 60 * 3;
 }
 
 Skeleton::Skeleton(int handle, int indexX, int indexY)
@@ -25,7 +31,7 @@ Skeleton::Skeleton(int handle, int indexX, int indexY)
 	indexX_ = indexX;
 	indexY_ = indexY;
 
-	isMove_ = true;
+	isMove_ = false;
 }
 
 void Skeleton::Update()
@@ -42,6 +48,8 @@ void Skeleton::Update()
 			isIntrusion_ = true;
 		}
 	}
+
+	MoveSwitch(STARET_MOVE_INTEVAL, DIEAD_MOVE_INTERVAL);
 
 	// 縄張りモードと追跡モードの切り替え
 	ModeSwitch();
@@ -132,7 +140,7 @@ void Skeleton::Draw()
 
 void Skeleton::SetInit()
 {
-	isMove_ = true;
+	isMove_ = false;
 	
 	indexX_ = 9;
 	indexY_ = 8;

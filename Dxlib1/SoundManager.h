@@ -46,6 +46,6 @@ public:
 	/// <summary>
 	/// 指定のサウンドの音量の変更
 	/// </summary>
-	/// <param name="name"></param>
+	/// <param name="name">サウンド名、音量</param>
 	void ChangeVolume(const char* name, int volume);
 };
