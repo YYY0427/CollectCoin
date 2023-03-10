@@ -14,7 +14,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	SetGraphMode(Game::kScreenWidth, Game::kScreenHeight, Game::kColorDepth);
 
 	// ウインドウ名設定
-	SetMainWindowText("パックマン");
+	SetMainWindowText(Game::kTitleText);
 
 	// 初期化
 	if (DxLib_Init() == -1) 
