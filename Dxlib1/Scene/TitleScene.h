@@ -5,6 +5,7 @@
 
 class InputState;
 class BackGround;
+class Player;
 
 /// <summary>
 /// タイトルシーン
@@ -25,6 +26,7 @@ private:
 		exsit
 	};
 
+	std::shared_ptr<Player> pPlayer_;
 	std::shared_ptr<BackGround> pBackGround_;
 
 	int playerH_;
@@ -42,6 +44,7 @@ private:
 	int slimeH_;
 	int ghostH_;
 	int golemH_;
+	int controller_;
 
 	// 画像インデックス
 	int playerImgIdx_;
@@ -62,6 +65,8 @@ private:
 
 	// タイトル名ハンドル
 	int titleH_;
+
+	int teachH_;
 
 	// フェードタイマー
 	int fadeTimer_;	

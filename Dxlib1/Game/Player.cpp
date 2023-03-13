@@ -18,10 +18,10 @@ namespace
 	constexpr float GET_FEED_SPEED = 1.7f;
 
 	// パワーエサを取得した場合持続時間(何秒か)
-	constexpr int FEED_DURATION = 60 * 8;
+	constexpr int FEED_DURATION = 60 * 10;
 
 	// プレイヤーを残り何割でフラッシュさせるかの割合
-	constexpr float FLASH_RATIO = 0.7f;
+	constexpr float FLASH_RATIO = 0.8f;
 
 	constexpr float GRAVITY = 1.0f;
 

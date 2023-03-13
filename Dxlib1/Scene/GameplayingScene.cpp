@@ -49,7 +49,7 @@ namespace
 	const char* const GAMECLEAR_STRING = "GAME CLEAR!!!";
 
 	// ゲームオーバー文字列
-	const char* const GAMEOVER_STRING = "GAME OVER!!!";
+	const char* const GAMEOVER_STRING = "GAME OVER...";
 }
 
 GameplayingScene::GameplayingScene(SceneManager& manager) :
@@ -77,24 +77,26 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	assert(tempScreenH_ >= 0);
 
 	// フォントの作成
-	gameOverH_ = CreateFontToHandle("PixelMplus10", 50, 10);
+	gameOverH_ = CreateFontToHandle("PixelMplus10", 50, 30);
+	gameOverShadowH_ = CreateFontToHandle("PixelMplus10", 51, 30);
 	gameClearH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 	readyH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 
 	// 画像のロード
 	int nowaponPlayerH = my::MyLoadGraph("Data/img/game/nowapon-player.png");
-	int waponPlayerH = my::MyLoadGraph("Data/img/game/wapon-player.png");
-	int deadPlayerH = my::MyLoadGraph("Data/img/game/player-deth.png");
-	int attackPlayerH = my::MyLoadGraph("Data/img/game/player-attack.png");
+	int waponPlayerH = my::MyLoadGraph("Data/img/game/wapon-player_gold.png");
+	int deadPlayerH = my::MyLoadGraph("Data/img/game/player-deth1.png");
+	int attackPlayerH = my::MyLoadGraph("Data/img/game/player-attack_gold.png");
 
-	int skeletonH = my::MyLoadGraph("Data/img/game/skeleton_walk.png");
- 	int slimeH = my::MyLoadGraph("Data/img/game/slime.png");
-	int ghostH = my::MyLoadGraph("Data/img/game/whiteGhost.png");
-	int golemH = my::MyLoadGraph("Data/img/game/golem.png");
+	int skeletonH = my::MyLoadGraph("Data/img/game/skeleton_monokuro.png");
+ 	int slimeH = my::MyLoadGraph("Data/img/game/slime_monokuro.png");
+	int ghostH = my::MyLoadGraph("Data/img/game/ghost_monokuro.png");
+	int golemH = my::MyLoadGraph("Data/img/game/golem_monokuro.png");
 
-	int mapChipH = my::MyLoadGraph("Data/img/game/mapchip.png");
+	int mapChipH = my::MyLoadGraph("Data/img/game/mapchip1.png");
 	int backGraph = my::MyLoadGraph("Data/img/game/Gray.png");
 	lifeH_ = my::MyLoadGraph("Data/img/game/hart.png");
+	coinH_ = my::MyLoadGraph("Data/img/game/coin.png");
 
 
 	pEnemy_[EnemyBase::skeleton] = std::make_shared<Skeleton>(
@@ -125,6 +127,7 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 		enemy->SetField(pField_);
 	}
 	
+	pBackGround_->SetPlayer(pPlayer_);
 	pPlayer_->SetField(pField_);
 	pField_->SetPlayer(pPlayer_);
 
@@ -136,6 +139,8 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 
 	PlayMusic("Data/sound/BGM/game.mp3", DX_PLAYTYPE_LOOP);
 	SetVolumeMusic(0);
+
+	coinPos_.y = 0.0f;
 }
 
 GameplayingScene::~GameplayingScene()
@@ -331,6 +336,12 @@ void GameplayingScene::Draw()
 	// プレイヤーの描画
 	pPlayer_->Draw();
 
+	for (auto coin : coin_)
+	{
+		coinPos_.x = GetRand(Game::kScreenWidth);
+		DrawRectRotaGraph(coinPos_.x, coinPos_.y, 0, 0, 8, 8, 3.7f, 0.0f, coinH_, true);
+	}
+
 	// ゲームオーバー
 	if (isGameOver_)
 	{
@@ -340,12 +351,14 @@ void GameplayingScene::Draw()
 		int width = (Game::kScreenWidth / 2) - (stringWidth / 2);
 		int height = (Game::kScreenHeight / 2) - (stringHeight / 2);
 
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gameOverFadeValue_);
+
 		// ゲームオーバー文字の表示
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gameOverFadeValue_);
+		DrawStringToHandle(width - 3, height,
+			GAMEOVER_STRING, 0x000000, gameOverShadowH_, false);
 		DrawStringToHandle(width, height,
 			GAMEOVER_STRING, 0xffffff, gameOverH_, false);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
 	}
 	// ゲームクリア
 	if (isGameClear_)
@@ -367,9 +380,9 @@ void GameplayingScene::Draw()
 	// 残機の描画
 	for (int i = 0; i < life_; i++)
 	{
-		int x = Game::kScreenWidth / 2 + 100 + (i * 40);
+		int x = Game::kScreenWidth / 2 + 250 + (-i * 40);
 
-		DrawRectRotaGraph(x, Game::kScreenHeight - 30, 0, 0, 16, 16, 2.0f, 0.0f, lifeH_, true);
+		DrawRectRotaGraph(x, Game::kScreenHeight - 30, 0, 0, 16, 16, 2.5f, 0.0f, lifeH_, true);
 	}
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
@@ -388,6 +401,12 @@ void GameplayingScene::Draw()
 
 void GameplayingScene::GameClearUpdate(const InputState& input)
 {
+	coinPos_.y++;
+	if (gameClearTimer_ % 10 == 0)
+	{
+		coin_.push_back(1);
+	}
+
 	gameClearTimer_++;
 	if (gameClearTimer_ == 60 && !isGameClear_)
 	{
@@ -399,7 +418,7 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 		gameClearTimer_ = 120;
 	}
 
-		pPlayer_->ClearUpdate();
+	pPlayer_->ClearUpdate();
 	if (isGameClear_)
 	{
 		gameClearTimer_ -= 2;

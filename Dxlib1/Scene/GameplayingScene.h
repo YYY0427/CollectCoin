@@ -1,8 +1,10 @@
 #pragma once
 #include "Scene.h"
 #include "../Game/EnemyBase.h"
+#include "../vec2.h"
 #include <memory>	//「スマートポインタ」を使うためのinclude
 #include <array>	//配列用
+#include <vector>
 
 //プロトタイプ宣言
 class Player;	//プレイヤークラス
@@ -43,6 +45,8 @@ private:
 
 	std::shared_ptr<BackGround> pBackGround_;
 
+	std::vector<int> coin_;
+
 	//フェードの色(デフォ黒)
 	unsigned int  fadeColor_ = 0x000000; 
 
@@ -63,11 +67,13 @@ private:
 
 	// 文字のハンドル
 	int gameOverH_;
+	int gameOverShadowH_;
 	int gameClearH_;
 	int readyH_;
 
 	// 画像のハンドル
 	int lifeH_;
+	int coinH_;
 
 	// ゲームオーバーか
 	bool isGameOver_;
@@ -82,6 +88,8 @@ private:
 	bool isAnimeEnd_;
 
 	int timer_;
+
+	Vec2 coinPos_;
 
 	int preparTimer_;
 

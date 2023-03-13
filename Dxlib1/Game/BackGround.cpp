@@ -1,5 +1,6 @@
 #include "BackGround.h"
 #include "../Game.h"
+#include "Player.h"
 #include <DxLib.h>
 
 BackGround::BackGround(int handle) :
@@ -14,10 +15,21 @@ BackGround::BackGround(int handle) :
 
 void BackGround::Update()
 {
-	scroll_ += 1;
-	if (scroll_ >= Game::kScreenHeight)
+	if (!pPlayer_->GetPowerFeed())
 	{
-		scroll_ = 0;
+		scroll_ += 1;
+		if (scroll_ >= Game::kScreenHeight)
+		{
+			scroll_ = 0;
+		}
+	}
+	else
+	{
+		scroll_ -= 2;
+		if (scroll_ <= 0)
+		{
+			scroll_ = Game::kScreenHeight;
+		}
 	}
 }
 

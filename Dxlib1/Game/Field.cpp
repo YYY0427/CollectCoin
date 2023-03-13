@@ -100,13 +100,13 @@ Field::Field() :
 	crydeGoalY_ = 20;
 	crydeGoalX_ = 17;
 
-	sordH_ = my::MyLoadGraph("Data/img/game/sord.png");
+	sordH_ = my::MyLoadGraph("Data/img/game/sord_gold.png");
 
 	coinH_ = my::MyLoadGraph("Data/img/game/coin.png");
 
 	doorH_ = my::MyLoadGraph("Data/img/game/door.png");
 
-	stringH_ = CreateFontToHandle("PixelMplus10", 20, 10);
+	stringH_ = CreateFontToHandle("PixelMplus10", 30, 10);
 
 	for (int y = 0; y < Field::MAP_HEIGHT; y++)
 	{
@@ -120,7 +120,6 @@ Field::Field() :
 	{
 		for (int x = 0; x < Field::MAP_WIDTH; x++)
 		{
-		//	mapData_[y][x] = mapData[y][x];
 			mapData_[y][x] = mapData1[y][x];
 		}
 	}
@@ -208,14 +207,16 @@ void Field::Draw()
 				DrawBox(
 					x * CHIP_SIZE + DISPLAY_POS_X, y * CHIP_SIZE + DISPLAY_POS_Y,
 					x * CHIP_SIZE + CHIP_SIZE + DISPLAY_POS_X, y * CHIP_SIZE + CHIP_SIZE + DISPLAY_POS_Y,
-					GetColor(0, 0, 255), false);
+					GetColor(255, 255, 255), true);
 			}*/
 		}
 	}
-
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+	DrawFormatStringToHandle(Game::kScreenWidth / 2 - 225 + 2, Game::kScreenHeight - 50 + 2, 0x000000, stringH_, "%d / %d\n", coin_, LestCoin(), true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	// Žc‚è‚ÌƒRƒCƒ“‚Ì–‡”
-	DrawRectRotaGraph(Game::kScreenWidth / 2 - 130, Game::kScreenHeight - 30, 0, 0, 8, 8, 3.0f, 0.0f, coinH_, true);
-	DrawFormatStringToHandle(Game::kScreenWidth / 2 - 100, Game::kScreenHeight - 40, 0x000000, stringH_, "%d / %d\n", coin_, LestCoin());
+	DrawRectRotaGraph(Game::kScreenWidth / 2 - 260, Game::kScreenHeight - 35, 0, 0, 8, 8, 3.7f, 0.0f, coinH_, true);
+	DrawFormatStringToHandle(Game::kScreenWidth / 2 - 225, Game::kScreenHeight - 50, 0xffffff, stringH_, "%d / %d\n", coin_, LestCoin());
 }
 
 int Field::LestCoin()

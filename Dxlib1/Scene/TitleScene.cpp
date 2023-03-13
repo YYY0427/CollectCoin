@@ -163,20 +163,25 @@ TitleScene::TitleScene(SceneManager& manager) :
 	pos_(0, Game::kScreenHeight / 2 - Player::HEIGHT)
 {
 	// 画像のロード
-	sordH_ = my::MyLoadGraph("Data/img/game/sord.png");
+	sordH_ = my::MyLoadGraph("Data/img/game/sord_gold.png");
 	nowaponPlayerH_ = my::MyLoadGraph("Data/img/game/nowapon-player.png");
-	waponPlayerH_ = my::MyLoadGraph("Data/img/game/wapon-player.png");
-	skeletonH_ = my::MyLoadGraph("Data/img/game/skeleton_walk.png");
-	slimeH_ = my::MyLoadGraph("Data/img/game/slime.png");
-	ghostH_ = my::MyLoadGraph("Data/img/game/whiteGhost.png");
-	golemH_ = my::MyLoadGraph("Data/img/game/golem.png");
+	waponPlayerH_ = my::MyLoadGraph("Data/img/game/wapon-player_gold.png");
+	skeletonH_ = my::MyLoadGraph("Data/img/game/skeleton_monokuro.png");
+	slimeH_ = my::MyLoadGraph("Data/img/game/slime_monokuro.png");
+	ghostH_ = my::MyLoadGraph("Data/img/game/ghost_monokuro.png");
+	golemH_ = my::MyLoadGraph("Data/img/game/golem_monokuro.png");
+	controller_ = my::MyLoadGraph("Data/img/game/controller.png");
+	int backGraph = my::MyLoadGraph("Data/img/game/Gray.png");
 
 	normalSelectionH_ = CreateFontToHandle("PixelMplus10", 30, 10);
 	selectionH_ = CreateFontToHandle("PixelMplus10", 40, 10);
 	titleH_ = CreateFontToHandle("PixelMplus10", 150, 10);
-	int backGraph = my::MyLoadGraph("Data/img/game/Gray.png");
+	teachH_ = CreateFontToHandle("PixelMplus10", 25, 10);
 
 	pBackGround_ = std::make_shared<BackGround>(backGraph);
+	pPlayer_ = std::make_shared <Player>(1,1,1,1,1,1);
+
+	pBackGround_->SetPlayer(pPlayer_);
 
 	startH_ = normalSelectionH_;
 	optionH_ = normalSelectionH_;
@@ -206,6 +211,23 @@ void TitleScene::Draw()
 
 	pBackGround_->Draw();
 
+	// 影
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+	DrawStringToHandle((Game::kScreenWidth / 2) - (width4 / 2) + 10, 100 + 10, TITLE_STRING, 0x000000, titleH_, false);
+	DrawStringToHandle((Game::kScreenWidth / 2) - (width1 / 2) + 5, Game::kScreenHeight / 2 + 150 + 5,
+		SELECTON1_STRING, 0x000000, startH_, false);
+	DrawStringToHandle((Game::kScreenWidth / 2) - (width2 / 2) + 5, Game::kScreenHeight / 2 + 225 + 5,
+		SELECTON2_STRING, 0x000000, optionH_, false);
+	DrawStringToHandle((Game::kScreenWidth / 2) - (width3 / 2) + 5, Game::kScreenHeight / 2 + 300 + 5,
+		SELECTON3_STRING, 0x000000, exsitH_, false);
+	DrawStringToHandle(Game::kScreenWidth / 2 + 600 + 5, Game::kScreenHeight - 45 + 5, "けってい", 0x000000, teachH_, false);
+	DrawStringToHandle(Game::kScreenWidth / 2 + 270 + 128 + 5, Game::kScreenHeight - 45 + 5, "せんたく", 0x000000, teachH_, false);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	// タイトル
+	DrawStringToHandle((Game::kScreenWidth / 2) - (width4 / 2), 100, TITLE_STRING, 0xffffff, titleH_, false);
+
+	// 選択肢
 	DrawStringToHandle((Game::kScreenWidth / 2) - (width1 / 2), Game::kScreenHeight / 2 + 150,
 		SELECTON1_STRING, 0xffffff, startH_, false);
 	DrawStringToHandle((Game::kScreenWidth / 2) - (width2 / 2), Game::kScreenHeight / 2 + 225,
@@ -213,7 +235,17 @@ void TitleScene::Draw()
 	DrawStringToHandle((Game::kScreenWidth / 2) - (width3 / 2), Game::kScreenHeight / 2 + 300,
 		SELECTON3_STRING, 0xffffff, exsitH_, false);
 
-	DrawStringToHandle((Game::kScreenWidth / 2) - (width4 / 2), 100, TITLE_STRING, 0xffffff, titleH_, false);
+	// A けってい
+	DrawRectRotaGraph(Game::kScreenWidth / 2 + 570, Game::kScreenHeight - 30, 0, 0, 16, 16, 2.0f, 0.0f, controller_, true);
+	DrawStringToHandle(Game::kScreenWidth / 2 + 600, Game::kScreenHeight - 45, "けってい", 0xffffff, teachH_, false);
+
+	// ↑↓←→　せんたく
+	DrawRectRotaGraph(Game::kScreenWidth / 2 + 250, Game::kScreenHeight - 30, 128, 0, 16, 16, 2.0f, 0.0f, controller_, true);
+	DrawRectRotaGraph(Game::kScreenWidth / 2 + 255 + 32, Game::kScreenHeight - 30, 144, 0, 16, 16, 2.0f, 0.0f, controller_, true);
+	DrawRectRotaGraph(Game::kScreenWidth / 2 + 260 + 64, Game::kScreenHeight - 30, 160, 0, 16, 16, 2.0f, 0.0f, controller_, true);
+	DrawRectRotaGraph(Game::kScreenWidth / 2 + 265 + 96, Game::kScreenHeight - 30, 176, 0, 16, 16, 2.0f, 0.0f, controller_, true);
+	DrawStringToHandle(Game::kScreenWidth / 2 + 270 + 128, Game::kScreenHeight - 45, "せんたく", 0xffffff, teachH_, false);
+
 
 	if (!isTurnFlag_)
 	{
