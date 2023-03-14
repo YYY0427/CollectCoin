@@ -87,6 +87,11 @@ Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int 
 	speed_ = NORMAL_SPEED;
 }
 
+Player::~Player()
+{
+	DeleteSoundMem(powerUpBgmH_);
+}
+
 void Player::Init()
 {
 	handle_ = normalH_;

@@ -123,7 +123,6 @@ protected:
 
 	// 画像のハンドル
 	int handle_;
-	int izikeHandle_;
 
 	// 表示する画像のインデックス
 	int idX_;

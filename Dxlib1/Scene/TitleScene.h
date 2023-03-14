@@ -23,6 +23,7 @@ private:
 	{
 		start,
 		option,
+		tutorial,
 		exsit
 	};
 
@@ -35,6 +36,10 @@ private:
 
 	// 座標
 	Vec2 pos_;
+	Vec2 cursor1Pos_;
+	Vec2 cursor2Pos_;
+	Vec2 cursor3Pos_;
+	Vec2 cursor4Pos_;
 
 	// 画像ハンドル
 	int sordH_;
@@ -45,6 +50,10 @@ private:
 	int ghostH_;
 	int golemH_;
 	int controller_;
+	int cursor1H_;
+	int cursor2H_;
+	int cursor3H_;
+	int cursor4H_;
 
 	// 画像インデックス
 	int playerImgIdx_;

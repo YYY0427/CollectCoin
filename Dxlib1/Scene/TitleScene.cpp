@@ -16,6 +16,26 @@
 
 namespace
 {
+	constexpr int pw_width_1 = 400;												//ポーズ枠の幅
+	constexpr int pw_height_1 = 100;												//ポーズ枠の高さ
+	constexpr int pw_start_x_1 = (Game::kScreenWidth / 2) - (pw_width_1 / 2);	//ポーズ枠の左
+	constexpr int pw_start_y_1 = Game::kScreenHeight / 2 + 100;					//ポーズ枠上
+
+	constexpr int pw_width_2 = 120;												//ポーズ枠の幅
+	constexpr int pw_height_2 = 100;												//ポーズ枠の高さ
+	constexpr int pw_start_x_2 = 600;	//ポーズ枠の左
+	constexpr int pw_start_y_2 = Game::kScreenHeight / 2 + 215;					//ポーズ枠上
+
+	constexpr int pw_width_3 = 120;												//ポーズ枠の幅
+	constexpr int pw_height_3 = 100;												//ポーズ枠の高さ
+	constexpr int pw_start_x_3 = (Game::kScreenWidth / 2) - (pw_width_3 / 2);	//ポーズ枠の左
+	constexpr int pw_start_y_3 = Game::kScreenHeight / 2 + 215;					//ポーズ枠上
+
+	constexpr int pw_width_4 = 120;												//ポーズ枠の幅
+	constexpr int pw_height_4 = 100;												//ポーズ枠の高さ
+	constexpr int pw_start_x_4 = 880;	//ポーズ枠の左
+	constexpr int pw_start_y_4 = Game::kScreenHeight / 2 + 215;					//ポーズ枠上
+
 	constexpr int PLAYER_SCALE = 3.0f;
 	constexpr int SKELETON_SCALE = 3.0f;
 	constexpr int SLIME_SCALE = 3.0f;
@@ -23,7 +43,7 @@ namespace
 	constexpr int GOLEM_SCALE = 3.0f;
 
 	// タイトル
-	const char* const TITLE_STRING = "ぼくの自信作！！";
+	const char* const TITLE_STRING = "これくとコイン";
 
 	// 選択肢
 	const char* const SELECTON1_STRING = "GAME START";
@@ -80,32 +100,104 @@ void TitleScene::NormalUpdate(const InputState& input)
 	ghostImgIdx_ = (ghostImgIdx_ + 1) % (Ghost::ANIME_FRAME_SPEED * Ghost::ANIME_FRAME_NUM);
 	golemImgIdx_ = (golemImgIdx_ + 1) % (Ghost::ANIME_FRAME_SPEED * Ghost::ANIME_FRAME_NUM);
 
-	//選択肢を上下で回す処理
-	if (input.IsTriggered(InputType::up))
-	{
-		SoundManager::GetInstance().Play("cursor");
-		currentInputIndex_ = ((currentInputIndex_ - 1) + SELECTION_NUM) % SELECTION_NUM;
-	}
-	else if (input.IsTriggered(InputType::down))
-	{
-		SoundManager::GetInstance().Play("cursor");
-		currentInputIndex_ = (currentInputIndex_ + 1) % SELECTION_NUM;
-	}
-
+	// 選択肢を回す
 	if (currentInputIndex_ == start)
-		startH_ = selectionH_;
-	else
-		startH_ = normalSelectionH_;
+	{
+		cursor1Pos_.x = pw_start_x_1;
+		cursor1Pos_.y = pw_start_y_1;
 
-	if (currentInputIndex_ == option)
-		optionH_ = selectionH_;
-	else
-		optionH_ = normalSelectionH_;
+		cursor2Pos_.x = pw_start_x_1 + pw_width_1;
+		cursor2Pos_.y = pw_start_y_1;
 
-	if (currentInputIndex_ == exsit)
-		exsitH_ = selectionH_;
-	else
-		exsitH_ = normalSelectionH_;
+		cursor3Pos_.x = pw_start_x_1 + pw_width_1;
+		cursor3Pos_.y = pw_start_y_1 + pw_height_1;
+
+		cursor4Pos_.x = pw_start_x_1;
+		cursor4Pos_.y = pw_start_y_1 + pw_height_1;
+
+		if (input.IsTriggered(InputType::down))
+		{
+			SoundManager::GetInstance().Play("cursor");
+			currentInputIndex_ = option;
+		}
+	}
+	else if (currentInputIndex_ == option)
+	{
+		cursor1Pos_.x = pw_start_x_2;
+		cursor1Pos_.y = pw_start_y_2;
+
+		cursor2Pos_.x = pw_start_x_2 + pw_width_2;
+		cursor2Pos_.y = pw_start_y_2;
+
+		cursor3Pos_.x = pw_start_x_2 + pw_width_2;
+		cursor3Pos_.y = pw_start_y_2 + pw_height_2;
+
+		cursor4Pos_.x = pw_start_x_2;
+		cursor4Pos_.y = pw_start_y_2 + pw_height_2;
+		if (input.IsTriggered(InputType::up))
+		{
+			SoundManager::GetInstance().Play("cursor");
+			currentInputIndex_ = start;
+		}
+		else if (input.IsTriggered(InputType::right))
+		{
+			SoundManager::GetInstance().Play("cursor");
+			currentInputIndex_ = tutorial;
+		}
+	}
+	else if (currentInputIndex_ == tutorial)
+	{
+		cursor1Pos_.x = pw_start_x_3;
+		cursor1Pos_.y = pw_start_y_3;
+
+		cursor2Pos_.x = pw_start_x_3 + pw_width_3;
+		cursor2Pos_.y = pw_start_y_3;
+
+		cursor3Pos_.x = pw_start_x_3 + pw_width_3;
+		cursor3Pos_.y = pw_start_y_3 + pw_height_3;
+
+		cursor4Pos_.x = pw_start_x_3;
+		cursor4Pos_.y = pw_start_y_3 + pw_height_3;
+		if (input.IsTriggered(InputType::up))
+		{
+			SoundManager::GetInstance().Play("cursor");
+			currentInputIndex_ = start;
+		}
+		else if (input.IsTriggered(InputType::right))
+		{
+			SoundManager::GetInstance().Play("cursor");
+			currentInputIndex_ = exsit;
+		}
+		else if (input.IsTriggered(InputType::left))
+		{
+			SoundManager::GetInstance().Play("cursor");
+			currentInputIndex_ = option;
+		}
+	}
+	else if (currentInputIndex_ == exsit)
+	{
+		cursor1Pos_.x = pw_start_x_4;
+		cursor1Pos_.y = pw_start_y_4;
+
+		cursor2Pos_.x = pw_start_x_4 + pw_width_4;
+		cursor2Pos_.y = pw_start_y_4;
+
+		cursor3Pos_.x = pw_start_x_4 + pw_width_4;
+		cursor3Pos_.y = pw_start_y_4 + pw_height_4;
+
+		cursor4Pos_.x = pw_start_x_4;
+		cursor4Pos_.y = pw_start_y_4 + pw_height_4;
+		if (input.IsTriggered(InputType::up))
+		{
+			SoundManager::GetInstance().Play("cursor");
+			currentInputIndex_ = start;
+		}
+		else if (input.IsTriggered(InputType::left))
+		{
+			SoundManager::GetInstance().Play("cursor");
+			currentInputIndex_ = tutorial;
+		}
+	}
 
 	//次へのボタンが押されたら次のシーンへ行く
 	if (input.IsTriggered(InputType::next))
@@ -117,7 +209,12 @@ void TitleScene::NormalUpdate(const InputState& input)
 		}
 		else if (currentInputIndex_ == option)
 		{
-			decisionIndex_ = option;
+			manager_.PushScene(new OptionScene(manager_));
+			return;
+		}
+		else if (currentInputIndex_ == tutorial)
+		{
+			decisionIndex_ = tutorial;
 		}
 		else if (currentInputIndex_ == exsit)
 		{
@@ -139,15 +236,13 @@ void TitleScene::FadeOutUpdate(const InputState& input)
 		manager_.ChangeScene(new GameplayingScene(manager_));
 		return;
 	}
-	else if (fadeTimer_ == FAIDE_INTERVAL && decisionIndex_ == option)
+	else if (fadeTimer_ == FAIDE_INTERVAL && decisionIndex_ == tutorial)
 	{
-		StopMusic();
-		manager_.ChangeScene(new OptionScene(manager_));
-		return;
+		/*manager_.ChangeScene(new OptionScene(manager_));
+		return;*/
 	}
 	else if (fadeTimer_ == FAIDE_INTERVAL && decisionIndex_ == exsit)
 	{
-	
 		DxLib_End();
 	}
 }
@@ -171,12 +266,16 @@ TitleScene::TitleScene(SceneManager& manager) :
 	ghostH_ = my::MyLoadGraph("Data/img/game/ghost_monokuro.png");
 	golemH_ = my::MyLoadGraph("Data/img/game/golem_monokuro.png");
 	controller_ = my::MyLoadGraph("Data/img/game/controller.png");
+	cursor1H_ = my::MyLoadGraph("Data/img/game/cursor1.png");
+	cursor2H_ = my::MyLoadGraph("Data/img/game/cursor2.png");
+	cursor3H_ = my::MyLoadGraph("Data/img/game/cursor3.png");
+	cursor4H_ = my::MyLoadGraph("Data/img/game/cursor4.png");
 	int backGraph = my::MyLoadGraph("Data/img/game/Gray.png");
 
-	normalSelectionH_ = CreateFontToHandle("PixelMplus10", 30, 10);
-	selectionH_ = CreateFontToHandle("PixelMplus10", 40, 10);
-	titleH_ = CreateFontToHandle("PixelMplus10", 150, 10);
-	teachH_ = CreateFontToHandle("PixelMplus10", 25, 10);
+	normalSelectionH_ = CreateFontToHandle("PixelMplus10", 30, 0);
+	selectionH_ = CreateFontToHandle("PixelMplus10", 40, 0);
+	titleH_ = CreateFontToHandle("PixelMplus10", 150, 9);
+	teachH_ = CreateFontToHandle("PixelMplus10", 25, 0);
 
 	pBackGround_ = std::make_shared<BackGround>(backGraph);
 	pPlayer_ = std::make_shared <Player>(1,1,1,1,1,1);
@@ -195,6 +294,7 @@ TitleScene::TitleScene(SceneManager& manager) :
 
 TitleScene::~TitleScene()
 {
+
 }
 
 void TitleScene::Update(const InputState& input)
@@ -213,27 +313,35 @@ void TitleScene::Draw()
 
 	// 影
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
-	DrawStringToHandle((Game::kScreenWidth / 2) - (width4 / 2) + 10, 100 + 10, TITLE_STRING, 0x000000, titleH_, false);
-	DrawStringToHandle((Game::kScreenWidth / 2) - (width1 / 2) + 5, Game::kScreenHeight / 2 + 150 + 5,
-		SELECTON1_STRING, 0x000000, startH_, false);
-	DrawStringToHandle((Game::kScreenWidth / 2) - (width2 / 2) + 5, Game::kScreenHeight / 2 + 225 + 5,
-		SELECTON2_STRING, 0x000000, optionH_, false);
-	DrawStringToHandle((Game::kScreenWidth / 2) - (width3 / 2) + 5, Game::kScreenHeight / 2 + 300 + 5,
-		SELECTON3_STRING, 0x000000, exsitH_, false);
-	DrawStringToHandle(Game::kScreenWidth / 2 + 600 + 5, Game::kScreenHeight - 45 + 5, "けってい", 0x000000, teachH_, false);
-	DrawStringToHandle(Game::kScreenWidth / 2 + 270 + 128 + 5, Game::kScreenHeight - 45 + 5, "せんたく", 0x000000, teachH_, false);
+	DrawStringToHandle((Game::kScreenWidth / 2) - (width4 / 2) + 5, 100 + 5, TITLE_STRING, 0x000000, titleH_, false);
+	DrawStringToHandle(Game::kScreenWidth / 2 + 600 + 2, Game::kScreenHeight - 45 + 2, "けってい", 0x000000, teachH_, false);
+	DrawStringToHandle(Game::kScreenWidth / 2 + 270 + 128 + 2, Game::kScreenHeight - 45 + 2, "せんたく", 0x000000, teachH_, false);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	// タイトル
 	DrawStringToHandle((Game::kScreenWidth / 2) - (width4 / 2), 100, TITLE_STRING, 0xffffff, titleH_, false);
 
 	// 選択肢
-	DrawStringToHandle((Game::kScreenWidth / 2) - (width1 / 2), Game::kScreenHeight / 2 + 150,
-		SELECTON1_STRING, 0xffffff, startH_, false);
-	DrawStringToHandle((Game::kScreenWidth / 2) - (width2 / 2), Game::kScreenHeight / 2 + 225,
-		SELECTON2_STRING, 0xffffff, optionH_, false);
-	DrawStringToHandle((Game::kScreenWidth / 2) - (width3 / 2), Game::kScreenHeight / 2 + 300,
-		SELECTON3_STRING, 0xffffff, exsitH_, false);
+	DrawRoundRect(pw_start_x_1 - 3, pw_start_y_1 - 3, pw_start_x_1 + pw_width_1 + 3, pw_start_y_1 + pw_height_1 + 3, 5, 5, 0x000000, true);
+	DrawRoundRect(pw_start_x_2 - 3, pw_start_y_2 - 3, pw_start_x_2 + pw_width_2 + 3, pw_start_y_2 + pw_height_2 + 3, 5, 5, 0x000000, true);
+	DrawRoundRect(pw_start_x_3 - 3, pw_start_y_3 - 3, pw_start_x_3 + pw_width_3 + 3, pw_start_y_3 + pw_height_3 + 3, 5, 5, 0x000000, true);
+	DrawRoundRect(pw_start_x_4 - 3, pw_start_y_4 - 3, pw_start_x_4 + pw_width_4 + 3, pw_start_y_4 + pw_height_4 + 3, 5, 5, 0x000000, true);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+	DrawRoundRect(pw_start_x_1, pw_start_y_1, pw_start_x_1 + pw_width_1, pw_start_y_1 + pw_height_1, 5, 5, 0xffffff, true);
+	DrawRoundRect(pw_start_x_2, pw_start_y_2, pw_start_x_2 + pw_width_2, pw_start_y_2 + pw_height_2, 5, 5, 0xffffff, true);
+	DrawRoundRect(pw_start_x_3, pw_start_y_3, pw_start_x_3 + pw_width_3, pw_start_y_3 + pw_height_3, 5, 5, 0xffffff, true);
+	DrawRoundRect(pw_start_x_4, pw_start_y_4, pw_start_x_4 + pw_width_4, pw_start_y_4 + pw_height_4, 5, 5, 0xffffff, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	DrawRoundRect(pw_start_x_1, pw_start_y_1, pw_start_x_1 + pw_width_1, pw_start_y_1 + pw_height_1 - 5, 5, 5, 0xffffff, true);
+	DrawRoundRect(pw_start_x_2, pw_start_y_2, pw_start_x_2 + pw_width_2, pw_start_y_2 + pw_height_2 - 5, 5, 5, 0xffffff, true);
+	DrawRoundRect(pw_start_x_3, pw_start_y_3, pw_start_x_3 + pw_width_3, pw_start_y_3 + pw_height_3 - 5, 5, 5, 0xffffff, true);
+	DrawRoundRect(pw_start_x_4, pw_start_y_4, pw_start_x_4 + pw_width_4, pw_start_y_4 + pw_height_4 - 5, 5, 5, 0xffffff, true);
+
+	// カーソル
+	DrawRotaGraph(cursor1Pos_.x, cursor1Pos_.y, 0.2f, 0.0f, cursor1H_, true);
+	DrawRotaGraph(cursor2Pos_.x, cursor2Pos_.y, 0.2f, 0.0f, cursor2H_, true);
+	DrawRotaGraph(cursor3Pos_.x, cursor3Pos_.y, 0.2f, 0.0f, cursor3H_, true);
+	DrawRotaGraph(cursor4Pos_.x, cursor4Pos_.y, 0.2f, 0.0f, cursor4H_, true);
 
 	// A けってい
 	DrawRectRotaGraph(Game::kScreenWidth / 2 + 570, Game::kScreenHeight - 30, 0, 0, 16, 16, 2.0f, 0.0f, controller_, true);
@@ -245,7 +353,6 @@ void TitleScene::Draw()
 	DrawRectRotaGraph(Game::kScreenWidth / 2 + 260 + 64, Game::kScreenHeight - 30, 160, 0, 16, 16, 2.0f, 0.0f, controller_, true);
 	DrawRectRotaGraph(Game::kScreenWidth / 2 + 265 + 96, Game::kScreenHeight - 30, 176, 0, 16, 16, 2.0f, 0.0f, controller_, true);
 	DrawStringToHandle(Game::kScreenWidth / 2 + 270 + 128, Game::kScreenHeight - 45, "せんたく", 0xffffff, teachH_, false);
-
 
 	if (!isTurnFlag_)
 	{

@@ -64,9 +64,6 @@ EnemyBase::EnemyBase() :
 	isIntrusion_(true),
 	isDoor_(false)
 {
-	// 画像のロード
-	izikeHandle_ = my::MyLoadGraph("Data/img/game/izike.png");
-
 	// 画像のサイズの取得
 	GetGraphSizeF(handle_, &size_.x, &size_.y);
 

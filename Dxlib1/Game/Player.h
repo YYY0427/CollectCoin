@@ -34,7 +34,7 @@ public:
 	Player(int normalH, int waponH, int deadH, int attackH, int indexX, int indexY);
 
 	//デストラクタ
-	~Player(){};
+	~Player();
 
 	// ポインタの設定
 	void SetEnemy(std::shared_ptr<EnemyBase>enemy, int i) { pEnemy_[i] = enemy; }

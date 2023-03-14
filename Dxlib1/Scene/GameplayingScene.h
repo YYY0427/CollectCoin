@@ -2,8 +2,8 @@
 #include "Scene.h"
 #include "../Game/EnemyBase.h"
 #include "../vec2.h"
-#include <memory>	//「スマートポインタ」を使うためのinclude
-#include <array>	//配列用
+#include <memory>	
+#include <array>	
 #include <vector>
 
 //プロトタイプ宣言
@@ -12,6 +12,8 @@ class Field;
 class EnemyBase;
 class Map;
 class BackGround;
+class Coin;
+class Particle;
 
 /// <summary>
 /// ゲーム中シーン
@@ -41,11 +43,17 @@ private:
 	//フィールド
 	std::shared_ptr<Field> pField_;
 
+	// マップチップ
 	std::shared_ptr<Map> pMap_;
 
+	// 背景
 	std::shared_ptr<BackGround> pBackGround_;
 
-	std::vector<int> coin_;
+	// ゲームクリア演出コイン
+	std::vector<std::shared_ptr<Coin>> pCoin_;
+
+	// ゲームクリア演出パーティクル
+	std::array<std::shared_ptr<Particle>, 100> pParticle_;
 
 	//フェードの色(デフォ黒)
 	unsigned int  fadeColor_ = 0x000000; 
@@ -65,10 +73,16 @@ private:
 	int gameOverFadeTimer_ = 0;
 	int gameOverFadeValue_ = 0;
 
+	// ゲームクリア文字のフェード設定
+	static constexpr int game_clear_fade_interval = 30;
+	int gameClearFadeTimer_ = 0;
+	int gameClearFadeValue_ = 0;
+
 	// 文字のハンドル
 	int gameOverH_;
 	int gameOverShadowH_;
 	int gameClearH_;
+	int gameClearShadowH_;
 	int readyH_;
 
 	// 画像のハンドル
@@ -88,8 +102,6 @@ private:
 	bool isAnimeEnd_;
 
 	int timer_;
-
-	Vec2 coinPos_;
 
 	int preparTimer_;
 

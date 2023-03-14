@@ -17,6 +17,8 @@
 #include "../Game/Map.h"
 #include "../Game/BackGround.h"
 #include "../SoundManager.h"
+#include "../Game/Coin.h"
+#include "../Particle.h"
 #include <DxLib.h>
 #include <cassert>
 
@@ -55,7 +57,7 @@ namespace
 GameplayingScene::GameplayingScene(SceneManager& manager) :
 	Scene(manager),
 	updateFunc_(&GameplayingScene::FadeInUpdate),
-	life_(1),
+	life_(3),
 	timer_(0),
 	gameOverTimer_(0),
 	gameClearTimer_(0),
@@ -79,7 +81,8 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	// フォントの作成
 	gameOverH_ = CreateFontToHandle("PixelMplus10", 50, 30);
 	gameOverShadowH_ = CreateFontToHandle("PixelMplus10", 51, 30);
-	gameClearH_ = CreateFontToHandle("PixelMplus10", 20, 10);
+	gameClearH_ = CreateFontToHandle("PixelMplus10", 50, 30);
+	gameClearShadowH_ = CreateFontToHandle("PixelMplus10", 51, 30);
 	readyH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 
 	// 画像のロード
@@ -95,6 +98,9 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 
 	int mapChipH = my::MyLoadGraph("Data/img/game/mapchip1.png");
 	int backGraph = my::MyLoadGraph("Data/img/game/Gray.png");
+
+	int sordH_ =  my::MyLoadGraph("Data/img/game/sord_gold.png");
+	int doorH_ =  my::MyLoadGraph("Data/img/game/door.png");
 	lifeH_ = my::MyLoadGraph("Data/img/game/hart.png");
 	coinH_ = my::MyLoadGraph("Data/img/game/coin.png");
 
@@ -117,9 +123,14 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 								GOLEM_START_INDEX_Y);		// 初期座標Y
 
 	pPlayer_ = std::make_shared<Player>(nowaponPlayerH, waponPlayerH, deadPlayerH, attackPlayerH, PLAYER_START_INDEX_X, PLAYER_START_INDEX_Y);
-	pField_ = std::make_shared<Field>();
+	pField_ = std::make_shared<Field>(sordH_, doorH_, coinH_);
 	pMap_ = std::make_shared<Map>(mapChipH);
 	pBackGround_ = std::make_shared<BackGround>(backGraph);
+
+	for (auto& circle : pParticle_)
+	{
+		circle = std::make_shared<Particle>();
+	}
 
 	for (auto& enemy : pEnemy_)
 	{
@@ -139,8 +150,6 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 
 	PlayMusic("Data/sound/BGM/game.mp3", DX_PLAYTYPE_LOOP);
 	SetVolumeMusic(0);
-
-	coinPos_.y = 0.0f;
 }
 
 GameplayingScene::~GameplayingScene()
@@ -166,8 +175,6 @@ void GameplayingScene::FadeInUpdate(const InputState& input)
 		fadeValue_ = 0;
 
 		preparTimer_ = 120;
-
-	//	SoundManager::GetInstance().Play("gameStart");
 
 		updateFunc_ = &GameplayingScene::PrepareUpdate;
 	}
@@ -286,6 +293,14 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 		// BGMを止める
 		StopMusic();
 		pPlayer_->StopMusic();
+		
+		/*for (auto& enemy : pEnemy_)
+		{
+			for (auto& circle : pParticle_)
+			{
+				circle->SetPos(enemy->GetPos());
+			}
+		}*/
 
 		// ゲームクリア演出に移行
 		updateFunc_ = &GameplayingScene::GameClearUpdate;
@@ -336,10 +351,14 @@ void GameplayingScene::Draw()
 	// プレイヤーの描画
 	pPlayer_->Draw();
 
-	for (auto coin : coin_)
+	for (auto& coin : pCoin_)
 	{
-		coinPos_.x = GetRand(Game::kScreenWidth);
-		DrawRectRotaGraph(coinPos_.x, coinPos_.y, 0, 0, 8, 8, 3.7f, 0.0f, coinH_, true);
+		coin->Draw();
+	}
+
+	for (auto& circle : pParticle_)
+	{
+		circle->Draw();
 	}
 
 	// ゲームオーバー
@@ -350,7 +369,6 @@ void GameplayingScene::Draw()
 
 		int width = (Game::kScreenWidth / 2) - (stringWidth / 2);
 		int height = (Game::kScreenHeight / 2) - (stringHeight / 2);
-
 
 		// ゲームオーバー文字の表示
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gameOverFadeValue_);
@@ -363,11 +381,19 @@ void GameplayingScene::Draw()
 	// ゲームクリア
 	if (isGameClear_)
 	{
-		int width = GetDrawStringWidthToHandle(GAMECLEAR_STRING, strlen(GAMECLEAR_STRING), gameOverH_);
+		int stringWidth = GetDrawStringWidthToHandle(GAMECLEAR_STRING, strlen(GAMECLEAR_STRING), gameClearH_);
+		int stringHeight = GetFontSizeToHandle(gameClearH_);
+
+		int width = (Game::kScreenWidth / 2) - (stringWidth / 2);
+		int height = (Game::kScreenHeight / 2) - (stringHeight / 2);
 
 		// ゲームクリア文字の表示
-		DrawStringToHandle((Game::kScreenWidth / 2) - (width / 2), Game::kScreenHeight / 2 + 40,
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gameClearFadeValue_);
+		DrawStringToHandle(width - 3, height,
+			GAMECLEAR_STRING, 0x000000, gameClearShadowH_, false);
+		DrawStringToHandle(width, height,
 			GAMECLEAR_STRING, 0xffffff, gameClearH_, false);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 	if (preparTimer_ > 0)
 	{
@@ -401,10 +427,20 @@ void GameplayingScene::Draw()
 
 void GameplayingScene::GameClearUpdate(const InputState& input)
 {
-	coinPos_.y++;
-	if (gameClearTimer_ % 10 == 0)
+	/*for (auto& circle : pParticle_)
 	{
-		coin_.push_back(1);
+		circle->Update();
+	}*/
+
+	if (gameClearTimer_ % 1 == 0)
+	{
+		pCoin_.push_back(std::make_shared<Coin>(coinH_));
+		pCoin_.push_back(std::make_shared<Coin>(coinH_));
+	}
+	
+	for (auto& coin : pCoin_)
+	{
+		coin->Update();
 	}
 
 	gameClearTimer_++;
@@ -422,10 +458,16 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 	if (isGameClear_)
 	{
 		gameClearTimer_ -= 2;
-		if (gameClearTimer_ <= 0)
+		gameClearFadeValue_ = 255 * (static_cast<float>(gameClearFadeTimer_)) / static_cast<float>(game_clear_fade_interval);
+
+		if (++gameClearFadeTimer_ >= 255)
 		{
-			updateFunc_ = &GameplayingScene::FadeOutUpdate;
-			gameClearTimer_ = 0;
+			gameClearFadeValue_ = 255;
+			if (gameClearTimer_ <= 0)
+			{
+				updateFunc_ = &GameplayingScene::FadeOutUpdate;
+				gameClearTimer_ = 0;
+			}
 		}
 	}
 }

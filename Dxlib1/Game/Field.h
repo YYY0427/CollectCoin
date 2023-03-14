@@ -22,10 +22,10 @@ public:
 	static constexpr int DISPLAY_POS_Y = 100;
 
 	// コンストラクタ
-	Field();
+	Field(int sordH, int doorH, int coinH);
 	 
 	// デストラクタ
-	virtual ~Field(){}
+	virtual ~Field();
 
 	void Init();
 

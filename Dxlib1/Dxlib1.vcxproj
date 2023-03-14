@@ -151,12 +151,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\Coin.cpp" />
     <ClCompile Include="Game\BackGround.cpp" />
     <ClCompile Include="Game\Slime.cpp" />
     <ClCompile Include="Game\Golem.cpp" />
     <ClCompile Include="Game\Ghost.cpp" />
     <ClCompile Include="Game\Map.cpp" />
-    <ClCompile Include="Scene\GameclearScene.cpp" />
     <ClCompile Include="Game\Skeleton.cpp" />
     <ClCompile Include="DrawFunctions.cpp" />
     <ClCompile Include="Game\EnemyBase.cpp" />
@@ -165,7 +165,7 @@
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="InputState.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Scene\GameoverScene.cpp" />
+    <ClCompile Include="Particle.cpp" />
     <ClCompile Include="Scene\GameplayingScene.cpp" />
     <ClCompile Include="Scene\OptionScene.cpp" />
     <ClCompile Include="Scene\PauseScene.cpp" />
@@ -176,11 +176,13 @@
     <ClCompile Include="vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game\Coin.h" />
     <ClInclude Include="Game\BackGround.h" />
     <ClInclude Include="Game\Slime.h" />
     <ClInclude Include="Game\Golem.h" />
     <ClInclude Include="Game\Ghost.h" />
     <ClInclude Include="Game\Map.h" />
+    <ClInclude Include="Particle.h" />
     <ClInclude Include="Scene\GameclearScene.h" />
     <ClInclude Include="Game\Skeleton.h" />
     <ClInclude Include="DrawFunctions.h" />
