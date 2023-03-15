@@ -59,7 +59,7 @@ namespace
 
 void TitleScene::FadeInUpdate(const InputState& input)
 {
-	SetVolumeMusic(static_cast<int>(255.0f / 60.0f * static_cast<float>(60 - fadeTimer_)));
+	SetVolumeMusic(static_cast<int>(255.0f / 60.0f * static_cast<float>(60 - fadeTimer_)) * (static_cast<float>(SoundManager::GetInstance().GetBGMVolume() / 255.0f)));
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(FAIDE_INTERVAL));
 	if (--fadeTimer_ == 0)
 	{
@@ -118,7 +118,7 @@ void TitleScene::NormalUpdate(const InputState& input)
 		if (input.IsTriggered(InputType::down))
 		{
 			SoundManager::GetInstance().Play("cursor");
-			currentInputIndex_ = option;
+			currentInputIndex_ = tutorial;
 		}
 	}
 	else if (currentInputIndex_ == option)
@@ -134,6 +134,7 @@ void TitleScene::NormalUpdate(const InputState& input)
 
 		cursor4Pos_.x = pw_start_x_2;
 		cursor4Pos_.y = pw_start_y_2 + pw_height_2;
+
 		if (input.IsTriggered(InputType::up))
 		{
 			SoundManager::GetInstance().Play("cursor");
@@ -158,6 +159,7 @@ void TitleScene::NormalUpdate(const InputState& input)
 
 		cursor4Pos_.x = pw_start_x_3;
 		cursor4Pos_.y = pw_start_y_3 + pw_height_3;
+
 		if (input.IsTriggered(InputType::up))
 		{
 			SoundManager::GetInstance().Play("cursor");
@@ -187,6 +189,7 @@ void TitleScene::NormalUpdate(const InputState& input)
 
 		cursor4Pos_.x = pw_start_x_4;
 		cursor4Pos_.y = pw_start_y_4 + pw_height_4;
+
 		if (input.IsTriggered(InputType::up))
 		{
 			SoundManager::GetInstance().Play("cursor");
@@ -229,7 +232,7 @@ void TitleScene::FadeOutUpdate(const InputState& input)
 {
 	fadeTimer_++;
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(FAIDE_INTERVAL));
-	SetVolumeMusic(255 - fadeValue_);
+	SetVolumeMusic(static_cast<float>((std::max)(SoundManager::GetInstance().GetBGMVolume() - fadeValue_, 0)));
 	if (fadeTimer_ == FAIDE_INTERVAL && decisionIndex_ == start)
 	{
 		StopMusic();
@@ -270,6 +273,11 @@ TitleScene::TitleScene(SceneManager& manager) :
 	cursor2H_ = my::MyLoadGraph("Data/img/game/cursor2.png");
 	cursor3H_ = my::MyLoadGraph("Data/img/game/cursor3.png");
 	cursor4H_ = my::MyLoadGraph("Data/img/game/cursor4.png");
+	playH_ = my::MyLoadGraph("Data/img/play.png");
+	settingH_ = my::MyLoadGraph("Data/img/setting.png");
+	questionH_ = my::MyLoadGraph("Data/img/question.png");
+	doorH_ = my::MyLoadGraph("Data/img/door.png");
+
 	int backGraph = my::MyLoadGraph("Data/img/game/Gray.png");
 
 	normalSelectionH_ = CreateFontToHandle("PixelMplus10", 30, 0);
@@ -289,7 +297,7 @@ TitleScene::TitleScene(SceneManager& manager) :
 	playerH_ = nowaponPlayerH_;
 
 	SetVolumeMusic(0);
-	PlayMusic("Data/sound/BGM/titleBgm.mp3", DX_PLAYTYPE_LOOP);
+	SoundManager::GetInstance().PlayMusic("Data/sound/BGM/titleBgm.mp3");
 }
 
 TitleScene::~TitleScene()
@@ -337,11 +345,16 @@ void TitleScene::Draw()
 	DrawRoundRect(pw_start_x_3, pw_start_y_3, pw_start_x_3 + pw_width_3, pw_start_y_3 + pw_height_3 - 5, 5, 5, 0xffffff, true);
 	DrawRoundRect(pw_start_x_4, pw_start_y_4, pw_start_x_4 + pw_width_4, pw_start_y_4 + pw_height_4 - 5, 5, 5, 0xffffff, true);
 
+	// アイコン
+	DrawRotaGraph(Game::kScreenWidth / 2, Game::kScreenHeight / 2 + 150, 1.0f, 0.0f, playH_, true);
+	DrawRotaGraph(Game::kScreenWidth / 2 - 140, Game::kScreenHeight / 2 + 265, 1.0f, 0.0f, settingH_, true);
+	DrawRotaGraph(Game::kScreenWidth / 2, Game::kScreenHeight / 2 + 265, 1.0f, 0.0f, questionH_, true);
+	DrawRotaGraph(Game::kScreenWidth / 2 + 140, Game::kScreenHeight / 2 + 265, 1.0f, 0.0f, doorH_, true);
+
 	// カーソル
 	DrawRotaGraph(cursor1Pos_.x, cursor1Pos_.y, 0.2f, 0.0f, cursor1H_, true);
 	DrawRotaGraph(cursor2Pos_.x, cursor2Pos_.y, 0.2f, 0.0f, cursor2H_, true);
 	DrawRotaGraph(cursor3Pos_.x, cursor3Pos_.y, 0.2f, 0.0f, cursor3H_, true);
-	DrawRotaGraph(cursor4Pos_.x, cursor4Pos_.y, 0.2f, 0.0f, cursor4H_, true);
 
 	// A けってい
 	DrawRectRotaGraph(Game::kScreenWidth / 2 + 570, Game::kScreenHeight - 30, 0, 0, 16, 16, 2.0f, 0.0f, controller_, true);

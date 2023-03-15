@@ -8,6 +8,9 @@
 class SoundManager
 {
 private:
+	int volumeSE_ = 255;
+	int volumeBGM_ = 255;
+
 	std::unordered_map<std::string, int> nameAndHandleTable_;
 	int LoadSoundFile(const char* fileName, const char* ext);
 	SoundManager();
@@ -34,7 +37,23 @@ public:
 	/// 指定のサウンドを鳴らす
 	/// </summary>
 	/// <param name="name">サウンド名</param>
-	void Play(const char* name);
+	void Play(const char* name);		// SE
+	void PlayMusic(const char* path);	// BGM
+	void PlayJingle(const char* path);	// ジングル(プレイヤー死亡、ゲームクリア、ゲームオーバーの音)
+
+	/// <summary>
+	/// SEのボリュームを設定する
+	/// </summary>
+	/// <param name="volume"></param>
+	void SetSEVolume(int volume);
+	int GetSEVolume() const;
+
+	/// <summary>
+	/// BGMのボリュームを設定する
+	/// </summary>
+	/// <param name="volume"></param>
+	void SetBGMVolume(int volume);
+	int GetBGMVolume() const;
 
 	/// <summary>
 	/// 指定のサウンドが再生中かチェック

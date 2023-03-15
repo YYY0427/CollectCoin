@@ -54,6 +54,10 @@ private:
 	int cursor2H_;
 	int cursor3H_;
 	int cursor4H_;
+	int playH_;
+	int settingH_;
+	int questionH_;
+	int doorH_;
 
 	// 画像インデックス
 	int playerImgIdx_;

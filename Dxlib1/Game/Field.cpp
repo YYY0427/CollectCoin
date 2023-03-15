@@ -117,7 +117,7 @@ Field::Field(int sordH, int doorH, int coinH) :
 	{
 		for (int x = 0; x < Field::MAP_WIDTH; x++)
 		{
-			mapData_[y][x] = mapData1[y][x];
+			mapData_[y][x] = mapData[y][x];
 		}
 	}
 }
@@ -269,7 +269,6 @@ bool Field::IsFeed(int y, int x)
 	if (mapData_[y][x] == 1)
 	{
 		coin_++;
-		SoundManager::GetInstance().ChangeVolume("coin", 150);
 		SoundManager::GetInstance().Play("coin");
 		mapData_[y][x] = 0;
 		return true;

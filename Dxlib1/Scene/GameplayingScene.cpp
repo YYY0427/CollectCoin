@@ -148,7 +148,7 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 		pField_->SetEnemy(pEnemy_[i], i);
 	}
 
-	PlayMusic("Data/sound/BGM/game.mp3", DX_PLAYTYPE_LOOP);
+	SoundManager::GetInstance().PlayMusic("Data/sound/BGM/game.mp3");
 	SetVolumeMusic(0);
 }
 
@@ -165,8 +165,7 @@ void GameplayingScene::FadeInUpdate(const InputState& input)
 	}
 
 	pPlayer_->SetEnabled(false);
-
-	SetVolumeMusic(static_cast<int>(255.0f / 60.0f * static_cast<float>(60 - fadeTimer_)));
+	SetVolumeMusic(static_cast<int>(255.0f / 60.0f * static_cast<float>(60 - fadeTimer_)) * (static_cast<float>(SoundManager::GetInstance().GetBGMVolume() / 255.0f)));
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_)) / static_cast<float>(fade_interval);
 	if (--fadeTimer_ == 0)
 	{
@@ -293,14 +292,6 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 		// BGMを止める
 		StopMusic();
 		pPlayer_->StopMusic();
-		
-		/*for (auto& enemy : pEnemy_)
-		{
-			for (auto& circle : pParticle_)
-			{
-				circle->SetPos(enemy->GetPos());
-			}
-		}*/
 
 		// ゲームクリア演出に移行
 		updateFunc_ = &GameplayingScene::GameClearUpdate;
@@ -446,9 +437,9 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 	gameClearTimer_++;
 	if (gameClearTimer_ == 60 && !isGameClear_)
 	{
-		SoundManager::GetInstance().Play("gameClear");
+		SoundManager::GetInstance().PlayJingle("Data/sound/BGM/gameClear.ogg");
 	}
-	else if (gameClearTimer_ > 120 && !SoundManager::GetInstance().Check("gameClear"))
+	else if (gameClearTimer_ > 120 && !CheckMusic())
 	{
 		isGameClear_ = true;
 		gameClearTimer_ = 120;
@@ -503,11 +494,11 @@ void GameplayingScene::GameOverUpdate(const InputState& input)
 
 			if (playerDeadSound_)
 			{
-				SoundManager::GetInstance().Play("gameOver");
+				SoundManager::GetInstance().PlayJingle("Data/sound/BGM/gameOver.wav");
 				playerDeadSound_ = false;
 			}
 		}
-		else if (pPlayer_->GetAnimeEnd() && !SoundManager::GetInstance().Check("gameOver"))
+		else if (pPlayer_->GetAnimeEnd() && !CheckMusic())
 		{
 			isGameOver_ = true;
 		}
@@ -550,7 +541,7 @@ void GameplayingScene::PlayerDeadUpdate(const InputState& input)
 		
 		if (playerDeadSound_)
 		{
-			SoundManager::GetInstance().Play("playerDead");
+			SoundManager::GetInstance().PlayJingle("Data/sound/BGM/playerDead.wav");
 			playerDeadSound_ = false;
 		}
 
@@ -560,7 +551,7 @@ void GameplayingScene::PlayerDeadUpdate(const InputState& input)
 		}
 	}
 
-	if (pPlayer_->GetAnimeEnd() && !SoundManager::GetInstance().Check("playerDead"))
+	if (pPlayer_->GetAnimeEnd() && !CheckMusic())
 	{
 		updateFunc_ = &GameplayingScene::FadeOutUpdate;
 	}
@@ -570,7 +561,7 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 {
 	fadeTimer_++;
 	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
-	SetVolumeMusic(255 - fadeValue_);
+	SetVolumeMusic(static_cast<float>((std::max)(SoundManager::GetInstance().GetBGMVolume() - fadeValue_, 0)));
 
 	// ゲームオーバー
 	if (fadeTimer_ > fade_interval && isGameOver_)
@@ -601,7 +592,7 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 		SetInit();
 
 		SetVolumeMusic(0);
-		PlayMusic("Data/sound/BGM/game.mp3", DX_PLAYTYPE_LOOP);
+		SoundManager::GetInstance().PlayMusic("Data/sound/BGM/game.mp3");
 
 		pPlayer_->StartMusic();
 

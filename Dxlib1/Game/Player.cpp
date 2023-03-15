@@ -59,7 +59,7 @@ Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int 
 	soundMin_(false),
 	vec_(0.0f, 0.0f)
 {
-	normalBgmVolume_ = 255;
+	normalBgmVolume_ = SoundManager::GetInstance().GetBGMVolume();
 	powerUpBgmVolume_ = 0;
 
 	indexX_ = indexX;
@@ -339,11 +339,6 @@ void Player::ClearUpdate()
 	
 	vec_.y += GRAVITY;
 
-	/*if (vec_.y > 0)
-	{
-		vec_.x += QUAKE;
-	}*/
-
 	pos_ += vec_;
 
 	if (pos_.y > pos.y)
@@ -417,7 +412,7 @@ void Player::SpeedCalculation()
 		// 新しいBGMを徐々に大きくしていく
 		ChangeVolumeSoundMem(powerUpBgmVolume_, powerUpBgmH_);
 		powerUpBgmVolume_ += 2;
-		powerUpBgmVolume_ = (std::min)(powerUpBgmVolume_, 255);
+		powerUpBgmVolume_ = (std::min)(powerUpBgmVolume_, SoundManager::GetInstance().GetBGMVolume());
 
 		// タイマーを開始
 		powerFeedTimer_++;
@@ -467,7 +462,7 @@ void Player::SpeedCalculation()
 	}
 	else if(soundMin_ && !isPowerFeed_)
 	{
-		if (normalBgmVolume_ >= 255 && powerUpBgmVolume_ <= 0)
+		if (normalBgmVolume_ >= SoundManager::GetInstance().GetBGMVolume() && powerUpBgmVolume_ <= 0)
 		{
 			soundMin_ = false;
 		}
@@ -475,7 +470,7 @@ void Player::SpeedCalculation()
 		// もともと流れていたBGMを大きくしていく
 		SetVolumeMusic(normalBgmVolume_);
 		normalBgmVolume_ += 2;
-		normalBgmVolume_ = (std::min)(normalBgmVolume_, 255);
+		normalBgmVolume_ = (std::min)(normalBgmVolume_, SoundManager::GetInstance().GetBGMVolume());
 
 		// 新しいBGMを徐々に小さくしていく
 		ChangeVolumeSoundMem(powerUpBgmVolume_, powerUpBgmH_);

@@ -13,7 +13,19 @@ public:
 	void Update(const InputState& input);
 	void Draw();
 private: 
-	int handle_;
+	int controllerH_;
+	int optionH_;
 	int teachH_;
+	int noteH_;
+	int speakerH_;
+	int bigH_;
+	int midleH_;
+	int noneH_;
+	int cursor1H_;
+	int cursor2H_;
+	int cursor3H_;
+	int cursor4H_;
+
+	int currentInputIndex_;
 };
 
