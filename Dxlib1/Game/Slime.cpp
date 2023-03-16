@@ -25,11 +25,12 @@ namespace
 	constexpr int STARET_MOVE_INTEVAL = 60 * 8;
 }
 
-Slime::Slime(int handle, int indexX, int indexY)
+Slime::Slime(int handle, int indexX, int indexY, int stage)
 {
 	handle_ = handle;
 	indexX_ = indexX;
 	indexY_ = indexY;
+	stage_ = stage;
 }
 
 void Slime::Update()
@@ -37,7 +38,7 @@ void Slime::Update()
 	// 死んだ場合初期化
 	if (isDead_)
 	{
-		SetDeadInit();
+		SetDeadInit(stage_);
 
 		// 敵が死んでいる状態で指定の位置に存在する場合にイジケ状態を解除
 		if (indexX_ == 10 && indexY_ == 10)
@@ -87,7 +88,7 @@ void Slime::Update()
 			};
 		}
 
-		moveDirection_ = pField_->InkyMove(indexY_, indexX_, isIntrusion_);
+		moveDirection_ = pField_->SlimeMove(indexY_, indexX_, isIntrusion_);
 
 		moveTimer_ = 0;
 	}
@@ -137,7 +138,7 @@ void Slime::Draw()
 	}
 }
 
-void Slime::SetInit()
+void Slime::SetInit(int stage)
 {
 	indexX_ = 8;
 	indexY_ = 10;

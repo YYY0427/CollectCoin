@@ -5,8 +5,30 @@
 
 namespace 
 {
-	//マップデータ
-	constexpr int mapData_[Field::MAP_HEIGHT][Field::MAP_WIDTH] =
+	// チュートリアル
+	constexpr int TUTORIAL_HEIGHT = 10;
+	constexpr int TUTORIAL_WIDTH = 10;
+
+	constexpr int mapDataTutorial[TUTORIAL_HEIGHT][TUTORIAL_WIDTH] =
+	{
+		{24,0,0,0,0,0,0,0,0,16},
+		{24,8,8,8,8,8,8,8,8,16},
+		{24,8,8,8,8,8,8,8,8,16},
+		{24,8,14,14,14,14,14,14,8,16},
+		{0,8,22,22,22,22,22,22,8,0},
+		{20,21,8,8,8,8,8,8,28,29},
+		{2,8,14,14,14,14,14,14,8,1},
+		{24,8,22,22,22,22,22,22,8,16},
+		{24,8,8,8,8,8,8,8,8,16},
+		{24,0,0,0,0,0,0,0,0,16},
+
+	};
+
+	// ステージ１
+	constexpr int STAGE_1_HEIGHT = 22;
+	constexpr int STAGE_1_WIDTH = 19;
+
+	constexpr int mapDataStage1[STAGE_1_HEIGHT][STAGE_1_WIDTH] =
 	{
 		{ 24,  0,  0,  0, 0, 0, 0, 0, 0, 7, 0,  0, 0, 0, 0,  0,  0,  0, 16 },
 		{ 24,  8,  8,  8, 8, 8, 8, 8, 8, 7, 8,  8, 8, 8, 8,  8,  8,  8, 16 },
@@ -36,15 +58,56 @@ namespace
 	constexpr int SCALE = 2.0f;
 }
 
-Map::Map(int handle) :
+Map::Map(int handle, int stage) :
 	handle_(handle),
 	graphWidth_(0),
 	graphHeight_(0)
 {
+	StageCheck(stage);
+	mapData_.resize(mapHeight_, std::vector<int>(mapWidth_));
+	StageCheck2(stage);
 	GetGraphSize(handle_, &graphWidth_, &graphHeight_);
 }
 
-void Map::Draw() 
+void Map::StageCheck(int stage)
+{
+	switch (stage)
+	{
+	case 0:
+		mapHeight_ = TUTORIAL_HEIGHT;
+		mapWidth_ = TUTORIAL_WIDTH;
+		break;
+	case 1:
+		mapHeight_ = STAGE_1_HEIGHT;
+		mapWidth_ = STAGE_1_WIDTH;
+	}
+}
+
+void Map::StageCheck2(int stage)
+{
+	switch (stage)
+	{
+	case 0:
+		for (int y = 0; y < mapHeight_; y++)
+		{
+			for (int x = 0; x < mapWidth_; x++)
+			{
+				mapData_[y][x] = mapDataTutorial[y][x];
+			}
+		}
+		break;
+	case 1:
+		for (int y = 0; y < mapHeight_; y++)
+		{
+			for (int x = 0; x < mapWidth_; x++)
+			{
+				mapData_[y][x] = mapDataStage1[y][x];
+			}
+		}
+	}
+}
+
+void Map::Draw()
 {
 	for (int y = -1; y <= 1; y++)
 	{
@@ -57,9 +120,9 @@ void Map::Draw()
 
 void Map::DrawMap() 
 {
-	for (int y = 0; y < Field::MAP_HEIGHT; y++) 
+	for (int y = 0; y < pField_->GetMapDataY(); y++)
 	{
-		for (int x = 0; x < Field::MAP_WIDTH; x++) 
+		for (int x = 0; x < pField_->GetMapDataX(); x++)
 		{
 
 			const int chipNo = mapData_[y][x];

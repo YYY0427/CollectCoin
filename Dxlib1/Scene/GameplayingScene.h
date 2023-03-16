@@ -6,8 +6,8 @@
 #include <array>	
 #include <vector>
 
-//プロトタイプ宣言
-class Player;	//プレイヤークラス
+// プロトタイプ宣言
+class Player;	
 class Field;	
 class EnemyBase;
 class Map;
@@ -33,12 +33,25 @@ public:
 
 	bool Colision(std::shared_ptr<EnemyBase>enemy, int width, int height);
 
+	void StageCheck(int stage);
+
 private:
+	enum
+	{
+		tutorial,	// チュートリアル
+		stage1,		// ステージ１
+	};
+
+	// ステージ
+	int stage_;
+
+	int enemyNum_;
+
 	//プレイヤー
 	std::shared_ptr<Player> pPlayer_;
 
 	// 敵
-	std::array<std::shared_ptr<EnemyBase>, EnemyBase::enemy_num> pEnemy_;
+	std::vector<std::shared_ptr<EnemyBase>> pEnemy_;
 
 	//フィールド
 	std::shared_ptr<Field> pField_;
@@ -88,6 +101,17 @@ private:
 	// 画像のハンドル
 	int lifeH_;
 	int coinH_;
+
+	int playerStartPosX_;
+	int playerStartPosY_;
+	int skeletonStartPosX_;
+	int skeletonStartPosY_;
+	int slimeStartPosX_;
+	int slimeStartPosY_;
+	int ghostStartPosX_;
+	int ghostStartPosY_;
+	int golemStartPosX_;
+	int golemStartPosY_;
 
 	// ゲームオーバーか
 	bool isGameOver_;

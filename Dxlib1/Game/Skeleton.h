@@ -27,7 +27,7 @@ public:
 	// アニメーション枚数
 	static constexpr int ANIME_FRAME_NUM = 4;
 
-	Skeleton(int handle, int indexX, int indexY);
+	Skeleton(int handle, int indexX, int indexY, int stage);
 	virtual ~Skeleton(){}
 
 	/// <summary>
@@ -37,6 +37,6 @@ public:
 
 	virtual void Draw()override;
 
-	virtual void SetInit()override;
+	virtual void SetInit(int stage)override;
 private:
 };

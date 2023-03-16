@@ -15,7 +15,29 @@ namespace
 	// 3 : 剣 
 	// 7 : 扉(中からは出れて、外からは入れない)
 
-	constexpr int mapData[Field::MAP_HEIGHT][Field::MAP_WIDTH] =
+	// チュートリアル
+	constexpr int TUTORIAL_HEIGHT = 10;
+	constexpr int TUTORIAL_WIDTH = 10;
+
+	constexpr int mapDataTutorial[TUTORIAL_HEIGHT][TUTORIAL_WIDTH] =
+	{
+		{  2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
+		{  2, 3, 0, 0, 1, 1, 0, 0, 3, 2 },
+		{  2, 0, 0, 0, 0, 0, 0, 0, 0, 2 },
+		{  2, 0, 2, 2, 2, 2, 2, 2, 0, 2 },
+		{  2, 0, 2, 2, 2, 2, 2, 2, 0, 2 },
+		{  0, 0, 1, 1, 1, 1, 1, 1, 0, 0 },
+		{  2, 0, 2, 2, 2, 2, 2, 2, 0, 2 },
+		{  2, 0, 2, 2, 2, 2, 2, 2, 0, 2 },
+		{  2, 3, 0, 0, 1, 1, 0, 0, 3, 2 },
+		{  2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
+	};
+
+	// ステージ1 
+	constexpr int STAGE_1_HEIGHT = 22;
+	constexpr int STAGE_1_WIDTH = 19;
+
+	constexpr int mapDataStage1[STAGE_1_HEIGHT][STAGE_1_WIDTH] =
 	{
 		{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
 		{ 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2 },
@@ -42,7 +64,7 @@ namespace
 	};
 
 	// デバック用
-	constexpr int mapData1[Field::MAP_HEIGHT][Field::MAP_WIDTH] =
+	constexpr int mapDataDebug[STAGE_1_HEIGHT][STAGE_1_WIDTH] =
 	{
 		{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
 		{ 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2 },
@@ -68,58 +90,42 @@ namespace
 		{ 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
 	};
 
-
 	// 点滅スピード
 	constexpr int FLASH_SPEED = 20;
 
-	// アニメーション
+	// コインのアニメーション
 	constexpr int COIN_FRAME_NUM = 4;		
 	constexpr int COIN_FRAME_SPEED = 15;
 
+	// ドアのアニメーション
 	constexpr int DOOR_FRAME_NUM = 4;
 	constexpr int DOOR_FRAME_SPEED = 50;
 }
 
-Field::Field(int sordH, int doorH, int coinH) :
+Field::Field(int sordH, int doorH, int coinH, int stage) :
 	sordH_(sordH),
 	doorH_(doorH),
 	coinH_(coinH),
 	coinImgIdx_(0),
 	doorImgIdx_(0),
-	coin_(0),
+	getCoinNum_(0),
+	
 	isDraw_(true),
 	closeDoor_(false),
 	openDoor_(false)
 {
-	pinkyGoalX_ = 1;
-	pinkyGoalY_ = 1;
+	StageCheck(stage);
+	// ステージによって配列のサイズの変更
+	mapData_.resize(mapHeight_, std::vector<int>(mapWidth_));
+	enemyTargetMapData_.resize(mapHeight_, std::vector<int>(mapWidth_));
+	StageCheck2(stage);
 
-	blinkyGoalX_ = 17;
-	blinkyGoalY_ = 1;
+	// コインの合計枚数の取得
+	coinTotalNum_ = LestCoin();
 
-	inkyGoalX_ = 1;
-	inkyGoalY_ = 20;
-
-	crydeGoalY_ = 20;
-	crydeGoalX_ = 17;
+	stage_ = stage;
 
 	stringH_ = CreateFontToHandle("PixelMplus10", 30, 10);
-
-	for (int y = 0; y < Field::MAP_HEIGHT; y++)
-	{
-		for (int x = 0; x < Field::MAP_WIDTH; x++)
-		{
-			mapData2_[y][x] = 0;
-		}
-	}
-
-	for (int y = 0; y < Field::MAP_HEIGHT; y++)
-	{
-		for (int x = 0; x < Field::MAP_WIDTH; x++)
-		{
-			mapData_[y][x] = mapData[y][x];
-		}
-	}
 }
 
 Field::~Field()
@@ -142,6 +148,58 @@ void Field::Init()
 	crydeGoalX_ = 17;
 
 	isDraw_ = true;
+}
+
+void Field::StageCheck(int stage)
+{
+	switch (stage)
+	{
+	case 0:
+		pEnemy_.resize(1);
+		mapHeight_ = TUTORIAL_HEIGHT;
+		mapWidth_ = TUTORIAL_WIDTH;
+		blinkyGoalX_ = 5;
+		blinkyGoalY_ = 2;
+		break;
+	case 1:
+		pEnemy_.resize(4);
+		mapHeight_ = STAGE_1_HEIGHT;
+		mapWidth_ = STAGE_1_WIDTH;
+		pinkyGoalX_ = 1;
+		pinkyGoalY_ = 1;
+		blinkyGoalX_ = 17;
+		blinkyGoalY_ = 1;
+		inkyGoalX_ = 1;
+		inkyGoalY_ = 20;
+		crydeGoalY_ = 20;
+		crydeGoalX_ = 17;
+		break;
+	}
+}
+
+void Field::StageCheck2(int stage)
+{
+	switch (stage)
+	{
+	case 0:
+		for (int y = 0; y < mapHeight_; y++)
+		{
+			for (int x = 0; x < mapWidth_; x++)
+			{
+				mapData_[y][x] = mapDataTutorial[y][x];
+			}
+		}
+		break;
+	case 1:
+		for (int y = 0; y < mapHeight_; y++)
+		{
+			for (int x = 0; x < mapWidth_; x++)
+			{
+				mapData_[y][x] = mapDataStage1[y][x];
+			}
+		}
+		break;
+	}
 }
 
 void Field::Updata()
@@ -179,9 +237,9 @@ void Field::Updata()
 
 void Field::Draw()
 {
-	for (int y = 0; y < MAP_HEIGHT; y++)
+	for (int y = 0; y < mapHeight_; y++)
 	{
-		for (int x = 0; x < MAP_WIDTH; x++)
+		for (int x = 0; x < mapWidth_; x++)
 		{
 			// コインの描画
 			if (mapData_[y][x] == 1)
@@ -214,22 +272,22 @@ void Field::Draw()
 		}
 	}
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
-	DrawFormatStringToHandle(Game::kScreenWidth / 2 - 225 + 2, Game::kScreenHeight - 50 + 2, 0x000000, stringH_, "%d / %d\n", coin_, LestCoin(), true);
+	DrawFormatStringToHandle(Game::kScreenWidth / 2 - 225 + 2, Game::kScreenHeight - 50 + 2, 0x000000, stringH_, "%d / %d\n", getCoinNum_, coinTotalNum_, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	// 残りのコインの枚数
 	DrawRectRotaGraph(Game::kScreenWidth / 2 - 260, Game::kScreenHeight - 35, 0, 0, 8, 8, 3.7f, 0.0f, coinH_, true);
-	DrawFormatStringToHandle(Game::kScreenWidth / 2 - 225, Game::kScreenHeight - 50, 0xffffff, stringH_, "%d / %d\n", coin_, LestCoin());
+	DrawFormatStringToHandle(Game::kScreenWidth / 2 - 225, Game::kScreenHeight - 50, 0xffffff, stringH_, "%d / %d\n", getCoinNum_, coinTotalNum_);
 }
 
 int Field::LestCoin()
 {
 	int coin = 0;
-	for (int y = 0; y < MAP_HEIGHT; y++)
+	for (int y = 0; y < mapHeight_; y++)
 	{
-		for (int x = 0; x < MAP_WIDTH; x++)
+		for (int x = 0; x < mapWidth_; x++)
 		{
-			if (mapData[y][x] == 1)
+			if (mapData_[y][x] == 1)
 			{
 				coin++;
 			}
@@ -241,9 +299,9 @@ int Field::LestCoin()
 // ゲームクリア判定
 bool Field::IsGameClearCheck()
 {
-	for (int y = 0; y < MAP_HEIGHT; y++)
+	for (int y = 0; y < mapHeight_; y++)
 	{
-		for (int x = 0; x < MAP_WIDTH; x++)
+		for (int x = 0; x < mapWidth_; x++)
 		{
 			if (mapData_[y][x] == 1)
 			{
@@ -257,21 +315,26 @@ bool Field::IsGameClearCheck()
 // ブロックがあるかどうか
 bool Field::IsBlock(int y, int x)
 {
-	if (mapData_[y][x] == 2)	
-		return true;
-	
+	if (x >= 0 && y >= 0 && x < mapWidth_ && y < mapHeight_)
+	{
+		if (mapData_[y][x] == 2)
+			return true;
+	}
 	return false;
 }
 
 // コインがあるかどうか
 bool Field::IsFeed(int y, int x)
 {
-	if (mapData_[y][x] == 1)
+	if (x >= 0 && y >= 0 && x < mapWidth_ && y < mapHeight_)
 	{
-		coin_++;
-		SoundManager::GetInstance().Play("coin");
-		mapData_[y][x] = 0;
-		return true;
+		if (mapData_[y][x] == 1)
+		{
+			getCoinNum_++;
+			SoundManager::GetInstance().Play("coin");
+			mapData_[y][x] = 0;
+			return true;
+		}
 	}
 
 	return false;
@@ -280,41 +343,62 @@ bool Field::IsFeed(int y, int x)
 // 剣があるかどうか
 bool Field::IsPowerFeed(int y, int x)
 {
-	if (mapData_[y][x] == 3)
+	if (x >= 0 && y >= 0 && x < mapWidth_ && y < mapHeight_)
 	{
-		SoundManager::GetInstance().Play("powerUp");
-		mapData_[y][x] = 0;
-		return true;
+		if (mapData_[y][x] == 3)
+		{
+			SoundManager::GetInstance().Play("powerUp");
+			mapData_[y][x] = 0;
+			return true;
+		}
 	}
 	return false;
 }
 
 int  Field::Warp(int ky, int kx, int indexY, int indexX)
 {
-	//前の座標が特定の位置かつ現在の座標が特定の位置ならワープ
-	if (ky == 10 && kx == 1 && indexY == 10 && indexX == 0)
+	if (stage_ == 0)
 	{
-		SoundManager::GetInstance().Play("warp");
-		indexX = 18;
-		
+		//前の座標が特定の位置かつ現在の座標が特定の位置ならワープ
+		if (ky == 5 && kx == 1 && indexY == 5 && indexX == 0)
+		{
+			SoundManager::GetInstance().Play("warp");
+			indexX = 9;
+
+		}
+		if (ky == 5 && kx == 8 && indexY == 5 && indexX == 9)
+		{
+			SoundManager::GetInstance().Play("warp");
+			indexX = 0;
+		}
 	}
-	if (ky == 10 && kx == 17 && indexY == 10 && indexX == 18)
+	if (stage_ == 1)
 	{
-		SoundManager::GetInstance().Play("warp");
-		indexX = 0;
+		//前の座標が特定の位置かつ現在の座標が特定の位置ならワープ
+		if (ky == 10 && kx == 1 && indexY == 10 && indexX == 0)
+		{
+			SoundManager::GetInstance().Play("warp");
+			indexX = 18;
+
+		}
+		if (ky == 10 && kx == 17 && indexY == 10 && indexX == 18)
+		{
+			SoundManager::GetInstance().Play("warp");
+			indexX = 0;
+		}
 	}
 	return (indexX);
 }
 
 void Field::MoveDataSet(int goalY, int goalX)
 {
-	for (int y = 0; y < MAP_HEIGHT; y++)
+	for (int y = 0; y < mapHeight_; y++)
 	{
-		for (int x = 0; x < MAP_WIDTH; x++)
+		for (int x = 0; x < mapWidth_; x++)
 		{
 			if (mapData_[y][x] != 2 && mapData_[y][x] != 8)
 			{
-				mapData2_[y][x] = 0;
+				enemyTargetMapData_[y][x] = 0;
 			}
 		}
 	}
@@ -326,26 +410,26 @@ void Field::Search(int y, int x, int goalY, int goalX, int pos)
 {
 	pos += 1;
 
-	if (x > 0 && y > 0 && x < MAP_WIDTH - 1 && y < MAP_HEIGHT - 1)
+	if (x > 0 && y > 0 && x < mapWidth_ - 1 && y < mapHeight_ - 1)
 	{
-		if (mapData2_[y - 1][x] == 0 || mapData2_[y - 1][x] > pos)
+		if (enemyTargetMapData_[y - 1][x] == 0 || enemyTargetMapData_[y - 1][x] > pos)
 		{
-			mapData2_[y - 1][x] = pos;
+			enemyTargetMapData_[y - 1][x] = pos;
 			Search(y - 1, x, goalY, goalX, pos);
 		}
-		if (mapData2_[y + 1][x] == 0 || mapData2_[y + 1][x] > pos)
+		if (enemyTargetMapData_[y + 1][x] == 0 || enemyTargetMapData_[y + 1][x] > pos)
 		{
-			mapData2_[y + 1][x] = pos;
+			enemyTargetMapData_[y + 1][x] = pos;
 			Search(y + 1, x, goalY, goalX, pos);
 		}
-		if (mapData2_[y][x - 1] == 0 || mapData2_[y][x - 1] > pos)
+		if (enemyTargetMapData_[y][x - 1] == 0 || enemyTargetMapData_[y][x - 1] > pos)
 		{
-			mapData2_[y][x - 1] = pos;
+			enemyTargetMapData_[y][x - 1] = pos;
 			Search(y, x - 1, goalY, goalX, pos);
 		}
-		if (mapData2_[y][x + 1] == 0 || mapData2_[y][x + 1] > pos)
+		if (enemyTargetMapData_[y][x + 1] == 0 || enemyTargetMapData_[y][x + 1] > pos)
 		{
-			mapData2_[y][x + 1] = pos;
+			enemyTargetMapData_[y][x + 1] = pos;
 			Search(y, x + 1, goalY, goalX, pos);
 		}
 
@@ -353,11 +437,11 @@ void Field::Search(int y, int x, int goalY, int goalX, int pos)
 		{
 			if (enemy->GetTracking())
 			{
-				mapData2_[pPlayer_->GetIndexY()][pPlayer_->GetIndexX()] = 0;
+				enemyTargetMapData_[pPlayer_->GetIndexY()][pPlayer_->GetIndexX()] = 0;
 			}
 			else
 			{
-				mapData2_[goalY][goalX] = 0;
+				enemyTargetMapData_[goalY][goalX] = 0;
 			}
 		}
 	}
@@ -407,24 +491,27 @@ bool Field::Intrusion(int y, int x, bool flag)
 	// flagがtrueの場合通れる
 	if (!flag)
 	{
-		if (mapData_[y][x] == 7)
+		if (x >= 0 && y >= 0 && x < mapWidth_ && y < mapHeight_)
 		{
-			// 通れない
-			return false;
+			if (mapData_[y][x] == 7)
+			{
+				// 通れない
+				return false;
+			}
 		}
 	}
 	// 通れる
 	return true;
 }
 
-int Field::BlinkyMove(int enemyIndexY, int enemyIndexX, bool flag)
+int Field::SkeletonMove(int enemyIndexY, int enemyIndexX, bool flag)
 {
 	int y = enemyIndexY;
 	int x = enemyIndexX;
 	
 	if (pEnemy_[0]->GetMove())
 	{
-		if (pEnemy_[0]->GetTracking() || pEnemy_[0]->GetIzike())
+		if (pEnemy_[0]->GetTracking() || pEnemy_[0]->GetIzike() || stage_ == 0)
 		{
 			// 追跡モード
 			MoveDataSet(pPlayer_->GetIndexY(), pPlayer_->GetIndexX());
@@ -463,38 +550,38 @@ int Field::BlinkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 
 		if (pEnemy_[0]->GetIzike() && !SpornInOrAuto(enemyIndexY, enemyIndexX))
 		{
-			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] < mapData2_[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] < mapData2_[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y, x - 1) && mapData2_[y][x] < mapData2_[y][x - 1])
+			if (!IsBlock(y, x - 1) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y][x - 1])
 			{
 				return EnemyBase::left;
 			}
-			if (!IsBlock(y, x + 1) && mapData2_[y][x] < mapData2_[y][x + 1])
+			if (!IsBlock(y, x + 1) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y][x + 1])
 			{
 				return EnemyBase::right;
 			}
 		}
 		else
 		{
-			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] > mapData2_[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] > mapData2_[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y, x - 1) && mapData2_[y][x] > mapData2_[y][x - 1])
+			if (!IsBlock(y, x - 1) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y][x - 1])
 			{
 				return EnemyBase::left;
 			}
-			if (!IsBlock(y, x + 1) && mapData2_[y][x] > mapData2_[y][x + 1])
+			if (!IsBlock(y, x + 1) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y][x + 1])
 			{
 				return EnemyBase::right;
 			}
@@ -503,7 +590,7 @@ int Field::BlinkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 	return 0;
 }
 
-int Field::PinkyMove(int enemyIndexY, int enemyIndexX, bool flag)
+int Field::GolemMove(int enemyIndexY, int enemyIndexX, bool flag)
 {
 	int y = enemyIndexY;
 	int x = enemyIndexX;
@@ -546,38 +633,38 @@ int Field::PinkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 		}
 		if (pEnemy_[3]->GetIzike() && !SpornInOrAuto(enemyIndexY, enemyIndexX))
 		{
-			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] < mapData2_[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] < mapData2_[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y, x + 1) && mapData2_[y][x] < mapData2_[y][x + 1])
+			if (!IsBlock(y, x + 1) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y][x + 1])
 			{
 				return EnemyBase::right;
 			}
-			if (!IsBlock(y, x - 1) && mapData2_[y][x] < mapData2_[y][x - 1])
+			if (!IsBlock(y, x - 1) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y][x - 1])
 			{
 				return EnemyBase::left;
 			}
 		}
 		else
 		{
-			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] > mapData2_[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] > mapData2_[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y, x + 1) && mapData2_[y][x] > mapData2_[y][x + 1])
+			if (!IsBlock(y, x + 1) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y][x + 1])
 			{
 				return EnemyBase::right;
 			}
-			if (!IsBlock(y, x - 1) && mapData2_[y][x] > mapData2_[y][x - 1])
+			if (!IsBlock(y, x - 1) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y][x - 1])
 			{
 				return EnemyBase::left;
 			}
@@ -586,7 +673,7 @@ int Field::PinkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 	return 0;
 }
 
-int Field::InkyMove(int enemyIndexY, int enemyIndexX, bool flag)
+int Field::SlimeMove(int enemyIndexY, int enemyIndexX, bool flag)
 {
 	int y = enemyIndexY;
 	int x = enemyIndexX;
@@ -651,38 +738,38 @@ int Field::InkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 
 		if (pEnemy_[1]->GetIzike() && !SpornInOrAuto(enemyIndexY, enemyIndexX))
 		{
-			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] < mapData2_[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] < mapData2_[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y, x - 1) && mapData2_[y][x] < mapData2_[y][x - 1])
+			if (!IsBlock(y, x - 1) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y][x - 1])
 			{
 				return EnemyBase::left;
 			}
-			if (!IsBlock(y, x + 1) && mapData2_[y][x] < mapData2_[y][x + 1])
+			if (!IsBlock(y, x + 1) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y][x + 1])
 			{
 				return EnemyBase::right;
 			}
 		}
 		else
 		{
-			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] > mapData2_[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] > mapData2_[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y, x - 1) && mapData2_[y][x] > mapData2_[y][x - 1])
+			if (!IsBlock(y, x - 1) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y][x - 1])
 			{
 				return EnemyBase::left;
 			}
-			if (!IsBlock(y, x + 1) && mapData2_[y][x] > mapData2_[y][x + 1])
+			if (!IsBlock(y, x + 1) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y][x + 1])
 			{
 				return EnemyBase::right;
 			}
@@ -691,7 +778,7 @@ int Field::InkyMove(int enemyIndexY, int enemyIndexX, bool flag)
 	return 0;
 }
 
-int Field::CrydeMove(int enemyIndexY, int enemyIndexX, bool flag)
+int Field::GhostMove(int enemyIndexY, int enemyIndexX, bool flag)
 {
 	int y = enemyIndexY;
 	int x = enemyIndexX;
@@ -747,38 +834,38 @@ int Field::CrydeMove(int enemyIndexY, int enemyIndexX, bool flag)
 		// リスポーン地点にいる状態でイジケ状態の場合逃げずにリスポーン地点からでる
 		if (pEnemy_[2]->GetIzike() && !SpornInOrAuto(enemyIndexY, enemyIndexX))
 		{
-			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] < mapData2_[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] < mapData2_[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y, x - 1) && mapData2_[y][x] < mapData2_[y][x - 1])
+			if (!IsBlock(y, x - 1) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y][x - 1])
 			{
 				return EnemyBase::left;
 			}
-			if (!IsBlock(y, x + 1) && mapData2_[y][x] < mapData2_[y][x + 1])
+			if (!IsBlock(y, x + 1) && enemyTargetMapData_[y][x] < enemyTargetMapData_[y][x + 1])
 			{
 				return EnemyBase::right;
 			}
 		}
 		else
 		{
-			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && mapData2_[y][x] > mapData2_[y - 1][x])
+			if (!IsBlock(y - 1, x) && Intrusion(y - 1, x, flag) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y - 1][x])
 			{
 				return EnemyBase::up;
 			}
-			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && mapData2_[y][x] > mapData2_[y + 1][x])
+			if (!IsBlock(y + 1, x) && Intrusion(y + 1, x, flag) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y + 1][x])
 			{
 				return EnemyBase::down;
 			}
-			if (!IsBlock(y, x - 1) && mapData2_[y][x] > mapData2_[y][x - 1])
+			if (!IsBlock(y, x - 1) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y][x - 1])
 			{
 				return EnemyBase::left;
 			}
-			if (!IsBlock(y, x + 1) && mapData2_[y][x] > mapData2_[y][x + 1])
+			if (!IsBlock(y, x + 1) && enemyTargetMapData_[y][x] > enemyTargetMapData_[y][x + 1])
 			{
 				return EnemyBase::right;
 			}

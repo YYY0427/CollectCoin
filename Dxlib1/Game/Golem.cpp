@@ -25,11 +25,13 @@ namespace
 	constexpr int STARET_MOVE_INTEVAL = 60 * 12;
 }
 
-Golem::Golem(int handle, int indexX, int indexY)
+Golem::Golem(int handle, int indexX, int indexY, int stage)
 {
 	handle_ = handle;
 	indexX_ = indexX;
 	indexY_ = indexY;
+
+	stage_ = stage;
 }
 
 void Golem::Update()
@@ -37,7 +39,7 @@ void Golem::Update()
 	// 死んだ場合初期化
 	if (isDead_)
 	{
-		SetDeadInit();
+		SetDeadInit(stage_);
 
 		// 敵が死んでいる状態で指定の位置に存在する場合にイジケ状態を解除
 		if (indexX_ == 10 && indexY_ == 10)
@@ -89,7 +91,7 @@ void Golem::Update()
 			};
 		}
 
-		moveDirection_ = pField_->PinkyMove(indexY_, indexX_, isIntrusion_);
+		moveDirection_ = pField_->GolemMove(indexY_, indexX_, isIntrusion_);
 
 		moveTimer_ = 0;
 	}
@@ -139,7 +141,7 @@ void Golem::Draw()
 	}
 }
 
-void Golem::SetInit()
+void Golem::SetInit(int stage)
 {
 	indexX_ = 10;
 	indexY_ = 10;

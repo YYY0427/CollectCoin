@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <memory>	
 #include "../Geometry.h"
 #include "../vec2.h"
@@ -31,7 +32,7 @@ public:
 	static constexpr int ATTACK_ANIME_FRAME_NUM = 6;	// 攻撃時
 
 	// コンストラクタ
-	Player(int normalH, int waponH, int deadH, int attackH, int indexX, int indexY);
+	Player(int normalH, int waponH, int deadH, int attackH, int indexX, int indexY, int stage);
 
 	//デストラクタ
 	~Player();
@@ -67,6 +68,8 @@ public:
 	// BGMを止める
 	void StopMusic();
 
+	void StageCheck(int stage);
+
 	// 外から値を見る
 	Vec2 GetSize() const { return deathImgSize_; }
 	Vec2 GetPos() const { return pos_; }
@@ -96,9 +99,12 @@ public:
 
 private:
 
+	int stage_;
+
 	// ポインタ
 	std::shared_ptr<Field> pField_;	
-	std::shared_ptr<EnemyBase> pEnemy_[EnemyBase::enemy_num];
+	/*std::shared_ptr<EnemyBase> pEnemy_[EnemyBase::enemy_num];*/
+	std::vector<std::shared_ptr<EnemyBase>> pEnemy_;
 
 	Vec2 deathImgSize_;
 	Vec2 attackImgSize_;

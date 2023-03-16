@@ -1,9 +1,18 @@
 #pragma once
+#include "Field.h"
+#include <memory>
+#include <vector>
+
 class Map
 {
 public:
-	Map(int handle);
+	Map(int handle, int stage);
 	virtual ~Map(){};
+
+	void SetField(std::shared_ptr<Field>field) { pField_ = field; }
+
+	void StageCheck(int stage);
+	void StageCheck2(int stage);
 
 	//描画
 	void Draw();
@@ -18,6 +27,16 @@ private:
 	int ChipNum();
 
 private:
+	
+	std::shared_ptr<Field> pField_;
+
+	std::vector<std::vector<int>> mapData_;
+
+	int mapHeight_;
+	int mapWidth_;
+
+	int stage_;
+
 	//グラフィックデータのハンドル
 	int handle_;
 

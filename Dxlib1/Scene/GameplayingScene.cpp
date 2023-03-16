@@ -25,10 +25,16 @@
 namespace
 {
 	// プレイヤーの初期位置
+	constexpr int TUTORIAL_PLAYER_START_INDEX_X = 5;
+	constexpr int TUTORIAL_PLAYER_START_INDEX_Y = 5;
+
 	constexpr int PLAYER_START_INDEX_X = 9;
 	constexpr int PLAYER_START_INDEX_Y = 16;
 
 	// 敵(スケルトン)の初期位置
+	constexpr int TUTORIAL_SKELETON_START_INDEX_X = 5;
+	constexpr int TUTORIAL_SKELETON_START_INDEX_Y = 1;
+
 	constexpr int SKELETON_START_INDEX_X = 9;
 	constexpr int SKELETON_START_INDEX_Y = 8;
 
@@ -69,6 +75,8 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	faideEnabled_(false),
 	playerDeadSound_(false)
 {
+	stage_ = tutorial;
+
 	// 画面幅　画面高　ビット数
 	int sw, sh, bit;
 	// 幅と高さを取得
@@ -105,26 +113,47 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	coinH_ = my::MyLoadGraph("Data/img/game/coin.png");
 
 
-	pEnemy_[EnemyBase::skeleton] = std::make_shared<Skeleton>(
-								skeletonH,					// 画像ハンドル
-								SKELETON_START_INDEX_X,		// 初期座標X
-								SKELETON_START_INDEX_Y);	// 初期座標Y
-	pEnemy_[EnemyBase::slime] = std::make_shared<Slime>(
-								slimeH,						// 画像ハンドル
-								SLIME_START_INDEX_X,		// 初期座標X
-								SLIME_START_INDEX_Y);		// 初期座標Y
-	pEnemy_[EnemyBase::ghost] = std::make_shared<Ghost>(
-								ghostH,						// 画像ハンドル
-								GHOST_START_INDEX_X,		// 初期座標X
-								GHOST_START_INDEX_Y);		// 初期座標Y
-	pEnemy_[EnemyBase::golem] = std::make_shared<Golem>(
-								golemH,						// 画像ハンドル
-								GOLEM_START_INDEX_X,		// 初期座標X
-								GOLEM_START_INDEX_Y);		// 初期座標Y
+	StageCheck(stage_);
 
-	pPlayer_ = std::make_shared<Player>(nowaponPlayerH, waponPlayerH, deadPlayerH, attackPlayerH, PLAYER_START_INDEX_X, PLAYER_START_INDEX_Y);
-	pField_ = std::make_shared<Field>(sordH_, doorH_, coinH_);
-	pMap_ = std::make_shared<Map>(mapChipH);
+	if (stage_ >= 1)
+	{
+		enemyNum_ = EnemyBase::enemy_num;
+		pEnemy_.resize(enemyNum_);
+		pEnemy_[EnemyBase::skeleton] = std::make_shared<Skeleton>(
+			skeletonH,			
+			skeletonStartPosX_,	
+			skeletonStartPosY_,
+			stage_);	
+		pEnemy_[EnemyBase::slime] = std::make_shared<Slime>(
+			slimeH,			
+			slimeStartPosX_,
+			slimeStartPosY_,
+			stage_);		
+		pEnemy_[EnemyBase::ghost] = std::make_shared<Ghost>(
+			ghostH,			
+			ghostStartPosX_,
+			ghostStartPosY_,
+			stage_);		
+		pEnemy_[EnemyBase::golem] = std::make_shared<Golem>(
+			golemH,					
+			golemStartPosX_,		
+			golemStartPosY_,
+			stage_);		
+	}
+	else
+	{
+		enemyNum_ = 1;
+		pEnemy_.resize(enemyNum_);
+		pEnemy_[EnemyBase::skeleton] = std::make_shared<Skeleton>(
+			skeletonH,					// 画像ハンドル
+			skeletonStartPosX_,			// 初期座標X
+			skeletonStartPosY_,			// 初期座標Y 
+			stage_);		
+	}
+	
+	pPlayer_ = std::make_shared<Player>(nowaponPlayerH, waponPlayerH, deadPlayerH, attackPlayerH, playerStartPosX_, playerStartPosY_, stage_);
+	pField_ = std::make_shared<Field>(sordH_, doorH_, coinH_, stage_);
+	pMap_ = std::make_shared<Map>(mapChipH, stage_);
 	pBackGround_ = std::make_shared<BackGround>(backGraph);
 
 	for (auto& circle : pParticle_)
@@ -141,8 +170,9 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	pBackGround_->SetPlayer(pPlayer_);
 	pPlayer_->SetField(pField_);
 	pField_->SetPlayer(pPlayer_);
+	pMap_->SetField(pField_);
 
-	for (int i = 0; i < EnemyBase::enemy_num; i++)
+	for (int i = 0; i < enemyNum_; i++)
 	{
 		pPlayer_->SetEnemy(pEnemy_[i], i);
 		pField_->SetEnemy(pEnemy_[i], i);
@@ -166,7 +196,7 @@ void GameplayingScene::FadeInUpdate(const InputState& input)
 
 	pPlayer_->SetEnabled(false);
 	SetVolumeMusic(static_cast<int>(255.0f / 60.0f * static_cast<float>(60 - fadeTimer_)) * (static_cast<float>(SoundManager::GetInstance().GetBGMVolume() / 255.0f)));
-	fadeValue_ = 255 * (static_cast<float>(fadeTimer_)) / static_cast<float>(fade_interval);
+	fadeValue_ = 255 * (static_cast<int>(fadeTimer_)) / static_cast<int>(fade_interval);
 	if (--fadeTimer_ == 0)
 	{
 		faideEnabled_ = true;
@@ -581,7 +611,7 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 		for (auto& enemy : pEnemy_)
 		{
 			enemy->Init();
-			enemy->SetInit();
+			enemy->SetInit(stage_);
 		}
 
 		// 初期化
@@ -648,4 +678,32 @@ bool GameplayingScene::Colision(std::shared_ptr<EnemyBase>enemy, int width, int 
 	if (playerBottom < enemyTop)	return false;
 
 	return true;
+}
+
+void GameplayingScene::StageCheck(int stage)
+{
+
+	switch (stage_)
+	{
+	case 0:
+		playerStartPosX_ = TUTORIAL_PLAYER_START_INDEX_X;
+		playerStartPosY_ = TUTORIAL_PLAYER_START_INDEX_Y;
+		skeletonStartPosX_ = TUTORIAL_SKELETON_START_INDEX_X;
+		skeletonStartPosY_ = TUTORIAL_SKELETON_START_INDEX_Y;
+		break;
+	case 1:
+		playerStartPosX_ = PLAYER_START_INDEX_X;
+		playerStartPosY_ = PLAYER_START_INDEX_Y;
+		skeletonStartPosX_ = SKELETON_START_INDEX_X;
+		skeletonStartPosY_ = SKELETON_START_INDEX_Y;
+		slimeStartPosX_ = SLIME_START_INDEX_X;
+		slimeStartPosY_ = SLIME_START_INDEX_Y;
+		ghostStartPosX_ = GHOST_START_INDEX_X;
+		ghostStartPosY_ = GHOST_START_INDEX_Y;
+		golemStartPosX_ = GOLEM_START_INDEX_X;
+		golemStartPosY_ = GOLEM_START_INDEX_Y;
+		break;
+	default:
+		break;
+	}
 }

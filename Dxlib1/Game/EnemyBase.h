@@ -13,13 +13,11 @@ class Field;
 class EnemyBase
 {
 public:
-
 	// ‰æ‘œ‚Ì•
 	static constexpr int WIDTH = 16;
 
 	// ‰æ‘œ‚Ì‚‚³
 	static constexpr int HEIGHT = 16;
-
 
 	EnemyBase();
 	virtual ~EnemyBase(){}
@@ -40,7 +38,6 @@ public:
 	/// </summary>
 	virtual void Draw() = 0;
 
-
 	// Œ»İi‚ñ‚Å‚¢‚é•ûŒü‚Ö‚Ì“–‚½‚è”»’è
 	bool Colision(int direction);
 
@@ -54,9 +51,9 @@ public:
 	void PosCalculation();
 
 	// “G‚ª€‚ñ‚¾‚Æ‚«‚Ì‰Šú‰»
-	void SetDeadInit();
+	void SetDeadInit(int stage);
 
-	virtual void SetInit() = 0;
+	virtual void SetInit(int stage) = 0;
 
 	// “G‚ÌÀ•W‚Ìæ“¾
 	Vec2 GetPos() const { return pos_; }
@@ -180,4 +177,6 @@ protected:
 	int moveTimer2_;
 
 	bool isDoor_;
+
+	int stage_;
 };

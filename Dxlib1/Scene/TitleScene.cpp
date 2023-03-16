@@ -286,7 +286,7 @@ TitleScene::TitleScene(SceneManager& manager) :
 	teachH_ = CreateFontToHandle("PixelMplus10", 25, 0);
 
 	pBackGround_ = std::make_shared<BackGround>(backGraph);
-	pPlayer_ = std::make_shared <Player>(1,1,1,1,1,1);
+	pPlayer_ = std::make_shared <Player>(1,1,1,1,1,1,1);
 
 	pBackGround_->SetPlayer(pPlayer_);
 
@@ -355,6 +355,7 @@ void TitleScene::Draw()
 	DrawRotaGraph(cursor1Pos_.x, cursor1Pos_.y, 0.2f, 0.0f, cursor1H_, true);
 	DrawRotaGraph(cursor2Pos_.x, cursor2Pos_.y, 0.2f, 0.0f, cursor2H_, true);
 	DrawRotaGraph(cursor3Pos_.x, cursor3Pos_.y, 0.2f, 0.0f, cursor3H_, true);
+	DrawRotaGraph(cursor4Pos_.x, cursor4Pos_.y, 0.2f, 0.0f, cursor4H_, true);
 
 	// A ‚¯‚Á‚Ä‚¢
 	DrawRectRotaGraph(Game::kScreenWidth / 2 + 570, Game::kScreenHeight - 30, 0, 0, 16, 16, 2.0f, 0.0f, controller_, true);

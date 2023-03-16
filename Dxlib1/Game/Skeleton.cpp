@@ -25,13 +25,15 @@ namespace
 	constexpr int STARET_MOVE_INTEVAL = 60 * 3;
 }
 
-Skeleton::Skeleton(int handle, int indexX, int indexY)
+Skeleton::Skeleton(int handle, int indexX, int indexY, int stage)
 {
 	handle_ = handle;
 	indexX_ = indexX;
 	indexY_ = indexY;
 
 	isMove_ = false;
+
+	stage_ = stage;
 }
 
 void Skeleton::Update()
@@ -39,10 +41,10 @@ void Skeleton::Update()
 	// 死んだ場合初期化
 	if (isDead_)
 	{
-		SetDeadInit();
+		SetDeadInit(stage_);
 
 		// 敵が死んでいる状態で指定の位置に存在する場合にイジケ状態を解除
-		if (indexX_ == 10 && indexY_ == 10)
+		if (indexX_ == 9 && indexY_ == 10)
 		{
 		//	isIzike_ = false;
 			isIntrusion_ = true;
@@ -88,7 +90,7 @@ void Skeleton::Update()
 			};
 		}
 
-		moveDirection_ = pField_->BlinkyMove(indexY_, indexX_, isIntrusion_);
+		moveDirection_ = pField_->SkeletonMove(indexY_, indexX_, isIntrusion_);
 
 		moveTimer_ = 0;
 	}
@@ -130,7 +132,7 @@ void Skeleton::Draw()
 
 		int imgY = DirectReturnNum(HEIGHT);
 
-		DrawRectRotaGraph(pos_.x, pos_.y,		// 座標
+		DrawRectRotaGraph(pos_.x, pos_.y - 5,		// 座標
 			imgX, imgY,							// 切り取り左上
 			WIDTH, HEIGHT,						// 幅、高さ
 			SCALE, 0,							// 拡大率、回転角度
@@ -138,10 +140,18 @@ void Skeleton::Draw()
 	}
 }
 
-void Skeleton::SetInit()
+void Skeleton::SetInit(int stage)
 {
 	isMove_ = false;
-	
-	indexX_ = 9;
-	indexY_ = 8;
+
+	if (stage == 0)
+	{
+		indexX_ = 5;
+		indexY_ = 2;
+	}
+	else if (stage == 1)
+	{
+		indexX_ = 9;
+		indexY_ = 8;
+	}
 }

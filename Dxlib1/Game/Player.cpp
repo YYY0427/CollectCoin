@@ -30,7 +30,8 @@ namespace
 	constexpr float QUAKE = 5.0f;
 }
 
-Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int indexY) :
+Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int indexY, int stage) :
+	stage_(stage),
 	angle_(0.0f),
 	kX_(0), kY_(0),
 	moveTimer_(0),
@@ -62,18 +63,18 @@ Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int 
 	normalBgmVolume_ = SoundManager::GetInstance().GetBGMVolume();
 	powerUpBgmVolume_ = 0;
 
+	// 初期座標
 	indexX_ = indexX;
 	indexY_ = indexY;
 
+	// 画像
 	normalH_ = normalH;
 	waponH_ = waponH;
 	deathH_ = deadH;
 	attackH_ = attackH;
-
 	handle_ = normalH_;
 
 	powerUpBgmH_ = LoadSoundMem("Data/sound/BGM/powerUp.mp3");
-
 	StartMusic();
 
 	// 画像サイズの取得
@@ -85,6 +86,15 @@ Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int 
 	pos_.y=  (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_Y);
 
 	speed_ = NORMAL_SPEED;
+
+	if (stage >= 1)
+	{
+		pEnemy_.resize(EnemyBase::enemy_num);
+	}
+	else
+	{
+		pEnemy_.resize(1);
+	}
 }
 
 Player::~Player()
@@ -94,12 +104,11 @@ Player::~Player()
 
 void Player::Init()
 {
+	StageCheck(stage_);
 	handle_ = normalH_;
 	angle_ = 0.0f;
 	kX_ = 0; 
 	kY_ = 0;
-	indexX_ = 9; 
-	indexY_ = 16;
 	moveTimer_ = 0;
 	moveDirection_ = 0;
 	feedGetNum_ = 0;
@@ -515,4 +524,19 @@ void Player::StartMusic()
 void Player::StopMusic()
 {
 	StopSoundMem(powerUpBgmH_);
+}
+
+void Player::StageCheck(int stage)
+{
+	switch (stage)
+	{
+	case 0:
+		indexY_ = 5;
+		indexX_ = 5;
+		break;
+	case 1:
+		indexX_ = 9;
+		indexY_ = 16;
+		break;
+	}
 }

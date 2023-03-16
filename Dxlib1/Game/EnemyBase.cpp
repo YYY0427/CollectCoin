@@ -196,11 +196,19 @@ void EnemyBase::PosCalculation()
 	};
 }
 
-void EnemyBase::SetDeadInit()
+void EnemyBase::SetDeadInit(int stage)
 {
 	// インデックス座標を変更し、座標の計算
-	indexX_ = 10;
-	indexY_ = 10;
+	if (stage == 0)
+	{
+		indexX_ = 5;
+		indexY_ = 5;
+	}
+	else if (stage == 1)
+	{
+		indexX_ = 9;
+		indexY_ = 10;
+	}
 	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_X);
 	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_Y);
 

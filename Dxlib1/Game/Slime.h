@@ -22,7 +22,7 @@ public:
 	// アニメーション枚数
 	static constexpr int ANIME_FRAME_NUM = 7;
 
-	Slime(int handle, int indexX, int indexY);
+	Slime(int handle, int indexX, int indexY, int stage);
 
 	virtual ~Slime(){}
 	/// <summary>
@@ -32,7 +32,7 @@ public:
 
 	virtual void Draw()override;
 
-	virtual void SetInit()override;
+	virtual void SetInit(int stage)override;
 
 private:
 };

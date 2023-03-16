@@ -22,7 +22,7 @@ public:
 	// アニメーション枚数
 	static constexpr int ANIME_FRAME_NUM = 4;
 
-	Ghost(int handle, int indexX, int indexY);
+	Ghost(int handle, int indexX, int indexY, int stage);
 
 	virtual ~Ghost(){}
 
@@ -33,6 +33,6 @@ public:
 
 	virtual void Draw()override;
 
-	virtual void SetInit()override;
+	virtual void SetInit(int stage)override;
 };
 

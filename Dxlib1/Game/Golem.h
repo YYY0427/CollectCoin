@@ -22,7 +22,7 @@ public:
 	// アニメーション枚数
 	static constexpr int ANIME_FRAME_NUM = 4;
 
-	Golem(int handle, int indexX, int indexY);
+	Golem(int handle, int indexX, int indexY, int stage);
 
 	virtual ~Golem(){}
 	/// <summary>
@@ -32,5 +32,5 @@ public:
 
 	virtual void Draw()override;
 
-	virtual void SetInit()override;
+	virtual void SetInit(int stage)override;
 };

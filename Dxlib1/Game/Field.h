@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <vector>
 #include "EnemyBase.h"
 
 class Player;
@@ -8,12 +9,6 @@ class EnemyBase;
 class Field
 {
 public:
-	// マップの横幅
-	static constexpr int MAP_WIDTH = 19;
-
-	// マップの縦幅
-	static constexpr int MAP_HEIGHT = 22;
-
 	// ブロックの大きさ
 	static constexpr int CHIP_SIZE = 32;
 
@@ -21,13 +16,22 @@ public:
 	static constexpr int DISPLAY_POS_X = 495;
 	static constexpr int DISPLAY_POS_Y = 100;
 
+	// ステージのサイズの取得
+	int GetMapDataY() const { return mapHeight_; }
+	int GetMapDataX() const { return mapWidth_; }
+
 	// コンストラクタ
-	Field(int sordH, int doorH, int coinH);
+	Field(int sordH, int doorH, int coinH, int stage);
 	 
 	// デストラクタ
 	virtual ~Field();
 
+	// プレイヤー死亡時の初期化
 	void Init();
+
+	// ステージによって配列のサイズの変更、敵の目標を変更
+	void StageCheck(int stage);
+	void StageCheck2(int stage);
 
 	// 更新処理
 	void Updata();
@@ -73,30 +77,34 @@ public:
 	// 特定のブロックに侵入可能か
 	bool Intrusion(int y, int x, bool flag);
 
-	// mapData2を参照してプレイヤーからの数字が小さい方向の値を返す 
-	// プレイヤーがパワーエサを取得していたら大きい方向の値を返す
-	int BlinkyMove(int enemyIndexY, int enemyIndexX, bool flag);
-
-	int PinkyMove(int enemyIndexY, int enemyIndexX, bool flag);
-
-	int InkyMove(int enemyIndexY, int enemyIndexX, bool flag);
-
-	int CrydeMove(int enemyIndexY, int enemyIndexX, bool flag);
+	// 敵の動き
+	int SkeletonMove(int enemyIndexY, int enemyIndexX, bool flag);
+	int GolemMove(int enemyIndexY, int enemyIndexX, bool flag);
+	int SlimeMove(int enemyIndexY, int enemyIndexX, bool flag);
+	int GhostMove(int enemyIndexY, int enemyIndexX, bool flag);
 private:
 	std::shared_ptr<Player> pPlayer_;
+	std::vector<std::shared_ptr<EnemyBase>> pEnemy_;
+	std::vector<std::vector<int>> mapData_;
+	std::vector<std::vector<int>> enemyTargetMapData_;
 
-	std::shared_ptr<EnemyBase> pEnemy_[EnemyBase::enemy_num];
-
-	int mapData_[Field::MAP_HEIGHT][Field::MAP_WIDTH];
-
-	int mapData2_[Field::MAP_HEIGHT][Field::MAP_WIDTH];
+	// ステージのサイズ
+	int mapHeight_;
+	int mapWidth_;
+	
+	// ステージ
+	int stage_;
 
 	// 表示するかどうか
 	bool isDraw_;
 
-	int coin_;
-	int stringH_;
+	// プレイヤーが取得したコインの枚数
+	int getCoinNum_;
 
+	// プレイヤーが集めなければいけないコインの枚数
+	int coinTotalNum_;
+
+	// ドアを開くか閉めるか
 	bool openDoor_;
 	bool closeDoor_;
 
@@ -105,9 +113,14 @@ private:
 	int sordH_;
 	int doorH_;
 
+	// 画像インデックス
 	int coinImgIdx_;
 	int doorImgIdx_;
 
+	// フォントハンドル
+	int stringH_;
+
+	// 敵の目標
 	int pinkyGoalY_;
 	int pinkyGoalX_;
 

@@ -25,11 +25,13 @@ namespace
 	constexpr int STARET_MOVE_INTEVAL = 60 * 4;
 }
 
-Ghost::Ghost(int handle, int indexX, int indexY)
+Ghost::Ghost(int handle, int indexX, int indexY, int stage)
 {
 	handle_ = handle;
 	indexX_ = indexX;
 	indexY_ = indexY;
+
+	stage_ = stage;
 
 	isIntrusion_ = true;
 }
@@ -39,7 +41,7 @@ void Ghost::Update()
 	// 死んだ場合初期化
 	if (isDead_)
 	{
-		SetDeadInit();
+		SetDeadInit(stage_);
 
 		// 敵が死んでいる状態で指定の位置に存在する場合にイジケ状態を解除
 		if (indexX_ == 10 && indexY_ == 10)
@@ -89,7 +91,7 @@ void Ghost::Update()
 			};
 		}
 
-		moveDirection_ = pField_->CrydeMove(indexY_, indexX_, isIntrusion_);
+		moveDirection_ = pField_->GhostMove(indexY_, indexX_, isIntrusion_);
 
 		moveTimer_ = 0;
 	}
@@ -135,11 +137,11 @@ void Ghost::Draw()
 			imgX, imgY,							// 切り取り左上
 			WIDTH, HEIGHT,						// 幅、高さ
 			SCALE, 0,							// 拡大率、回転角度
-			handle_, true);						// 画像のハンドル、透過するか
+			handle_, true);
 	}
 }
 
-void Ghost::SetInit()
+void Ghost::SetInit(int stage)
 {
 	indexX_ = 9;
 	indexY_ = 10;

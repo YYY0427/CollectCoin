@@ -28,6 +28,7 @@ SoundManager::SoundManager()
 
 SoundManager::~SoundManager()
 {
+	
 }
 
 void SoundManager::Play(const char* name)
