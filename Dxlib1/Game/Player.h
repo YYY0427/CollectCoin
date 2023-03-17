@@ -38,11 +38,11 @@ public:
 	~Player();
 
 	// ポインタの設定
-	void SetEnemy(std::shared_ptr<EnemyBase>enemy, int i) { pEnemy_[i] = enemy; }
+	void SetEnemy(std::shared_ptr<EnemyBase>enemy, int i, int stage);
 	void SetField(std::shared_ptr<Field>field) { pField_ = field; }
 
 	// 初期化
-	void Init();
+	void Init(int stage);
 
 	// 処理
 	void Update(const InputState& input);	// ノーマル

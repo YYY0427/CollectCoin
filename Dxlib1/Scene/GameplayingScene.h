@@ -24,28 +24,31 @@ public:
 	GameplayingScene(SceneManager& manager);
 	~GameplayingScene();
 
+	// 更新
 	void Update(const InputState& input);
 
+	// 描画
 	void Draw();
 
-	// 死亡時の初期化
+	// ステージ変更時初期化
 	void SetInit();
 
+	// 死亡時の初期化
+	void SetDeadInit();
+
+	// 敵とプレイヤーの当たり判定
 	bool Colision(std::shared_ptr<EnemyBase>enemy, int width, int height);
 
+	// ステージによって値を変える
 	void StageCheck(int stage);
 
 private:
+	// ステージ
 	enum
 	{
 		tutorial,	// チュートリアル
 		stage1,		// ステージ１
 	};
-
-	// ステージ
-	int stage_;
-
-	int enemyNum_;
 
 	//プレイヤー
 	std::shared_ptr<Player> pPlayer_;
@@ -87,9 +90,12 @@ private:
 	int gameOverFadeValue_ = 0;
 
 	// ゲームクリア文字のフェード設定
-	static constexpr int game_clear_fade_interval = 30;
+	static constexpr int game_clear_fade_interval = 60;
 	int gameClearFadeTimer_ = 0;
-	int gameClearFadeValue_ = 0;
+	int gameClearStringFadeValue_ = 0;
+
+	// 文字座標
+	Vec2 gameClearPos_;
 
 	// 文字のハンドル
 	int gameOverH_;
@@ -101,7 +107,16 @@ private:
 	// 画像のハンドル
 	int lifeH_;
 	int coinH_;
+	int tempScreenH_;
+	int skeletonH_;
+	int slimeH_;
+	int ghostH_;
+	int golemH_;
+	int playH_;
+	int retryH_;
+	int doorH_;
 
+	// 初期座標
 	int playerStartPosX_;
 	int playerStartPosY_;
 	int skeletonStartPosX_;
@@ -119,25 +134,43 @@ private:
 	// ゲームクリアか
 	bool isGameClear_;
 
+	// タイトル画面に戻る
+	bool isTitile_;
+
+	// 次のステージへ
+	bool isNextStage_;
+
+	// リトライするか
+	bool isRetry_;
+
+	// コインの存在
+	bool isCoinEnabled_;
+
 	// フェイドイン中か
 	bool faideEnabled_;
 
 	// アニメーションが終了したか
 	bool isAnimeEnd_;
 
+	// どのステージか
+	int stage_;
+
+	// 敵を何体表示させるか 
+	int enemyNum_;
+
+	// 選択肢インデックス
+	int currentInputIndex_;
+
+	// タイマー
 	int timer_;
-
 	int preparTimer_;
-
 	int gameOverTimer_;
 	int gameClearTimer_;
 
-	bool enemyKill_;
-
+	// プレイヤー死亡ジングルを鳴らすか
 	bool playerDeadSound_;
 
-	int tempScreenH_;
-
+	// 画面揺れ
 	int quakeTimer_;
 	float quakeX_;
 	float quakeY_;

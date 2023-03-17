@@ -102,9 +102,22 @@ Player::~Player()
 	DeleteSoundMem(powerUpBgmH_);
 }
 
-void Player::Init()
+void Player::SetEnemy(std::shared_ptr<EnemyBase> enemy, int i, int stage)
 {
-	StageCheck(stage_);
+	if (stage >= 1)
+	{
+		pEnemy_.resize(EnemyBase::enemy_num);
+	}
+	else
+	{
+		pEnemy_.resize(1);
+	}
+	pEnemy_[i] = enemy;
+}
+
+void Player::Init(int stage)
+{
+	StageCheck(stage);
 	handle_ = normalH_;
 	angle_ = 0.0f;
 	kX_ = 0; 

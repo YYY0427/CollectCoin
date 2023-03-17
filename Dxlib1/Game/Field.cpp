@@ -114,16 +114,9 @@ Field::Field(int sordH, int doorH, int coinH, int stage) :
 	closeDoor_(false),
 	openDoor_(false)
 {
-	StageCheck(stage);
-	// ステージによって配列のサイズの変更
-	mapData_.resize(mapHeight_, std::vector<int>(mapWidth_));
-	enemyTargetMapData_.resize(mapHeight_, std::vector<int>(mapWidth_));
-	StageCheck2(stage);
-
-	// コインの合計枚数の取得
-	coinTotalNum_ = LestCoin();
-
 	stage_ = stage;
+
+	StageCheck(stage);
 
 	stringH_ = CreateFontToHandle("PixelMplus10", 30, 10);
 }
@@ -133,36 +126,36 @@ Field::~Field()
 	DeleteFontToHandle(stringH_);
 }
 
-void Field::Init()
-{
-	pinkyGoalX_ = 1;
-	pinkyGoalY_ = 1;
-
-	blinkyGoalX_ = 17;
-	blinkyGoalY_ = 1;
-
-	inkyGoalX_ = 1;
-	inkyGoalY_ = 20;
-
-	crydeGoalY_ = 20;
-	crydeGoalX_ = 17;
-
-	isDraw_ = true;
-}
+//void Field::Init()
+//{
+//	pinkyGoalX_ = 1;
+//	pinkyGoalY_ = 1;
+//
+//	blinkyGoalX_ = 17;
+//	blinkyGoalY_ = 1;
+//
+//	inkyGoalX_ = 1;
+//	inkyGoalY_ = 20;
+//
+//	crydeGoalY_ = 20;
+//	crydeGoalX_ = 17;
+//
+//	isDraw_ = true;
+//}
 
 void Field::StageCheck(int stage)
 {
+	stage_ = stage;
 	switch (stage)
 	{
 	case 0:
-		pEnemy_.resize(1);
 		mapHeight_ = TUTORIAL_HEIGHT;
 		mapWidth_ = TUTORIAL_WIDTH;
 		blinkyGoalX_ = 5;
 		blinkyGoalY_ = 2;
+		pEnemy_.resize(1);
 		break;
 	case 1:
-		pEnemy_.resize(4);
 		mapHeight_ = STAGE_1_HEIGHT;
 		mapWidth_ = STAGE_1_WIDTH;
 		pinkyGoalX_ = 1;
@@ -173,12 +166,22 @@ void Field::StageCheck(int stage)
 		inkyGoalY_ = 20;
 		crydeGoalY_ = 20;
 		crydeGoalX_ = 17;
+		pEnemy_.resize(4);
 		break;
 	}
-}
 
-void Field::StageCheck2(int stage)
-{
+	mapData_.resize(mapHeight_);
+	for (int y = 0; y < mapHeight_; y++)
+	{
+		mapData_[y].resize(mapWidth_);
+	}
+
+	enemyTargetMapData_.resize(mapHeight_);
+	for (int y = 0; y < mapHeight_; y++)
+	{
+		enemyTargetMapData_[y].resize(mapWidth_);
+	}
+
 	switch (stage)
 	{
 	case 0:
@@ -195,11 +198,17 @@ void Field::StageCheck2(int stage)
 		{
 			for (int x = 0; x < mapWidth_; x++)
 			{
-				mapData_[y][x] = mapDataStage1[y][x];
+				/*mapData_[y][x] = mapDataStage1[y][x];*/
+				mapData_[y][x] = mapDataDebug[y][x];
 			}
 		}
 		break;
 	}
+
+	// コインの合計枚数の取得
+	coinTotalNum_ = LestCoin();
+
+	isDraw_ = false;
 }
 
 void Field::Updata()
@@ -278,6 +287,11 @@ void Field::Draw()
 	// 残りのコインの枚数
 	DrawRectRotaGraph(Game::kScreenWidth / 2 - 260, Game::kScreenHeight - 35, 0, 0, 8, 8, 3.7f, 0.0f, coinH_, true);
 	DrawFormatStringToHandle(Game::kScreenWidth / 2 - 225, Game::kScreenHeight - 50, 0xffffff, stringH_, "%d / %d\n", getCoinNum_, coinTotalNum_);
+}
+
+void Field::SetEnemy(std::shared_ptr<EnemyBase> enemy, int i, int stage)
+{
+	pEnemy_[i] = enemy;
 }
 
 int Field::LestCoin()

@@ -54,10 +54,28 @@ namespace
 	const char* const REDY_STRING = "REDEY";
 
 	// ゲームクリアー
-	const char* const GAMECLEAR_STRING = "GAME CLEAR!!!";
+	const char* const GAMECLEAR_STRING = "GAME CLEAR!";
 
 	// ゲームオーバー文字列
 	const char* const GAMEOVER_STRING = "GAME OVER...";
+
+	// 選択肢の数
+	constexpr int CHOICE_NUM = 3; 
+
+	constexpr int pw_width_1 = 400;												//ポーズ枠の幅
+	constexpr int pw_height_1 = 100;												//ポーズ枠の高さ
+	constexpr int pw_start_x_1 = (Game::kScreenWidth / 2) - (pw_width_1 / 2);	//ポーズ枠の左
+	constexpr int pw_start_y_1 = Game::kScreenHeight / 2;					//ポーズ枠上
+
+	constexpr int pw_width_2 = 400;												//ポーズ枠の幅
+	constexpr int pw_height_2 = 100;												//ポーズ枠の高さ
+	constexpr int pw_start_x_2 = (Game::kScreenWidth / 2) - (pw_width_1 / 2);	//ポーズ枠の左
+	constexpr int pw_start_y_2 = Game::kScreenHeight / 2 + 115;					//ポーズ枠上
+
+	constexpr int pw_width_3 = 400;												//ポーズ枠の幅
+	constexpr int pw_height_3 = 100;												//ポーズ枠の高さ
+	constexpr int pw_start_x_3 = (Game::kScreenWidth / 2) - (pw_width_1 / 2);	//ポーズ枠の左
+	constexpr int pw_start_y_3 = Game::kScreenHeight / 2 + 230;					//ポーズ枠上
 }
 
 GameplayingScene::GameplayingScene(SceneManager& manager) :
@@ -71,9 +89,14 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	quakeTimer_(0),
 	quakeX_(0.0f),
 	quakeY_(0.0f),
+	currentInputIndex_(0),
 	isGameClear_(false),
 	faideEnabled_(false),
-	playerDeadSound_(false)
+	playerDeadSound_(false),
+	isNextStage_(false),
+	isTitile_(false),
+	isRetry_(false),
+	isCoinEnabled_(false)
 {
 	stage_ = tutorial;
 
@@ -89,9 +112,15 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	// フォントの作成
 	gameOverH_ = CreateFontToHandle("PixelMplus10", 50, 30);
 	gameOverShadowH_ = CreateFontToHandle("PixelMplus10", 51, 30);
-	gameClearH_ = CreateFontToHandle("PixelMplus10", 50, 30);
-	gameClearShadowH_ = CreateFontToHandle("PixelMplus10", 51, 30);
+	gameClearH_ = CreateFontToHandle("PixelMplus10", 80, 30);
+	gameClearShadowH_ = CreateFontToHandle("PixelMplus10", 81, 30);
 	readyH_ = CreateFontToHandle("PixelMplus10", 20, 10);
+
+	int stringWidth = GetDrawStringWidthToHandle(GAMECLEAR_STRING, strlen(GAMECLEAR_STRING), gameClearH_);
+	int stringHeight = GetFontSizeToHandle(gameClearH_);
+
+	gameClearPos_.x = (Game::kScreenWidth / 2) - (stringWidth / 2);
+	gameClearPos_.y = (Game::kScreenHeight / 2) - 250;
 
 	// 画像のロード
 	int nowaponPlayerH = my::MyLoadGraph("Data/img/game/nowapon-player.png");
@@ -99,10 +128,14 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	int deadPlayerH = my::MyLoadGraph("Data/img/game/player-deth1.png");
 	int attackPlayerH = my::MyLoadGraph("Data/img/game/player-attack_gold.png");
 
-	int skeletonH = my::MyLoadGraph("Data/img/game/skeleton_monokuro.png");
- 	int slimeH = my::MyLoadGraph("Data/img/game/slime_monokuro.png");
-	int ghostH = my::MyLoadGraph("Data/img/game/ghost_monokuro.png");
-	int golemH = my::MyLoadGraph("Data/img/game/golem_monokuro.png");
+	playH_ = my::MyLoadGraph("Data/img/play.png");
+	//retryH_ = my::MyLoadGraph("Data/img/setting.png");
+	//doorH_ = my::MyLoadGraph("Data/img/question.png");
+
+	skeletonH_ = my::MyLoadGraph("Data/img/game/skeleton_monokuro.png");
+ 	slimeH_ = my::MyLoadGraph("Data/img/game/slime_monokuro.png");
+	ghostH_ = my::MyLoadGraph("Data/img/game/ghost_monokuro.png");
+	golemH_ = my::MyLoadGraph("Data/img/game/golem_monokuro.png");
 
 	int mapChipH = my::MyLoadGraph("Data/img/game/mapchip1.png");
 	int backGraph = my::MyLoadGraph("Data/img/game/Gray.png");
@@ -112,54 +145,12 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	lifeH_ = my::MyLoadGraph("Data/img/game/hart.png");
 	coinH_ = my::MyLoadGraph("Data/img/game/coin.png");
 
-
 	StageCheck(stage_);
 
-	if (stage_ >= 1)
-	{
-		enemyNum_ = EnemyBase::enemy_num;
-		pEnemy_.resize(enemyNum_);
-		pEnemy_[EnemyBase::skeleton] = std::make_shared<Skeleton>(
-			skeletonH,			
-			skeletonStartPosX_,	
-			skeletonStartPosY_,
-			stage_);	
-		pEnemy_[EnemyBase::slime] = std::make_shared<Slime>(
-			slimeH,			
-			slimeStartPosX_,
-			slimeStartPosY_,
-			stage_);		
-		pEnemy_[EnemyBase::ghost] = std::make_shared<Ghost>(
-			ghostH,			
-			ghostStartPosX_,
-			ghostStartPosY_,
-			stage_);		
-		pEnemy_[EnemyBase::golem] = std::make_shared<Golem>(
-			golemH,					
-			golemStartPosX_,		
-			golemStartPosY_,
-			stage_);		
-	}
-	else
-	{
-		enemyNum_ = 1;
-		pEnemy_.resize(enemyNum_);
-		pEnemy_[EnemyBase::skeleton] = std::make_shared<Skeleton>(
-			skeletonH,					// 画像ハンドル
-			skeletonStartPosX_,			// 初期座標X
-			skeletonStartPosY_,			// 初期座標Y 
-			stage_);		
-	}
-	
 	pPlayer_ = std::make_shared<Player>(nowaponPlayerH, waponPlayerH, deadPlayerH, attackPlayerH, playerStartPosX_, playerStartPosY_, stage_);
 	pField_ = std::make_shared<Field>(sordH_, doorH_, coinH_, stage_);
 	pMap_ = std::make_shared<Map>(mapChipH, stage_);
 	pBackGround_ = std::make_shared<BackGround>(backGraph);
-
-	for (auto& circle : pParticle_)
-	{
-		circle = std::make_shared<Particle>();
-	}
 
 	for (auto& enemy : pEnemy_)
 	{
@@ -171,11 +162,13 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	pPlayer_->SetField(pField_);
 	pField_->SetPlayer(pPlayer_);
 	pMap_->SetField(pField_);
+	pField_->StageCheck(stage_);
+//	pField_->StageCheck2(stage_);
 
 	for (int i = 0; i < enemyNum_; i++)
 	{
-		pPlayer_->SetEnemy(pEnemy_[i], i);
-		pField_->SetEnemy(pEnemy_[i], i);
+		pPlayer_->SetEnemy(pEnemy_[i], i, stage_);
+		pField_->SetEnemy(pEnemy_[i], i, stage_);
 	}
 
 	SoundManager::GetInstance().PlayMusic("Data/sound/BGM/game.mp3");
@@ -372,15 +365,22 @@ void GameplayingScene::Draw()
 	// プレイヤーの描画
 	pPlayer_->Draw();
 
-	for (auto& coin : pCoin_)
+	if (isCoinEnabled_)
 	{
-		coin->Draw();
+		for (auto& coin : pCoin_)
+		{
+			coin->Draw();
+		}
 	}
 
-	for (auto& circle : pParticle_)
+	// 残機の描画
+	for (int i = 0; i < life_; i++)
 	{
-		circle->Draw();
+		int x = Game::kScreenWidth / 2 + 250 + (-i * 40);
+
+		DrawRectRotaGraph(x, Game::kScreenHeight - 30, 0, 0, 16, 16, 2.5f, 0.0f, lifeH_, true);
 	}
+
 
 	// ゲームオーバー
 	if (isGameOver_)
@@ -400,20 +400,45 @@ void GameplayingScene::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 	// ゲームクリア
-	if (isGameClear_)
+	if (isGameClear_ /*&& gameClearTimer_ >= 120*/)
 	{
-		int stringWidth = GetDrawStringWidthToHandle(GAMECLEAR_STRING, strlen(GAMECLEAR_STRING), gameClearH_);
+		/*int stringWidth = GetDrawStringWidthToHandle(GAMECLEAR_STRING, strlen(GAMECLEAR_STRING), gameClearH_);
 		int stringHeight = GetFontSizeToHandle(gameClearH_);
 
 		int width = (Game::kScreenWidth / 2) - (stringWidth / 2);
-		int height = (Game::kScreenHeight / 2) - (stringHeight / 2);
+		int height = (Game::kScreenHeight / 2) - 300;*/
 
 		// ゲームクリア文字の表示
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gameClearFadeValue_);
-		DrawStringToHandle(width - 3, height,
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+		DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gameClearStringFadeValue_);
+		DrawStringToHandle(gameClearPos_.x - 3, gameClearPos_.y,
 			GAMECLEAR_STRING, 0x000000, gameClearShadowH_, false);
-		DrawStringToHandle(width, height,
+		DrawStringToHandle(gameClearPos_.x, gameClearPos_.y,
 			GAMECLEAR_STRING, 0xffffff, gameClearH_, false);
+		if (stage_ != 1)
+		{
+			// 選択肢
+			DrawRoundRect(pw_start_x_1 - 3, pw_start_y_1 - 3, pw_start_x_1 + pw_width_1 + 3, pw_start_y_1 + pw_height_1 + 3, 5, 5, 0x000000, true);
+			DrawRoundRect(pw_start_x_2 - 3, pw_start_y_2 - 3, pw_start_x_2 + pw_width_2 + 3, pw_start_y_2 + pw_height_2 + 3, 5, 5, 0x000000, true);
+			DrawRoundRect(pw_start_x_3 - 3, pw_start_y_3 - 3, pw_start_x_3 + pw_width_3 + 3, pw_start_y_3 + pw_height_3 + 3, 5, 5, 0x000000, true);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+			DrawRoundRect(pw_start_x_1, pw_start_y_1, pw_start_x_1 + pw_width_1, pw_start_y_1 + pw_height_1, 5, 5, 0xffffff, true);
+			DrawRoundRect(pw_start_x_2, pw_start_y_2, pw_start_x_2 + pw_width_2, pw_start_y_2 + pw_height_2, 5, 5, 0xffffff, true);
+			DrawRoundRect(pw_start_x_3, pw_start_y_3, pw_start_x_3 + pw_width_3, pw_start_y_3 + pw_height_3, 5, 5, 0xffffff, true);
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+			DrawRoundRect(pw_start_x_1, pw_start_y_1, pw_start_x_1 + pw_width_1, pw_start_y_1 + pw_height_1 - 5, 5, 5, 0xffffff, true);
+			DrawRoundRect(pw_start_x_2, pw_start_y_2, pw_start_x_2 + pw_width_2, pw_start_y_2 + pw_height_2 - 5, 5, 5, 0xffffff, true);
+			DrawRoundRect(pw_start_x_3, pw_start_y_3, pw_start_x_3 + pw_width_3, pw_start_y_3 + pw_height_3 - 5, 5, 5, 0xffffff, true);
+
+			// アイコン
+		//	DrawRotaGraph(Game::kScreenWidth / 2, Game::kScreenHeight / 2 + 150, 1.0f, 0.0f, playH_, true);
+		//	DrawRotaGraph(Game::kScreenWidth / 2 - 140, Game::kScreenHeight / 2 + 265, 1.0f, 0.0f, doorH_, true);
+		//	DrawRotaGraph(Game::kScreenWidth / 2, Game::kScreenHeight / 2 + 265, 1.0f, 0.0f, retryH_, true);
+
+			DrawFormatString(0, 0, 0xffffff, "currentInputIndex = %d", currentInputIndex_);
+		}
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 	if (preparTimer_ > 0)
@@ -422,14 +447,6 @@ void GameplayingScene::Draw()
 		// 準備中文字の表示
 		DrawStringToHandle((Game::kScreenWidth / 2) - (width / 2), Game::kScreenHeight / 2 + 40,
 			REDY_STRING, 0xffffff, readyH_, false);
-	}
-
-	// 残機の描画
-	for (int i = 0; i < life_; i++)
-	{
-		int x = Game::kScreenWidth / 2 + 250 + (-i * 40);
-
-		DrawRectRotaGraph(x, Game::kScreenHeight - 30, 0, 0, 16, 16, 2.5f, 0.0f, lifeH_, true);
 	}
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
@@ -448,16 +465,14 @@ void GameplayingScene::Draw()
 
 void GameplayingScene::GameClearUpdate(const InputState& input)
 {
-	/*for (auto& circle : pParticle_)
-	{
-		circle->Update();
-	}*/
-
+	isCoinEnabled_ = true;
 	if (gameClearTimer_ % 1 == 0)
 	{
 		pCoin_.push_back(std::make_shared<Coin>(coinH_));
 		pCoin_.push_back(std::make_shared<Coin>(coinH_));
 	}
+
+	pPlayer_->ClearUpdate();
 	
 	for (auto& coin : pCoin_)
 	{
@@ -465,29 +480,65 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 	}
 
 	gameClearTimer_++;
-	if (gameClearTimer_ == 60 && !isGameClear_)
+	if (gameClearTimer_ >= 60 && !isGameClear_)
 	{
 		SoundManager::GetInstance().PlayJingle("Data/sound/BGM/gameClear.ogg");
-	}
-	else if (gameClearTimer_ > 120 && !CheckMusic())
-	{
 		isGameClear_ = true;
-		gameClearTimer_ = 120;
+	//	gameClearStringFadeValue_ = 0;
 	}
+	
 
-	pPlayer_->ClearUpdate();
 	if (isGameClear_)
 	{
-		gameClearTimer_ -= 2;
-		gameClearFadeValue_ = 255 * (static_cast<float>(gameClearFadeTimer_)) / static_cast<float>(game_clear_fade_interval);
+		gameClearStringFadeValue_ = 255 * (static_cast<float>(gameClearFadeTimer_)) / static_cast<float>(game_clear_fade_interval);
+
+		gameClearPos_.y--;
+		if (gameClearPos_.y <= 240)
+		{
+			gameClearPos_.y = 240;
+		}
+
+	//	gameClearFadeTimer_ = (std::min)(gameClearFadeTimer_++, 255);
 
 		if (++gameClearFadeTimer_ >= 255)
 		{
-			gameClearFadeValue_ = 255;
-			if (gameClearTimer_ <= 0)
+			gameClearStringFadeValue_ = 255;
+
+			if (stage_ == 1)
 			{
+				isTitile_ = true;
 				updateFunc_ = &GameplayingScene::FadeOutUpdate;
+			}
+
+			//上下で回る処理
+			if (input.IsTriggered(InputType::up))
+			{
+				SoundManager::GetInstance().Play("cursor");
+				currentInputIndex_ = ((currentInputIndex_ - 1) + CHOICE_NUM) % CHOICE_NUM;
+			}
+			else if (input.IsTriggered(InputType::down))
+			{
+				SoundManager::GetInstance().Play("cursor");
+				currentInputIndex_ = (currentInputIndex_ + 1) % CHOICE_NUM;
+			}
+
+			if (input.IsTriggered(InputType::next))
+			{
+				SoundManager::GetInstance().Play("decision");
 				gameClearTimer_ = 0;
+				if (currentInputIndex_ == 0)
+				{
+					isNextStage_ = true;
+				}
+				else if (currentInputIndex_ == 1)
+				{
+					isRetry_ = true;
+				}
+				else 
+				{
+					isTitile_ = true;
+				}
+				updateFunc_ = &GameplayingScene::FadeOutUpdate;
 			}
 		}
 	}
@@ -599,54 +650,41 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 		manager_.ChangeScene(new TitleScene(manager_));
 		return;
 	}
-	// ゲームクリアー
-	else if (fadeTimer_ > fade_interval && isGameClear_)
+	// 次のステージへ
+	else if (fadeTimer_ > fade_interval && isNextStage_)
 	{
+		isNextStage_ = false;
+		stage_ += 1;
+		SetInit();
+		updateFunc_ = &GameplayingScene::FadeInUpdate;
+		return;
+	}
+	// タイトル画面に戻る
+	else if (fadeTimer_ > fade_interval && isTitile_)
+	{
+		isTitile_ = false;
 		manager_.ChangeScene(new TitleScene(manager_));
 		return;
+	}
+	// リトライ
+	else if (fadeTimer_ > fade_interval && isRetry_)
+	{
+		SetInit();
+		updateFunc_ = &GameplayingScene::FadeInUpdate;
 	}
 	// 残機が１減った
 	else if (fadeTimer_ > fade_interval && life_ > 0)
 	{
-		for (auto& enemy : pEnemy_)
-		{
-			enemy->Init();
-			enemy->SetInit(stage_);
-		}
-
-		// 初期化
-		pPlayer_->Init();
-
-		pField_->Init();
-
-		SetInit();
-
-		SetVolumeMusic(0);
-		SoundManager::GetInstance().PlayMusic("Data/sound/BGM/game.mp3");
-
-		pPlayer_->StartMusic();
-
+		SetDeadInit();
 		updateFunc_ = &GameplayingScene::FadeInUpdate;
 	}
 }
 
 void GameplayingScene::PrepareUpdate(const InputState& input)
 {
-	/*if (!SoundManager::GetInstance().Check("gameStart"))
-	{
-		preparTimer_--;
-	}*/
 	preparTimer_--;
 	if (preparTimer_ <= 0)
 	{
-		/*SetVolumeMusic(static_cast<int>(255.0f / 60.0f * static_cast<float>(60 - bgmFadeTimer_)));
-		bgmFadeValue_ = 255 * (static_cast<float>(bgmFadeTimer_)) / static_cast<float>(bgm_fade_interval);
-		if (--bgmFadeTimer_ == 0)
-		{
-			updateFunc_ = &GameplayingScene::NormalUpdate;
-			preparTimer_ = 0;
-		}*/
-
 		updateFunc_ = &GameplayingScene::NormalUpdate;
 		preparTimer_ = 0;
 	}
@@ -654,10 +692,64 @@ void GameplayingScene::PrepareUpdate(const InputState& input)
 
 void GameplayingScene::SetInit()
 {
+	pCoin_.clear();
 	fadeTimer_ = fade_interval;
 	fadeValue_ = 255;
 	timer_ = 0;
+	isTitile_ = false;
+	isCoinEnabled_ = false;
+	isNextStage_ = false;
+	isRetry_ = false;
+	isGameClear_ = false;
+	isGameOver_ = false;
+	pPlayer_->Init(stage_);
+	StageCheck(stage_);
+	pField_->SetCoinNum(0);
+//	pField_->Init();
+	for (auto& enemy : pEnemy_)
+	{
+		enemy->Init();
+		enemy->SetInit(stage_);
+	}
+	for (auto& enemy : pEnemy_)
+	{
+		enemy->SetPlayer(pPlayer_);
+		enemy->SetField(pField_);
+	}
+	pBackGround_->SetPlayer(pPlayer_);
+	pPlayer_->SetField(pField_);
+	pField_->SetPlayer(pPlayer_);
+	pMap_->SetField(pField_);
+	pMap_->StageCheck(stage_);
+	pField_->StageCheck(stage_);
 
+	for (int i = 0; i < enemyNum_; i++)
+	{
+		pPlayer_->SetEnemy(pEnemy_[i], i, stage_);
+		pField_->SetEnemy(pEnemy_[i], i, stage_);
+	}
+	SetVolumeMusic(0);
+	SoundManager::GetInstance().PlayMusic("Data/sound/BGM/game.mp3");
+	pPlayer_->StartMusic();
+}
+
+void GameplayingScene::SetDeadInit()
+{
+	fadeTimer_ = fade_interval;
+	fadeValue_ = 255;
+	timer_ = 0;
+	isTitile_ = false;
+	isCoinEnabled_ = false;
+	isNextStage_ = false;
+	isRetry_ = false;
+	isGameClear_ = false;
+	isGameOver_ = false;
+	pPlayer_->Init(stage_);
+	for (auto& enemy : pEnemy_)
+	{
+		enemy->Init();
+		enemy->SetInit(stage_);
+	}
 }
 
 bool GameplayingScene::Colision(std::shared_ptr<EnemyBase>enemy, int width, int height)
@@ -682,8 +774,7 @@ bool GameplayingScene::Colision(std::shared_ptr<EnemyBase>enemy, int width, int 
 
 void GameplayingScene::StageCheck(int stage)
 {
-
-	switch (stage_)
+	switch (stage)
 	{
 	case 0:
 		playerStartPosX_ = TUTORIAL_PLAYER_START_INDEX_X;
@@ -705,5 +796,41 @@ void GameplayingScene::StageCheck(int stage)
 		break;
 	default:
 		break;
+	}
+
+	if (stage >= 1)
+	{
+		enemyNum_ = EnemyBase::enemy_num;
+		pEnemy_.resize(enemyNum_);
+		pEnemy_[EnemyBase::skeleton] = std::make_shared<Skeleton>(
+			skeletonH_,
+			skeletonStartPosX_,
+			skeletonStartPosY_,
+			stage_);
+		pEnemy_[EnemyBase::slime] = std::make_shared<Slime>(
+			slimeH_,
+			slimeStartPosX_,
+			slimeStartPosY_,
+			stage_);
+		pEnemy_[EnemyBase::ghost] = std::make_shared<Ghost>(
+			ghostH_,
+			ghostStartPosX_,
+			ghostStartPosY_,
+			stage_);
+		pEnemy_[EnemyBase::golem] = std::make_shared<Golem>(
+			golemH_,
+			golemStartPosX_,
+			golemStartPosY_,
+			stage_);
+	}
+	else
+	{
+		enemyNum_ = 1;
+		pEnemy_.resize(enemyNum_);
+		pEnemy_[EnemyBase::skeleton] = std::make_shared<Skeleton>(
+			skeletonH_,					// 画像ハンドル
+			skeletonStartPosX_,			// 初期座標X
+			skeletonStartPosY_,			// 初期座標Y 
+			stage_);
 	}
 }

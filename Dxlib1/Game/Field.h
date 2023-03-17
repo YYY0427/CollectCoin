@@ -26,12 +26,8 @@ public:
 	// デストラクタ
 	virtual ~Field();
 
-	// プレイヤー死亡時の初期化
-	void Init();
-
 	// ステージによって配列のサイズの変更、敵の目標を変更
 	void StageCheck(int stage);
-	void StageCheck2(int stage);
 
 	// 更新処理
 	void Updata();
@@ -40,8 +36,11 @@ public:
 	void Draw();
 	
 	// ポインタの設定
-	void SetEnemy(std::shared_ptr<EnemyBase>enemy, int i) { pEnemy_[i] = enemy; }
+	void SetEnemy(std::shared_ptr<EnemyBase>enemy, int i, int stage);
 	void SetPlayer(std::shared_ptr<Player>player) { pPlayer_ = player; }
+
+	// コインの枚数の設定
+	void SetCoinNum(int coinNum) { getCoinNum_ = coinNum; }
 
 	// マップデータのコインの合計枚数の集計
 	int LestCoin();

@@ -64,8 +64,6 @@ Map::Map(int handle, int stage) :
 	graphHeight_(0)
 {
 	StageCheck(stage);
-	mapData_.resize(mapHeight_, std::vector<int>(mapWidth_));
-	StageCheck2(stage);
 	GetGraphSize(handle_, &graphWidth_, &graphHeight_);
 }
 
@@ -81,10 +79,12 @@ void Map::StageCheck(int stage)
 		mapHeight_ = STAGE_1_HEIGHT;
 		mapWidth_ = STAGE_1_WIDTH;
 	}
-}
+	mapData_.resize(mapHeight_);
+	for (int y = 0; y < mapHeight_; y++)
+	{
+		mapData_[y].resize(mapWidth_);
+	}
 
-void Map::StageCheck2(int stage)
-{
 	switch (stage)
 	{
 	case 0:
@@ -105,6 +105,10 @@ void Map::StageCheck2(int stage)
 			}
 		}
 	}
+}
+
+void Map::StageCheck2(int stage)
+{
 }
 
 void Map::Draw()
