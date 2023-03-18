@@ -81,9 +81,11 @@ Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int 
 	GetGraphSizeF(deathH_, &deathImgSize_.x, &deathImgSize_.y);
 	GetGraphSizeF(attackH_, &attackImgSize_.x, &attackImgSize_.y);
 
+	Init(stage);
+
 	// インデックスの座標から初期座標を求める
-	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_X);
-	pos_.y=  (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_Y);
+	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosX_);
+	pos_.y=  (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosY_);
 
 	speed_ = NORMAL_SPEED;
 
@@ -95,6 +97,7 @@ Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int 
 	{
 		pEnemy_.resize(1);
 	}
+
 }
 
 Player::~Player()
@@ -504,8 +507,8 @@ void Player::SpeedCalculation()
 void Player::PosCalculation()
 {
 	// インデックス座標から座標を計算
-	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_X);
-	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_Y);
+	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosX_);
+	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosY_);
 
 	// 向いている方向と移動速度によって座標を計算
 	switch (moveDirection_) 
@@ -544,10 +547,14 @@ void Player::StageCheck(int stage)
 	switch (stage)
 	{
 	case 0:
+		disPlayPosX_ = Field::TUTORIAL_DISPLAY_POS_X;
+		disPlayPosY_ = Field::TUTORIAL_DISPLAY_POS_Y;
 		indexY_ = 5;
 		indexX_ = 5;
 		break;
 	case 1:
+		disPlayPosX_ = Field::STAGE_1_DISPLAY_POS_X;
+		disPlayPosY_ = Field::STAGE_1_DISPLAY_POS_Y;
 		indexX_ = 9;
 		indexY_ = 16;
 		break;

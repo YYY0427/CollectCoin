@@ -1,6 +1,16 @@
 #include "SoundManager.h"
 #include <DxLib.h>
 #include <cassert>
+#include <stdio.h>
+
+namespace
+{
+//	const char* const SOUND_FILE_SIGNATURE = "SND_";
+	constexpr char SOUND_FILE_SIGNATURE[] = "SND_";
+//	const char* const SOUND_CONFIG_FILE_PATH = "./sound.conf";
+	constexpr char SOUND_CONFIG_FILE_PATH[] = "../sound.conf";
+	constexpr float SOUND_CONFIG_VERSION = 1.0f;
+}
 
 int SoundManager::LoadSoundFile(const char* fileName, const char* ext)
 {
@@ -15,6 +25,7 @@ int SoundManager::LoadSoundFile(const char* fileName, const char* ext)
 
 SoundManager::SoundManager()
 {
+	LoadSoundConfig();
 	LoadSoundFile("coin", ".wav");
 	LoadSoundFile("cursor", ".wav");
 	LoadSoundFile("decision", ".wav");
@@ -24,6 +35,26 @@ SoundManager::SoundManager()
 	LoadSoundFile("powerDown", ".wav");
 	LoadSoundFile("warp", ".wav");
 	LoadSoundFile("gameStart", ".ogg");
+	SetSEVolume(volumeSE_);
+	SetBGMVolume(volumeBGM_);
+}
+
+void SoundManager::LoadSoundConfig()
+{
+	SoundConfigInfo conf = {};
+	FILE* fp = nullptr;
+	fopen_s(&fp, SOUND_CONFIG_FILE_PATH, "rb");
+	if (fp)
+	{
+		fread(&conf, sizeof(conf), 1, fp);
+		fclose(fp);
+		volumeBGM_ = conf.volumeBGM;
+		volumeSE_ = conf.volumeSE;
+	}
+	else
+	{
+		MessageBox(NULL, "ファイルオープン失敗", " ", MB_OK);	// メッセージボックスを使って警告表示
+	}
 }
 
 SoundManager::~SoundManager()
@@ -82,4 +113,21 @@ bool SoundManager::Check(const char* name)
 void SoundManager::ChangeVolume(const char* name, int volume)
 {
 	ChangeVolumeSoundMem(volume, nameAndHandleTable_[name]);
+}
+
+void SoundManager::SaveSoundConfig()
+{
+	SoundConfigInfo conf = {};
+	memcpy_s(conf.signature, sizeof(conf.signature), SOUND_FILE_SIGNATURE, sizeof(SOUND_FILE_SIGNATURE));
+
+	conf.version = SOUND_CONFIG_VERSION;
+	conf.volumeBGM = volumeBGM_;
+
+	FILE* fp = nullptr;
+	fopen_s(&fp, SOUND_CONFIG_FILE_PATH, "wb");
+	if (fp)
+	{
+		fwrite(&conf, sizeof(conf), 1, fp);
+		fclose(fp);
+	}
 }

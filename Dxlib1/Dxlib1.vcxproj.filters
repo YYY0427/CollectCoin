@@ -116,9 +116,6 @@
     <ClInclude Include="Game\Player.h">
       <Filter>ヘッダー ファイル\Game</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\GameoverScene.h">
-      <Filter>ヘッダー ファイル\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Scene\GameplayingScene.h">
       <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
@@ -151,9 +148,6 @@
     </ClInclude>
     <ClInclude Include="Game\EnemyBase.h">
       <Filter>ヘッダー ファイル\Game\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\GameclearScene.h">
-      <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Game\Golem.h">
       <Filter>ヘッダー ファイル\Game\Enemy</Filter>

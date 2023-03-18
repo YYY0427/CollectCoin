@@ -26,7 +26,7 @@ public:
 	void SetPlayer(std::shared_ptr<Player>player) { pPlayer_ = player; }
 	void SetField(std::shared_ptr<Field>field) { pField_ = field; }
 
-	void Init();
+	void Init(int stage);
 
 	/// <summary>
 	/// çXêV
@@ -179,4 +179,7 @@ protected:
 	bool isDoor_;
 
 	int stage_;
+
+	int disPlayPosX_;
+	int disPlayPosY_;
 };

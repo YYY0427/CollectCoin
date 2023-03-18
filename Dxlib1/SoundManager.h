@@ -8,18 +8,31 @@
 class SoundManager
 {
 private:
+	// 変更したサウンド情報をファイルに書き込む
+	struct SoundConfigInfo
+	{
+		char signature[4];			// "SND_"
+		float version;				// 1.0
+		unsigned short volumeSE;	// 0～255	
+		unsigned short volumeBGM;	// 0～255
+	};
+
 	int volumeSE_ = 255;
 	int volumeBGM_ = 255;
 
 	std::unordered_map<std::string, int> nameAndHandleTable_;
 	int LoadSoundFile(const char* fileName, const char* ext);
+
 	SoundManager();
-	~SoundManager();
 
 	// コピーも代入も禁止する
 	SoundManager(const SoundManager&) = delete;
 	void operator = (const SoundManager&) = delete;
+
+	void LoadSoundConfig();
 public:
+	~SoundManager();
+
 	/// <summary>
 	/// SoundManager使用者はGetInstance()を通した参照からしか利用できない
 	/// </summary>
@@ -67,4 +80,9 @@ public:
 	/// </summary>
 	/// <param name="name">サウンド名、音量</param>
 	void ChangeVolume(const char* name, int volume);
+
+	/// <summary>
+	/// サウンド情報をセーブ
+	/// </summary>
+	void SaveSoundConfig();
 };

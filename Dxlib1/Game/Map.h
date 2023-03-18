@@ -32,6 +32,9 @@ private:
 
 	std::vector<std::vector<int>> mapData_;
 
+	int disPlayPosX_;
+	int disPlayPosY_;
+
 	int mapHeight_;
 	int mapWidth_;
 

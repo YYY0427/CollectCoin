@@ -72,10 +72,14 @@ void Map::StageCheck(int stage)
 	switch (stage)
 	{
 	case 0:
+		disPlayPosX_ = Field::TUTORIAL_DISPLAY_POS_X;
+		disPlayPosY_ = Field::TUTORIAL_DISPLAY_POS_Y;
 		mapHeight_ = TUTORIAL_HEIGHT;
 		mapWidth_ = TUTORIAL_WIDTH;
 		break;
 	case 1:
+		disPlayPosX_ = Field::STAGE_1_DISPLAY_POS_X;
+		disPlayPosY_ = Field::STAGE_1_DISPLAY_POS_Y;
 		mapHeight_ = STAGE_1_HEIGHT;
 		mapWidth_ = STAGE_1_WIDTH;
 	}
@@ -137,8 +141,8 @@ void Map::DrawMap()
 			int graphX = (chipNo % ChipNumX()) * (Field::CHIP_SIZE / 2);
 			int graphY = (chipNo / ChipNumX()) * (Field::CHIP_SIZE / 2);
 
-			DrawRectRotaGraph(x * Field::CHIP_SIZE + Field::DISPLAY_POS_X + Field::CHIP_SIZE / 2, 
-							y * Field::CHIP_SIZE + Field::DISPLAY_POS_Y + Field::CHIP_SIZE / 2,
+			DrawRectRotaGraph(x * Field::CHIP_SIZE + disPlayPosX_ + Field::CHIP_SIZE / 2, 
+							y * Field::CHIP_SIZE + disPlayPosY_ + Field::CHIP_SIZE / 2,
 							graphX, graphY, Field::CHIP_SIZE / 2, Field::CHIP_SIZE / 2,
 							SCALE, 0.0f, handle_, true, false);
 		}

@@ -13,8 +13,11 @@ public:
 	static constexpr int CHIP_SIZE = 32;
 
 	// 表示場所
-	static constexpr int DISPLAY_POS_X = 495;
-	static constexpr int DISPLAY_POS_Y = 100;
+	static constexpr int TUTORIAL_DISPLAY_POS_X = 640;
+	static constexpr int TUTORIAL_DISPLAY_POS_Y = 325;
+
+	static constexpr int STAGE_1_DISPLAY_POS_X = 495;
+	static constexpr int STAGE_1_DISPLAY_POS_Y = 100;
 
 	// ステージのサイズの取得
 	int GetMapDataY() const { return mapHeight_; }
@@ -91,6 +94,10 @@ private:
 	int mapHeight_;
 	int mapWidth_;
 	
+	// ステージの表示位置
+	int disPlayPosX_;
+	int disPlayPosY_;
+
 	// ステージ
 	int stage_;
 

@@ -48,6 +48,7 @@ private:
 	{
 		tutorial,	// チュートリアル
 		stage1,		// ステージ１
+		stage_num
 	};
 
 	//プレイヤー
@@ -114,7 +115,11 @@ private:
 	int golemH_;
 	int playH_;
 	int retryH_;
-	int doorH_;
+	int backH_;
+	int cursor1H_;
+	int cursor2H_;
+	int cursor3H_;
+	int cursor4H_;
 
 	// 初期座標
 	int playerStartPosX_;
@@ -127,6 +132,16 @@ private:
 	int ghostStartPosY_;
 	int golemStartPosX_;
 	int golemStartPosY_;
+
+	// カーソルの座標
+	Vec2 cursor1Pos_;
+	Vec2 cursor2Pos_;
+	Vec2 cursor3Pos_;
+	Vec2 cursor4Pos_;
+
+	// ゲームクリア文字の幅と高さ
+	int stringWidth_;
+	int stringHeight_;
 
 	// ゲームオーバーか
 	bool isGameOver_;

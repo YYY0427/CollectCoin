@@ -14,10 +14,10 @@ namespace
 	constexpr int pw_start_x = 0;					// 画面の左
 	constexpr int pw_start_y = 0;					// 画面の枠上
 
-	constexpr int pw_width_1 = 700;												// オプション枠の幅
-	constexpr int pw_height_1 = 500;											// オプション枠の高さ
-	constexpr int pw_start_x_1 = (Game::kScreenWidth / 2) - (pw_width_1 / 2);	// オプション枠の左
-	constexpr int pw_start_y_1 = (Game::kScreenHeight / 2) - (pw_height_1 / 2);	// オプション枠上
+	constexpr int PW_WIDTH_1 = 700;												// オプション枠の幅
+	constexpr int PW_HEIGHT_1 = 500;											// オプション枠の高さ
+	constexpr int PW_START_X_1 = (Game::kScreenWidth / 2) - (PW_WIDTH_1 / 2);	// オプション枠の左
+	constexpr int PW_START_Y_1 = (Game::kScreenHeight / 2) - (PW_HEIGHT_1 / 2);	// オプション枠上
 
 	constexpr int nameCount = 2;
 
@@ -81,8 +81,8 @@ void OptionScene::Update(const InputState& input)
 	// タイトル画面に戻る
 	if (input.IsTriggered(InputType::prev))
 	{
+		soundMgr.SaveSoundConfig();
 		manager_.PopScene();
-		return;
 	}
 }
 
@@ -91,14 +91,14 @@ void OptionScene::Draw()
 	// 影の表示
 	SetDrawBlendMode(DX_BLENDMODE_MULA, 150);
 	DrawBox(pw_start_x, pw_start_y, pw_start_x + pw_width, pw_start_y + pw_height, 0x000000, true);
-	DrawBox(pw_start_x_1 + 10, pw_start_y_1 + 10, pw_start_x_1 + pw_width_1 + 10, pw_start_y_1 + pw_height_1 + 10, 0x000000, true);
+	DrawBox(PW_START_X_1 + 10, PW_START_Y_1 + 10, PW_START_X_1 + PW_WIDTH_1 + 10, PW_START_Y_1 + PW_HEIGHT_1 + 10, 0x000000, true);
 	DrawBox(0, Game::kScreenHeight - 60, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-	DrawBox(pw_start_x_1, pw_start_y_1, pw_start_x_1 + pw_width_1, pw_start_y_1 + pw_height_1, GetColor(200, 200, 200), true);
+	DrawBox(PW_START_X_1, PW_START_Y_1, PW_START_X_1 + PW_WIDTH_1, PW_START_Y_1 + PW_HEIGHT_1, GetColor(200, 200, 200), true);
 
 	// オプション
 	int width1 = GetDrawStringWidthToHandle(OPTION, strlen(OPTION), optionH_);
-	DrawStringToHandle((Game::kScreenWidth / 2) - (width1 / 2), pw_start_y_1 + 50, OPTION, 0x000000, optionH_, false);
+	DrawStringToHandle((Game::kScreenWidth / 2) - (width1 / 2), PW_START_Y_1 + 50, OPTION, 0x000000, optionH_, false);
 
 	// B もどる
 	DrawRectRotaGraph(Game::kScreenWidth / 2 + 570, Game::kScreenHeight - 30, 32, 0, 16, 16, 2.0f, 0.0f, controllerH_, true);

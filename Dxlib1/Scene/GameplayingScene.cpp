@@ -1,7 +1,5 @@
 #include "GameplayingScene.h"
 #include "../InputState.h"
-#include "GameoverScene.h"
-#include "GameclearScene.h"
 #include "TitleScene.h"
 #include "SceneManager.h"
 #include "../DrawFunctions.h"
@@ -62,20 +60,21 @@ namespace
 	// 選択肢の数
 	constexpr int CHOICE_NUM = 3; 
 
-	constexpr int pw_width_1 = 400;												//ポーズ枠の幅
-	constexpr int pw_height_1 = 100;												//ポーズ枠の高さ
-	constexpr int pw_start_x_1 = (Game::kScreenWidth / 2) - (pw_width_1 / 2);	//ポーズ枠の左
-	constexpr int pw_start_y_1 = Game::kScreenHeight / 2;					//ポーズ枠上
+	// 選択肢の箱座標
+	constexpr int PW_WIDTH_1 = 400;												//枠の幅
+	constexpr int PW_HEIGHT_1 = 100;											//枠の高さ
+	constexpr int PW_START_X_1 = (Game::kScreenWidth / 2) - (PW_WIDTH_1 / 2);	//枠のスタートX座標
+	constexpr int PW_START_Y_1= Game::kScreenHeight / 2;						//枠のスタートY座標
 
-	constexpr int pw_width_2 = 400;												//ポーズ枠の幅
-	constexpr int pw_height_2 = 100;												//ポーズ枠の高さ
-	constexpr int pw_start_x_2 = (Game::kScreenWidth / 2) - (pw_width_1 / 2);	//ポーズ枠の左
-	constexpr int pw_start_y_2 = Game::kScreenHeight / 2 + 115;					//ポーズ枠上
+	constexpr int PW_WIDTH_2 = 400;												
+	constexpr int PW_HEIGHT_2 = 100;											
+	constexpr int PW_START_X_2 = (Game::kScreenWidth / 2) - (PW_WIDTH_1 / 2);	
+	constexpr int PW_START_Y_2 = Game::kScreenHeight / 2 + 115;					
 
-	constexpr int pw_width_3 = 400;												//ポーズ枠の幅
-	constexpr int pw_height_3 = 100;												//ポーズ枠の高さ
-	constexpr int pw_start_x_3 = (Game::kScreenWidth / 2) - (pw_width_1 / 2);	//ポーズ枠の左
-	constexpr int pw_start_y_3 = Game::kScreenHeight / 2 + 230;					//ポーズ枠上
+	constexpr int PW_WIDTH_3 = 400;												
+	constexpr int PW_HEIGHT_3 = 100;											
+	constexpr int PW_START_X_3 = (Game::kScreenWidth / 2) - (PW_WIDTH_1 / 2);	
+	constexpr int PW_START_Y_3 = Game::kScreenHeight / 2 + 230;					
 }
 
 GameplayingScene::GameplayingScene(SceneManager& manager) :
@@ -112,15 +111,15 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	// フォントの作成
 	gameOverH_ = CreateFontToHandle("PixelMplus10", 50, 30);
 	gameOverShadowH_ = CreateFontToHandle("PixelMplus10", 51, 30);
-	gameClearH_ = CreateFontToHandle("PixelMplus10", 80, 30);
-	gameClearShadowH_ = CreateFontToHandle("PixelMplus10", 81, 30);
+	gameClearH_ = CreateFontToHandle("PixelMplus10", 100, 30);
+	gameClearShadowH_ = CreateFontToHandle("PixelMplus10", 102, 30);
 	readyH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 
-	int stringWidth = GetDrawStringWidthToHandle(GAMECLEAR_STRING, strlen(GAMECLEAR_STRING), gameClearH_);
-	int stringHeight = GetFontSizeToHandle(gameClearH_);
+	stringWidth_ = GetDrawStringWidthToHandle(GAMECLEAR_STRING, strlen(GAMECLEAR_STRING), gameClearH_);
+	stringHeight_ = GetFontSizeToHandle(gameClearH_);
 
-	gameClearPos_.x = (Game::kScreenWidth / 2) - (stringWidth / 2);
-	gameClearPos_.y = (Game::kScreenHeight / 2) - 250;
+	gameClearPos_.x = (Game::kScreenWidth / 2) - (stringWidth_ / 2);
+	gameClearPos_.y = (Game::kScreenHeight / 2) - 220;
 
 	// 画像のロード
 	int nowaponPlayerH = my::MyLoadGraph("Data/img/game/nowapon-player.png");
@@ -128,9 +127,14 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	int deadPlayerH = my::MyLoadGraph("Data/img/game/player-deth1.png");
 	int attackPlayerH = my::MyLoadGraph("Data/img/game/player-attack_gold.png");
 
+	cursor1H_ = my::MyLoadGraph("Data/img/game/cursor1.png");
+	cursor2H_ = my::MyLoadGraph("Data/img/game/cursor2.png");
+	cursor3H_ = my::MyLoadGraph("Data/img/game/cursor3.png");
+	cursor4H_ = my::MyLoadGraph("Data/img/game/cursor4.png");
+
 	playH_ = my::MyLoadGraph("Data/img/play.png");
-	//retryH_ = my::MyLoadGraph("Data/img/setting.png");
-	//doorH_ = my::MyLoadGraph("Data/img/question.png");
+	retryH_ = my::MyLoadGraph("Data/img/retry.png");
+	backH_ = my::MyLoadGraph("Data/img/back.png");
 
 	skeletonH_ = my::MyLoadGraph("Data/img/game/skeleton_monokuro.png");
  	slimeH_ = my::MyLoadGraph("Data/img/game/slime_monokuro.png");
@@ -156,6 +160,7 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	{
 		enemy->SetPlayer(pPlayer_);
 		enemy->SetField(pField_);
+		enemy->Init(stage_);
 	}
 	
 	pBackGround_->SetPlayer(pPlayer_);
@@ -163,7 +168,6 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	pField_->SetPlayer(pPlayer_);
 	pMap_->SetField(pField_);
 	pField_->StageCheck(stage_);
-//	pField_->StageCheck2(stage_);
 
 	for (int i = 0; i < enemyNum_; i++)
 	{
@@ -288,21 +292,6 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 		}
 	}
 
-	if (quakeTimer_ > 0)
-	{
-		quakeX_ = -quakeX_;
-		quakeX_ *= 0.95f;
-		quakeY_ = -quakeY_;
-		quakeY_ *= 0.95f;
-
-		--quakeTimer_;
-	}
-	else
-	{
-		quakeX_ = 0.0f;
-		quakeY_ = 0.0f;
-	}
-
 	// ポーズシーン切り替え
 	if (input.IsTriggered(InputType::pause))
 	{
@@ -400,16 +389,10 @@ void GameplayingScene::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 	// ゲームクリア
-	if (isGameClear_ /*&& gameClearTimer_ >= 120*/)
+	if (isGameClear_ )
 	{
-		/*int stringWidth = GetDrawStringWidthToHandle(GAMECLEAR_STRING, strlen(GAMECLEAR_STRING), gameClearH_);
-		int stringHeight = GetFontSizeToHandle(gameClearH_);
-
-		int width = (Game::kScreenWidth / 2) - (stringWidth / 2);
-		int height = (Game::kScreenHeight / 2) - 300;*/
-
 		// ゲームクリア文字の表示
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, (gameClearStringFadeValue_ * 100) / 255);
 		DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gameClearStringFadeValue_);
@@ -417,25 +400,33 @@ void GameplayingScene::Draw()
 			GAMECLEAR_STRING, 0x000000, gameClearShadowH_, false);
 		DrawStringToHandle(gameClearPos_.x, gameClearPos_.y,
 			GAMECLEAR_STRING, 0xffffff, gameClearH_, false);
-		if (stage_ != 1)
+
+		// 最後のステージをクリアした場合箱を表示しない
+		if (stage_ != stage_num - 1)
 		{
 			// 選択肢
-			DrawRoundRect(pw_start_x_1 - 3, pw_start_y_1 - 3, pw_start_x_1 + pw_width_1 + 3, pw_start_y_1 + pw_height_1 + 3, 5, 5, 0x000000, true);
-			DrawRoundRect(pw_start_x_2 - 3, pw_start_y_2 - 3, pw_start_x_2 + pw_width_2 + 3, pw_start_y_2 + pw_height_2 + 3, 5, 5, 0x000000, true);
-			DrawRoundRect(pw_start_x_3 - 3, pw_start_y_3 - 3, pw_start_x_3 + pw_width_3 + 3, pw_start_y_3 + pw_height_3 + 3, 5, 5, 0x000000, true);
+			DrawRoundRect(PW_START_X_1 - 3, PW_START_Y_1 - 3, PW_START_X_1 + PW_WIDTH_1 + 3, PW_START_Y_1 + PW_HEIGHT_1 + 3, 5, 5, 0x000000, true);
+			DrawRoundRect(PW_START_X_2 - 3, PW_START_Y_2 - 3, PW_START_X_2 + PW_WIDTH_2 + 3, PW_START_Y_2 + PW_HEIGHT_2 + 3, 5, 5, 0x000000, true);
+			DrawRoundRect(PW_START_X_3 - 3, PW_START_Y_3 - 3, PW_START_X_3 + PW_WIDTH_3 + 3, PW_START_Y_3 + PW_HEIGHT_3 + 3, 5, 5, 0x000000, true);
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
-			DrawRoundRect(pw_start_x_1, pw_start_y_1, pw_start_x_1 + pw_width_1, pw_start_y_1 + pw_height_1, 5, 5, 0xffffff, true);
-			DrawRoundRect(pw_start_x_2, pw_start_y_2, pw_start_x_2 + pw_width_2, pw_start_y_2 + pw_height_2, 5, 5, 0xffffff, true);
-			DrawRoundRect(pw_start_x_3, pw_start_y_3, pw_start_x_3 + pw_width_3, pw_start_y_3 + pw_height_3, 5, 5, 0xffffff, true);
+			DrawRoundRect(PW_START_X_1, PW_START_Y_1, PW_START_X_1 + PW_WIDTH_1, PW_START_Y_1 + PW_HEIGHT_1, 5, 5, 0xffffff, true);
+			DrawRoundRect(PW_START_X_2, PW_START_Y_2, PW_START_X_2 + PW_WIDTH_2, PW_START_Y_2 + PW_HEIGHT_2, 5, 5, 0xffffff, true);
+			DrawRoundRect(PW_START_X_3, PW_START_Y_3, PW_START_X_3 + PW_WIDTH_3, PW_START_Y_3 + PW_HEIGHT_3, 5, 5, 0xffffff, true);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-			DrawRoundRect(pw_start_x_1, pw_start_y_1, pw_start_x_1 + pw_width_1, pw_start_y_1 + pw_height_1 - 5, 5, 5, 0xffffff, true);
-			DrawRoundRect(pw_start_x_2, pw_start_y_2, pw_start_x_2 + pw_width_2, pw_start_y_2 + pw_height_2 - 5, 5, 5, 0xffffff, true);
-			DrawRoundRect(pw_start_x_3, pw_start_y_3, pw_start_x_3 + pw_width_3, pw_start_y_3 + pw_height_3 - 5, 5, 5, 0xffffff, true);
+			DrawRoundRect(PW_START_X_1, PW_START_Y_1, PW_START_X_1 + PW_WIDTH_1, PW_START_Y_1 + PW_HEIGHT_1 - 5, 5, 5, 0xffffff, true);
+			DrawRoundRect(PW_START_X_2, PW_START_Y_2, PW_START_X_2 + PW_WIDTH_2, PW_START_Y_2 + PW_HEIGHT_2 - 5, 5, 5, 0xffffff, true);
+			DrawRoundRect(PW_START_X_3, PW_START_Y_3, PW_START_X_3 + PW_WIDTH_3, PW_START_Y_3 + PW_HEIGHT_3 - 5, 5, 5, 0xffffff, true);
+
+			// カーソル
+			DrawRotaGraph(cursor1Pos_.x, cursor1Pos_.y, 0.2f, 0.0f, cursor1H_, true);
+			DrawRotaGraph(cursor2Pos_.x, cursor2Pos_.y, 0.2f, 0.0f, cursor2H_, true);
+			DrawRotaGraph(cursor3Pos_.x, cursor3Pos_.y, 0.2f, 0.0f, cursor3H_, true);
+			DrawRotaGraph(cursor4Pos_.x, cursor4Pos_.y, 0.2f, 0.0f, cursor4H_, true);
 
 			// アイコン
-		//	DrawRotaGraph(Game::kScreenWidth / 2, Game::kScreenHeight / 2 + 150, 1.0f, 0.0f, playH_, true);
-		//	DrawRotaGraph(Game::kScreenWidth / 2 - 140, Game::kScreenHeight / 2 + 265, 1.0f, 0.0f, doorH_, true);
-		//	DrawRotaGraph(Game::kScreenWidth / 2, Game::kScreenHeight / 2 + 265, 1.0f, 0.0f, retryH_, true);
+			DrawRotaGraph(Game::kScreenWidth / 2, (Game::kScreenHeight / 2) + 50, 1.0f, 0.0f, playH_, true);
+			DrawRotaGraph(Game::kScreenWidth / 2, (Game::kScreenHeight / 2) + 165, 0.8f, 0.0f, retryH_, true);
+			DrawRotaGraph(Game::kScreenWidth / 2, (Game::kScreenHeight / 2) + 280, 1.0f, 0.0f, backH_, true);
 
 			DrawFormatString(0, 0, 0xffffff, "currentInputIndex = %d", currentInputIndex_);
 		}
@@ -465,80 +456,146 @@ void GameplayingScene::Draw()
 
 void GameplayingScene::GameClearUpdate(const InputState& input)
 {
+	// ゲームクリア時のコインの演出
 	isCoinEnabled_ = true;
 	if (gameClearTimer_ % 1 == 0)
 	{
 		pCoin_.push_back(std::make_shared<Coin>(coinH_));
 		pCoin_.push_back(std::make_shared<Coin>(coinH_));
 	}
-
-	pPlayer_->ClearUpdate();
-	
 	for (auto& coin : pCoin_)
 	{
 		coin->Update();
 	}
+	
+	// ゲームクリア時のプレイヤーの演出
+	pPlayer_->ClearUpdate();
 
+	// ゲームクリア後指定の時間が経ったら一度だけジングルを鳴らす
 	gameClearTimer_++;
 	if (gameClearTimer_ >= 60 && !isGameClear_)
 	{
 		SoundManager::GetInstance().PlayJingle("Data/sound/BGM/gameClear.ogg");
+		gameClearTimer_ = 0;
 		isGameClear_ = true;
-	//	gameClearStringFadeValue_ = 0;
+
+		// 最後のステージをクリアした場合
+		if (stage_ == stage_num - 1)
+		{
+			gameClearPos_.x = (Game::kScreenWidth / 2) - (stringWidth_ / 2);
+			gameClearPos_.y = (Game::kScreenHeight / 2) - (stringHeight_ / 2) + 20;
+		}
 	}
 	
-
+	// 音楽が鳴っていた場合
 	if (isGameClear_)
 	{
 		gameClearStringFadeValue_ = 255 * (static_cast<float>(gameClearFadeTimer_)) / static_cast<float>(game_clear_fade_interval);
 
-		gameClearPos_.y--;
-		if (gameClearPos_.y <= 240)
+		if (stage_ != stage_num - 1)
 		{
-			gameClearPos_.y = 240;
+			gameClearPos_.y -= 0.5f;
+			if (gameClearPos_.y <= static_cast<float>((Game::kScreenHeight / 2) - 230))
+			{
+				gameClearPos_.y = static_cast<float>((Game::kScreenHeight / 2) - 230);
+			}
+		}
+		else
+		{
+			gameClearPos_.y -= 0.5f;
+			if (gameClearPos_.y <= static_cast<float>((Game::kScreenHeight / 2) - (stringHeight_ / 2)))
+			{
+				gameClearPos_.y = static_cast<float>((Game::kScreenHeight / 2) - (stringHeight_ / 2));
+			}
 		}
 
-	//	gameClearFadeTimer_ = (std::min)(gameClearFadeTimer_++, 255);
-
-		if (++gameClearFadeTimer_ >= 255)
+		if (++gameClearFadeTimer_ >= 100)
 		{
-			gameClearStringFadeValue_ = 255;
-
-			if (stage_ == 1)
+			gameClearFadeTimer_ = 100;
+		
+			// 最後のステージをクリアした場合すぐフェードしてタイトル画面に戻る
+			if (stage_ == stage_num - 1 && !CheckMusic())
 			{
 				isTitile_ = true;
 				updateFunc_ = &GameplayingScene::FadeOutUpdate;
 			}
 
-			//上下で回る処理
-			if (input.IsTriggered(InputType::up))
+			if (stage_ != stage_num - 1)
 			{
-				SoundManager::GetInstance().Play("cursor");
-				currentInputIndex_ = ((currentInputIndex_ - 1) + CHOICE_NUM) % CHOICE_NUM;
-			}
-			else if (input.IsTriggered(InputType::down))
-			{
-				SoundManager::GetInstance().Play("cursor");
-				currentInputIndex_ = (currentInputIndex_ + 1) % CHOICE_NUM;
-			}
+				//上下で回る処理
+				if (input.IsTriggered(InputType::up))
+				{
+					SoundManager::GetInstance().Play("cursor");
+					currentInputIndex_ = ((currentInputIndex_ - 1) + CHOICE_NUM) % CHOICE_NUM;
+				}
+				else if (input.IsTriggered(InputType::down))
+				{
+					SoundManager::GetInstance().Play("cursor");
+					currentInputIndex_ = (currentInputIndex_ + 1) % CHOICE_NUM;
+				}
 
-			if (input.IsTriggered(InputType::next))
-			{
-				SoundManager::GetInstance().Play("decision");
-				gameClearTimer_ = 0;
 				if (currentInputIndex_ == 0)
 				{
-					isNextStage_ = true;
+					cursor1Pos_.x = PW_START_X_1;
+					cursor1Pos_.y = PW_START_Y_1;
+
+					cursor2Pos_.x = PW_START_X_1 + PW_WIDTH_1;
+					cursor2Pos_.y = PW_START_Y_1;
+
+					cursor3Pos_.x = PW_START_X_1 + PW_WIDTH_1;
+					cursor3Pos_.y = PW_START_Y_1 + PW_HEIGHT_1;
+
+					cursor4Pos_.x = PW_START_X_1;
+					cursor4Pos_.y = PW_START_Y_1 + PW_HEIGHT_1;
 				}
 				else if (currentInputIndex_ == 1)
 				{
-					isRetry_ = true;
+					cursor1Pos_.x = PW_START_X_2;
+					cursor1Pos_.y = PW_START_Y_2;
+
+					cursor2Pos_.x = PW_START_X_2 + PW_WIDTH_2;
+					cursor2Pos_.y = PW_START_Y_2;
+
+					cursor3Pos_.x = PW_START_X_2 + PW_WIDTH_2;
+					cursor3Pos_.y = PW_START_Y_2 + PW_HEIGHT_2;
+
+					cursor4Pos_.x = PW_START_X_2;
+					cursor4Pos_.y = PW_START_Y_2 + PW_HEIGHT_2;
+
 				}
-				else 
+				else if (currentInputIndex_ == 2)
 				{
-					isTitile_ = true;
+					cursor1Pos_.x = PW_START_X_3;
+					cursor1Pos_.y = PW_START_Y_3;
+
+					cursor2Pos_.x = PW_START_X_3 + PW_WIDTH_3;
+					cursor2Pos_.y = PW_START_Y_3;
+
+					cursor3Pos_.x = PW_START_X_3 + PW_WIDTH_3;
+					cursor3Pos_.y = PW_START_Y_3 + PW_HEIGHT_3;
+
+					cursor4Pos_.x = PW_START_X_3;
+					cursor4Pos_.y = PW_START_Y_3 + PW_HEIGHT_3;
 				}
-				updateFunc_ = &GameplayingScene::FadeOutUpdate;
+
+				if (input.IsTriggered(InputType::next))
+				{
+					SoundManager::GetInstance().Play("decision");
+					gameClearTimer_ = 0;
+					if (currentInputIndex_ == 0)
+					{
+						isNextStage_ = true;
+					}
+					else if (currentInputIndex_ == 1)
+					{
+						isRetry_ = true;
+					}
+					else
+					{
+						isTitile_ = true;
+					}
+					updateFunc_ = &GameplayingScene::FadeOutUpdate;
+				}
 			}
 		}
 	}
@@ -693,6 +750,12 @@ void GameplayingScene::PrepareUpdate(const InputState& input)
 void GameplayingScene::SetInit()
 {
 	pCoin_.clear();
+	stringWidth_ = GetDrawStringWidthToHandle(GAMECLEAR_STRING, strlen(GAMECLEAR_STRING), gameClearH_);
+	stringHeight_ = GetFontSizeToHandle(gameClearH_);
+
+	gameClearPos_.x = (Game::kScreenWidth / 2) - (stringWidth_ / 2);
+	gameClearPos_.y = (Game::kScreenHeight / 2) - 220;
+
 	fadeTimer_ = fade_interval;
 	fadeValue_ = 255;
 	timer_ = 0;
@@ -705,10 +768,11 @@ void GameplayingScene::SetInit()
 	pPlayer_->Init(stage_);
 	StageCheck(stage_);
 	pField_->SetCoinNum(0);
-//	pField_->Init();
+	gameClearFadeTimer_ = 0;
+	gameClearStringFadeValue_ = 0;
 	for (auto& enemy : pEnemy_)
 	{
-		enemy->Init();
+		enemy->Init(stage_);
 		enemy->SetInit(stage_);
 	}
 	for (auto& enemy : pEnemy_)
@@ -747,9 +811,12 @@ void GameplayingScene::SetDeadInit()
 	pPlayer_->Init(stage_);
 	for (auto& enemy : pEnemy_)
 	{
-		enemy->Init();
+		enemy->Init(stage_);
 		enemy->SetInit(stage_);
 	}
+	SetVolumeMusic(0);
+	SoundManager::GetInstance().PlayMusic("Data/sound/BGM/game.mp3");
+	pPlayer_->StartMusic();
 }
 
 bool GameplayingScene::Colision(std::shared_ptr<EnemyBase>enemy, int width, int height)

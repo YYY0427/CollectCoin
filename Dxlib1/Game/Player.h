@@ -118,6 +118,9 @@ private:
 
 	bool enemyKill_;
 
+	int disPlayPosX_;
+	int disPlayPosY_;
+
 	//プレイヤーのインデックス座標
 	int indexX_;
 	int indexY_;

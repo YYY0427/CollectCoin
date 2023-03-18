@@ -183,7 +183,6 @@
     <ClInclude Include="Game\Ghost.h" />
     <ClInclude Include="Game\Map.h" />
     <ClInclude Include="Particle.h" />
-    <ClInclude Include="Scene\GameclearScene.h" />
     <ClInclude Include="Game\Skeleton.h" />
     <ClInclude Include="DrawFunctions.h" />
     <ClInclude Include="Game.h" />
@@ -192,7 +191,6 @@
     <ClInclude Include="Game\Player.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="InputState.h" />
-    <ClInclude Include="Scene\GameoverScene.h" />
     <ClInclude Include="Scene\GameplayingScene.h" />
     <ClInclude Include="Scene\OptionScene.h" />
     <ClInclude Include="Scene\PauseScene.h" />

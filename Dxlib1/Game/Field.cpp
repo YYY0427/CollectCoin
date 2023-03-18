@@ -22,14 +22,14 @@ namespace
 	constexpr int mapDataTutorial[TUTORIAL_HEIGHT][TUTORIAL_WIDTH] =
 	{
 		{  2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
-		{  2, 3, 0, 0, 1, 1, 0, 0, 3, 2 },
+		{  2, 3, 0, 0, 0, 0, 0, 0, 3, 2 },
 		{  2, 0, 0, 0, 0, 0, 0, 0, 0, 2 },
 		{  2, 0, 2, 2, 2, 2, 2, 2, 0, 2 },
 		{  2, 0, 2, 2, 2, 2, 2, 2, 0, 2 },
-		{  0, 0, 1, 1, 1, 1, 1, 1, 0, 0 },
+		{  0, 0, 0, 1, 0, 0, 0, 0, 0, 0 },
 		{  2, 0, 2, 2, 2, 2, 2, 2, 0, 2 },
 		{  2, 0, 2, 2, 2, 2, 2, 2, 0, 2 },
-		{  2, 3, 0, 0, 1, 1, 0, 0, 3, 2 },
+		{  2, 3, 0, 0, 0, 0, 0, 0, 3, 2 },
 		{  2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
 	};
 
@@ -126,23 +126,6 @@ Field::~Field()
 	DeleteFontToHandle(stringH_);
 }
 
-//void Field::Init()
-//{
-//	pinkyGoalX_ = 1;
-//	pinkyGoalY_ = 1;
-//
-//	blinkyGoalX_ = 17;
-//	blinkyGoalY_ = 1;
-//
-//	inkyGoalX_ = 1;
-//	inkyGoalY_ = 20;
-//
-//	crydeGoalY_ = 20;
-//	crydeGoalX_ = 17;
-//
-//	isDraw_ = true;
-//}
-
 void Field::StageCheck(int stage)
 {
 	stage_ = stage;
@@ -151,6 +134,8 @@ void Field::StageCheck(int stage)
 	case 0:
 		mapHeight_ = TUTORIAL_HEIGHT;
 		mapWidth_ = TUTORIAL_WIDTH;
+		disPlayPosX_ = TUTORIAL_DISPLAY_POS_X;
+		disPlayPosY_ = TUTORIAL_DISPLAY_POS_Y;
 		blinkyGoalX_ = 5;
 		blinkyGoalY_ = 2;
 		pEnemy_.resize(1);
@@ -158,6 +143,8 @@ void Field::StageCheck(int stage)
 	case 1:
 		mapHeight_ = STAGE_1_HEIGHT;
 		mapWidth_ = STAGE_1_WIDTH;
+		disPlayPosX_ = STAGE_1_DISPLAY_POS_X;
+		disPlayPosY_ = STAGE_1_DISPLAY_POS_Y;
 		pinkyGoalX_ = 1;
 		pinkyGoalY_ = 1;
 		blinkyGoalX_ = 17;
@@ -254,20 +241,20 @@ void Field::Draw()
 			if (mapData_[y][x] == 1)
 			{
 				int imgX = (coinImgIdx_ / COIN_FRAME_SPEED) * 8;
-				DrawRectRotaGraph(x * CHIP_SIZE + 16 + DISPLAY_POS_X, y * CHIP_SIZE + 16 + DISPLAY_POS_Y,
+				DrawRectRotaGraph(x * CHIP_SIZE + 16 + disPlayPosX_, y * CHIP_SIZE + 16 + disPlayPosY_,
 					imgX, 0, 8, 8, 2.0f, 0.0f, coinH_, true);
 			}
 			// Œ•‚Ì•`‰æ
 			if (mapData_[y][x] == 3)
 			{
-				DrawRectRotaGraph(x * CHIP_SIZE + 16 + DISPLAY_POS_X, y * CHIP_SIZE + 16 + DISPLAY_POS_Y,
+				DrawRectRotaGraph(x * CHIP_SIZE + 16 + disPlayPosX_, y * CHIP_SIZE + 16 + disPlayPosY_,
 					0, 0, 16, 16, 2.0f, 0.0f, sordH_, true);
 			}
 			// ”à‚Ì•`‰æ
 			if (mapData_[y][x] == 7)
 			{
 				int imgX = (doorImgIdx_ / DOOR_FRAME_SPEED) * 16;
-				DrawRectRotaGraph(x * CHIP_SIZE + 16 + DISPLAY_POS_X, y * CHIP_SIZE + 16 + DISPLAY_POS_Y,
+				DrawRectRotaGraph(x * CHIP_SIZE + 16 + disPlayPosX_, y * CHIP_SIZE + 16 + disPlayPosY_,
 					imgX, 0, 16, 16, 2.0f, 0.0f, doorH_, true);
 			}
 			// •Ç‚Ì•`‰æ

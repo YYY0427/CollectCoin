@@ -16,20 +16,20 @@
 
 namespace
 {
-	constexpr int pw_width_1 = 400;												//ポーズ枠の幅
-	constexpr int pw_height_1 = 100;												//ポーズ枠の高さ
-	constexpr int pw_start_x_1 = (Game::kScreenWidth / 2) - (pw_width_1 / 2);	//ポーズ枠の左
-	constexpr int pw_start_y_1 = Game::kScreenHeight / 2 + 100;					//ポーズ枠上
+	constexpr int PW_WIDTH_1 = 400;												//ポーズ枠の幅
+	constexpr int PW_HEIGHT_1 = 100;												//ポーズ枠の高さ
+	constexpr int PW_START_X_1 = (Game::kScreenWidth / 2) - (PW_WIDTH_1 / 2);	//ポーズ枠の左
+	constexpr int PW_START_Y_1 = Game::kScreenHeight / 2 + 100;					//ポーズ枠上
 
-	constexpr int pw_width_2 = 120;												//ポーズ枠の幅
-	constexpr int pw_height_2 = 100;												//ポーズ枠の高さ
-	constexpr int pw_start_x_2 = 600;	//ポーズ枠の左
-	constexpr int pw_start_y_2 = Game::kScreenHeight / 2 + 215;					//ポーズ枠上
+	constexpr int PW_WIDTH_2 = 120;												//ポーズ枠の幅
+	constexpr int PW_HEIGHT_2 = 100;												//ポーズ枠の高さ
+	constexpr int PW_START_X_2 = 600;	//ポーズ枠の左
+	constexpr int PW_START_Y_2 = Game::kScreenHeight / 2 + 215;					//ポーズ枠上
 
-	constexpr int pw_width_3 = 120;												//ポーズ枠の幅
-	constexpr int pw_height_3 = 100;												//ポーズ枠の高さ
-	constexpr int pw_start_x_3 = (Game::kScreenWidth / 2) - (pw_width_3 / 2);	//ポーズ枠の左
-	constexpr int pw_start_y_3 = Game::kScreenHeight / 2 + 215;					//ポーズ枠上
+	constexpr int PW_WIDTH_3 = 120;												//ポーズ枠の幅
+	constexpr int PW_HEIGHT_3 = 100;												//ポーズ枠の高さ
+	constexpr int PW_START_X_3 = (Game::kScreenWidth / 2) - (PW_WIDTH_3 / 2);	//ポーズ枠の左
+	constexpr int PW_START_Y_3 = Game::kScreenHeight / 2 + 215;					//ポーズ枠上
 
 	constexpr int pw_width_4 = 120;												//ポーズ枠の幅
 	constexpr int pw_height_4 = 100;												//ポーズ枠の高さ
@@ -103,17 +103,17 @@ void TitleScene::NormalUpdate(const InputState& input)
 	// 選択肢を回す
 	if (currentInputIndex_ == start)
 	{
-		cursor1Pos_.x = pw_start_x_1;
-		cursor1Pos_.y = pw_start_y_1;
+		cursor1Pos_.x = PW_START_X_1;
+		cursor1Pos_.y = PW_START_Y_1;
 
-		cursor2Pos_.x = pw_start_x_1 + pw_width_1;
-		cursor2Pos_.y = pw_start_y_1;
+		cursor2Pos_.x = PW_START_X_1 + PW_WIDTH_1;
+		cursor2Pos_.y = PW_START_Y_1;
 
-		cursor3Pos_.x = pw_start_x_1 + pw_width_1;
-		cursor3Pos_.y = pw_start_y_1 + pw_height_1;
+		cursor3Pos_.x = PW_START_X_1 + PW_WIDTH_1;
+		cursor3Pos_.y = PW_START_Y_1 + PW_HEIGHT_1;
 
-		cursor4Pos_.x = pw_start_x_1;
-		cursor4Pos_.y = pw_start_y_1 + pw_height_1;
+		cursor4Pos_.x = PW_START_X_1;
+		cursor4Pos_.y = PW_START_Y_1 + PW_HEIGHT_1;
 
 		if (input.IsTriggered(InputType::down))
 		{
@@ -123,17 +123,17 @@ void TitleScene::NormalUpdate(const InputState& input)
 	}
 	else if (currentInputIndex_ == option)
 	{
-		cursor1Pos_.x = pw_start_x_2;
-		cursor1Pos_.y = pw_start_y_2;
+		cursor1Pos_.x = PW_START_X_2;
+		cursor1Pos_.y = PW_START_Y_2;
 
-		cursor2Pos_.x = pw_start_x_2 + pw_width_2;
-		cursor2Pos_.y = pw_start_y_2;
+		cursor2Pos_.x = PW_START_X_2 + PW_WIDTH_2;
+		cursor2Pos_.y = PW_START_Y_2;
 
-		cursor3Pos_.x = pw_start_x_2 + pw_width_2;
-		cursor3Pos_.y = pw_start_y_2 + pw_height_2;
+		cursor3Pos_.x = PW_START_X_2 + PW_WIDTH_2;
+		cursor3Pos_.y = PW_START_Y_2 + PW_HEIGHT_2;
 
-		cursor4Pos_.x = pw_start_x_2;
-		cursor4Pos_.y = pw_start_y_2 + pw_height_2;
+		cursor4Pos_.x = PW_START_X_2;
+		cursor4Pos_.y = PW_START_Y_2 + PW_HEIGHT_2;
 
 		if (input.IsTriggered(InputType::up))
 		{
@@ -148,17 +148,17 @@ void TitleScene::NormalUpdate(const InputState& input)
 	}
 	else if (currentInputIndex_ == tutorial)
 	{
-		cursor1Pos_.x = pw_start_x_3;
-		cursor1Pos_.y = pw_start_y_3;
+		cursor1Pos_.x = PW_START_X_3;
+		cursor1Pos_.y = PW_START_Y_3;
 
-		cursor2Pos_.x = pw_start_x_3 + pw_width_3;
-		cursor2Pos_.y = pw_start_y_3;
+		cursor2Pos_.x = PW_START_X_3 + PW_WIDTH_3;
+		cursor2Pos_.y = PW_START_Y_3;
 
-		cursor3Pos_.x = pw_start_x_3 + pw_width_3;
-		cursor3Pos_.y = pw_start_y_3 + pw_height_3;
+		cursor3Pos_.x = PW_START_X_3 + PW_WIDTH_3;
+		cursor3Pos_.y = PW_START_Y_3 + PW_HEIGHT_3;
 
-		cursor4Pos_.x = pw_start_x_3;
-		cursor4Pos_.y = pw_start_y_3 + pw_height_3;
+		cursor4Pos_.x = PW_START_X_3;
+		cursor4Pos_.y = PW_START_Y_3 + PW_HEIGHT_3;
 
 		if (input.IsTriggered(InputType::up))
 		{
@@ -330,19 +330,19 @@ void TitleScene::Draw()
 	DrawStringToHandle((Game::kScreenWidth / 2) - (width4 / 2), 100, TITLE_STRING, 0xffffff, titleH_, false);
 
 	// 選択肢
-	DrawRoundRect(pw_start_x_1 - 3, pw_start_y_1 - 3, pw_start_x_1 + pw_width_1 + 3, pw_start_y_1 + pw_height_1 + 3, 5, 5, 0x000000, true);
-	DrawRoundRect(pw_start_x_2 - 3, pw_start_y_2 - 3, pw_start_x_2 + pw_width_2 + 3, pw_start_y_2 + pw_height_2 + 3, 5, 5, 0x000000, true);
-	DrawRoundRect(pw_start_x_3 - 3, pw_start_y_3 - 3, pw_start_x_3 + pw_width_3 + 3, pw_start_y_3 + pw_height_3 + 3, 5, 5, 0x000000, true);
+	DrawRoundRect(PW_START_X_1 - 3, PW_START_Y_1 - 3, PW_START_X_1 + PW_WIDTH_1 + 3, PW_START_Y_1 + PW_HEIGHT_1 + 3, 5, 5, 0x000000, true);
+	DrawRoundRect(PW_START_X_2 - 3, PW_START_Y_2 - 3, PW_START_X_2 + PW_WIDTH_2 + 3, PW_START_Y_2 + PW_HEIGHT_2 + 3, 5, 5, 0x000000, true);
+	DrawRoundRect(PW_START_X_3 - 3, PW_START_Y_3 - 3, PW_START_X_3 + PW_WIDTH_3 + 3, PW_START_Y_3 + PW_HEIGHT_3 + 3, 5, 5, 0x000000, true);
 	DrawRoundRect(pw_start_x_4 - 3, pw_start_y_4 - 3, pw_start_x_4 + pw_width_4 + 3, pw_start_y_4 + pw_height_4 + 3, 5, 5, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
-	DrawRoundRect(pw_start_x_1, pw_start_y_1, pw_start_x_1 + pw_width_1, pw_start_y_1 + pw_height_1, 5, 5, 0xffffff, true);
-	DrawRoundRect(pw_start_x_2, pw_start_y_2, pw_start_x_2 + pw_width_2, pw_start_y_2 + pw_height_2, 5, 5, 0xffffff, true);
-	DrawRoundRect(pw_start_x_3, pw_start_y_3, pw_start_x_3 + pw_width_3, pw_start_y_3 + pw_height_3, 5, 5, 0xffffff, true);
+	DrawRoundRect(PW_START_X_1, PW_START_Y_1, PW_START_X_1 + PW_WIDTH_1, PW_START_Y_1 + PW_HEIGHT_1, 5, 5, 0xffffff, true);
+	DrawRoundRect(PW_START_X_2, PW_START_Y_2, PW_START_X_2 + PW_WIDTH_2, PW_START_Y_2 + PW_HEIGHT_2, 5, 5, 0xffffff, true);
+	DrawRoundRect(PW_START_X_3, PW_START_Y_3, PW_START_X_3 + PW_WIDTH_3, PW_START_Y_3 + PW_HEIGHT_3, 5, 5, 0xffffff, true);
 	DrawRoundRect(pw_start_x_4, pw_start_y_4, pw_start_x_4 + pw_width_4, pw_start_y_4 + pw_height_4, 5, 5, 0xffffff, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-	DrawRoundRect(pw_start_x_1, pw_start_y_1, pw_start_x_1 + pw_width_1, pw_start_y_1 + pw_height_1 - 5, 5, 5, 0xffffff, true);
-	DrawRoundRect(pw_start_x_2, pw_start_y_2, pw_start_x_2 + pw_width_2, pw_start_y_2 + pw_height_2 - 5, 5, 5, 0xffffff, true);
-	DrawRoundRect(pw_start_x_3, pw_start_y_3, pw_start_x_3 + pw_width_3, pw_start_y_3 + pw_height_3 - 5, 5, 5, 0xffffff, true);
+	DrawRoundRect(PW_START_X_1, PW_START_Y_1, PW_START_X_1 + PW_WIDTH_1, PW_START_Y_1 + PW_HEIGHT_1 - 5, 5, 5, 0xffffff, true);
+	DrawRoundRect(PW_START_X_2, PW_START_Y_2, PW_START_X_2 + PW_WIDTH_2, PW_START_Y_2 + PW_HEIGHT_2 - 5, 5, 5, 0xffffff, true);
+	DrawRoundRect(PW_START_X_3, PW_START_Y_3, PW_START_X_3 + PW_WIDTH_3, PW_START_Y_3 + PW_HEIGHT_3 - 5, 5, 5, 0xffffff, true);
 	DrawRoundRect(pw_start_x_4, pw_start_y_4, pw_start_x_4 + pw_width_4, pw_start_y_4 + pw_height_4 - 5, 5, 5, 0xffffff, true);
 
 	// アイコン

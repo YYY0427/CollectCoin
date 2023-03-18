@@ -9,6 +9,7 @@ public:
 
 	void Update();
 	void Draw();
+	bool IsEnabled();
 private:
 	int imgH_;
 	Vec2 pos_;

@@ -66,17 +66,22 @@ EnemyBase::EnemyBase() :
 {
 	// 画像のサイズの取得
 	GetGraphSizeF(handle_, &size_.x, &size_.y);
-
-	moveInterval_ = Field::CHIP_SIZE;
-
-	speed_ = NORMAL_SPEED;
-
-	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_X);
-	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_Y);
 }
 
-void EnemyBase::Init()
+void EnemyBase::Init(int stage)
 {
+	switch (stage)
+	{
+	case 0 :
+		disPlayPosX_ = Field::TUTORIAL_DISPLAY_POS_X;
+		disPlayPosY_ = Field::TUTORIAL_DISPLAY_POS_Y;
+		break;
+	case 1:
+		disPlayPosX_ = Field::STAGE_1_DISPLAY_POS_X;
+		disPlayPosY_ = Field::STAGE_1_DISPLAY_POS_Y;
+		break;
+	}
+
 	moveTimer_ = 0;
 	moveTimer2_ = 0;
 	kX_ = 0;
@@ -93,6 +98,13 @@ void EnemyBase::Init()
 	isIzike_ = false;
 	isTracking_ = false;
 	isIntrusion_ = false;
+
+	moveInterval_ = Field::CHIP_SIZE;
+
+	speed_ = NORMAL_SPEED;
+
+	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosX_);
+	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosY_);
 }
 
 bool EnemyBase::Colision(int direction)
@@ -173,8 +185,8 @@ void EnemyBase::SpeedChange()
 void EnemyBase::PosCalculation()
 {
 	// インデックス座標を計算
-	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_X);
-	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_Y);
+	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosX_);
+	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosY_);
 
 	// 向いている方向によって座標を計算
 	switch (moveDirection_)
@@ -209,8 +221,8 @@ void EnemyBase::SetDeadInit(int stage)
 		indexX_ = 9;
 		indexY_ = 10;
 	}
-	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_X);
-	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + Field::DISPLAY_POS_Y);
+	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosX_);
+	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosY_);
 
 	// 初期化
 	isDead_ = false;
