@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Scene\Credit.cpp" />
     <ClCompile Include="Game\Coin.cpp" />
     <ClCompile Include="Game\BackGround.cpp" />
     <ClCompile Include="Game\Slime.cpp" />
@@ -176,6 +177,7 @@
     <ClCompile Include="vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Scene\Credit.h" />
     <ClInclude Include="Game\Coin.h" />
     <ClInclude Include="Game\BackGround.h" />
     <ClInclude Include="Game\Slime.h" />

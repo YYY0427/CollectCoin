@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene.h"
+
 /// <summary>
 /// オプションシーン
 /// </summary>
@@ -25,7 +26,6 @@ private:
 	int cursor2H_;
 	int cursor3H_;
 	int cursor4H_;
-
 	int currentInputIndex_;
 };
 

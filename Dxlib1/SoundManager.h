@@ -11,7 +11,7 @@ private:
 	// 変更したサウンド情報をファイルに書き込む
 	struct SoundConfigInfo
 	{
-		char signature[4];			// "SND_"
+		char signature[5];			// "SND_"
 		float version;				// 1.0
 		unsigned short volumeSE;	// 0～255	
 		unsigned short volumeBGM;	// 0～255

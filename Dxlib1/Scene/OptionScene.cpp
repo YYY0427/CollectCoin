@@ -135,10 +135,10 @@ void OptionScene::Draw()
 
 	auto& soundMgr = SoundManager::GetInstance();
 	// BGMÇÃê›íË
-	DrawFormatString(pw_start_x + 20, pw_start_y + 50, 0xffffff, "BGM Volume = %d", soundMgr.GetBGMVolume());
+//	DrawFormatString(pw_start_x + 20, pw_start_y + 50, 0xffffff, "BGM Volume = %d", soundMgr.GetBGMVolume());
 
 	// SEÇÃê›íË
-	DrawFormatString(pw_start_x + 20, pw_start_y + 70, 0xffffff, "SE Volume = %d", soundMgr.GetSEVolume());
+//	DrawFormatString(pw_start_x + 20, pw_start_y + 70, 0xffffff, "SE Volume = %d", soundMgr.GetSEVolume());
 
 	int bgmNum = soundMgr.GetBGMVolume() / 25;
 	int seNum = soundMgr.GetSEVolume() / 25;

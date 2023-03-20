@@ -23,7 +23,7 @@ private:
 	{
 		start,
 		option,
-		tutorial,
+		credit,
 		exsit
 	};
 

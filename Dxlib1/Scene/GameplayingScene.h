@@ -5,6 +5,7 @@
 #include <memory>	
 #include <array>	
 #include <vector>
+#include <list>
 
 // プロトタイプ宣言
 class Player;	
@@ -67,7 +68,7 @@ private:
 	std::shared_ptr<BackGround> pBackGround_;
 
 	// ゲームクリア演出コイン
-	std::vector<std::shared_ptr<Coin>> pCoin_;
+	std::list<std::shared_ptr<Coin>> pCoin_;
 
 	// ゲームクリア演出パーティクル
 	std::array<std::shared_ptr<Particle>, 100> pParticle_;

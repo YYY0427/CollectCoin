@@ -181,7 +181,7 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 
 GameplayingScene::~GameplayingScene()
 {
-	
+
 }
 
 void GameplayingScene::FadeInUpdate(const InputState& input)
@@ -428,7 +428,6 @@ void GameplayingScene::Draw()
 			DrawRotaGraph(Game::kScreenWidth / 2, (Game::kScreenHeight / 2) + 165, 0.8f, 0.0f, retryH_, true);
 			DrawRotaGraph(Game::kScreenWidth / 2, (Game::kScreenHeight / 2) + 280, 1.0f, 0.0f, backH_, true);
 
-			DrawFormatString(0, 0, 0xffffff, "currentInputIndex = %d", currentInputIndex_);
 		}
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
@@ -463,6 +462,15 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 		pCoin_.push_back(std::make_shared<Coin>(coinH_));
 		pCoin_.push_back(std::make_shared<Coin>(coinH_));
 	}
+
+	// 不要になったコインの削除
+	auto coin = std::remove_if(pCoin_.begin(), pCoin_.end(), [](const std::shared_ptr<Coin>& coin)
+		{
+			return coin->IsEnabled();
+		});
+	pCoin_.erase(coin, pCoin_.end());
+
+	// コインの演出処理
 	for (auto& coin : pCoin_)
 	{
 		coin->Update();

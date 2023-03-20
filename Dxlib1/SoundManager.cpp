@@ -8,7 +8,7 @@ namespace
 //	const char* const SOUND_FILE_SIGNATURE = "SND_";
 	constexpr char SOUND_FILE_SIGNATURE[] = "SND_";
 //	const char* const SOUND_CONFIG_FILE_PATH = "./sound.conf";
-	constexpr char SOUND_CONFIG_FILE_PATH[] = "../sound.conf";
+	constexpr char SOUND_CONFIG_FILE_PATH[] = "./sound.conf";
 	constexpr float SOUND_CONFIG_VERSION = 1.0f;
 }
 
@@ -53,7 +53,14 @@ void SoundManager::LoadSoundConfig()
 	}
 	else
 	{
-		MessageBox(NULL, "ファイルオープン失敗", " ", MB_OK);	// メッセージボックスを使って警告表示
+		// メッセージボックスを使って警告表示
+		MessageBox(NULL, "ファイルオープン失敗", " ", MB_OK);	
+
+		conf.volumeBGM = 255;
+		conf.volumeSE = 255;
+		conf.version = 1.0f;
+
+		SaveSoundConfig();
 	}
 }
 
@@ -118,10 +125,13 @@ void SoundManager::ChangeVolume(const char* name, int volume)
 void SoundManager::SaveSoundConfig()
 {
 	SoundConfigInfo conf = {};
-	memcpy_s(conf.signature, sizeof(conf.signature), SOUND_FILE_SIGNATURE, sizeof(SOUND_FILE_SIGNATURE));
+	auto signatureSize = sizeof(conf.signature);
+	auto signatureConstSize = sizeof(SOUND_FILE_SIGNATURE);
+	memcpy_s(conf.signature, signatureSize, SOUND_FILE_SIGNATURE, signatureConstSize);
 
 	conf.version = SOUND_CONFIG_VERSION;
 	conf.volumeBGM = volumeBGM_;
+	conf.volumeSE = volumeSE_;
 
 	FILE* fp = nullptr;
 	fopen_s(&fp, SOUND_CONFIG_FILE_PATH, "wb");

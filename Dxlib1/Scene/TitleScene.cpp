@@ -12,6 +12,7 @@
 #include "../Game/Player.h"
 #include "../SoundManager.h"
 #include "../Game/BackGround.h"
+#include "Credit.h"
 #include <DxLib.h>
 
 namespace
@@ -118,7 +119,7 @@ void TitleScene::NormalUpdate(const InputState& input)
 		if (input.IsTriggered(InputType::down))
 		{
 			SoundManager::GetInstance().Play("cursor");
-			currentInputIndex_ = tutorial;
+			currentInputIndex_ = credit;
 		}
 	}
 	else if (currentInputIndex_ == option)
@@ -143,10 +144,10 @@ void TitleScene::NormalUpdate(const InputState& input)
 		else if (input.IsTriggered(InputType::right))
 		{
 			SoundManager::GetInstance().Play("cursor");
-			currentInputIndex_ = tutorial;
+			currentInputIndex_ = credit;
 		}
 	}
-	else if (currentInputIndex_ == tutorial)
+	else if (currentInputIndex_ == credit)
 	{
 		cursor1Pos_.x = PW_START_X_3;
 		cursor1Pos_.y = PW_START_Y_3;
@@ -198,7 +199,7 @@ void TitleScene::NormalUpdate(const InputState& input)
 		else if (input.IsTriggered(InputType::left))
 		{
 			SoundManager::GetInstance().Play("cursor");
-			currentInputIndex_ = tutorial;
+			currentInputIndex_ = credit;
 		}
 	}
 
@@ -215,9 +216,10 @@ void TitleScene::NormalUpdate(const InputState& input)
 			manager_.PushScene(new OptionScene(manager_));
 			return;
 		}
-		else if (currentInputIndex_ == tutorial)
+		else if (currentInputIndex_ == credit)
 		{
-			decisionIndex_ = tutorial;
+			manager_.PushScene(new Credit(manager_));
+			return;
 		}
 		else if (currentInputIndex_ == exsit)
 		{
@@ -225,6 +227,10 @@ void TitleScene::NormalUpdate(const InputState& input)
 		}
 
 		updateFunc_ = &TitleScene::FadeOutUpdate;
+		/*if (decisionIndex_ == start || currentInputIndex_ == option || currentInputIndex_ == exsit)
+		{
+			updateFunc_ = &TitleScene::FadeOutUpdate;
+		}*/
 	}
 }
 
@@ -238,11 +244,6 @@ void TitleScene::FadeOutUpdate(const InputState& input)
 		StopMusic();
 		manager_.ChangeScene(new GameplayingScene(manager_));
 		return;
-	}
-	else if (fadeTimer_ == FAIDE_INTERVAL && decisionIndex_ == tutorial)
-	{
-		/*manager_.ChangeScene(new OptionScene(manager_));
-		return;*/
 	}
 	else if (fadeTimer_ == FAIDE_INTERVAL && decisionIndex_ == exsit)
 	{
@@ -275,7 +276,7 @@ TitleScene::TitleScene(SceneManager& manager) :
 	cursor4H_ = my::MyLoadGraph("Data/img/game/cursor4.png");
 	playH_ = my::MyLoadGraph("Data/img/play.png");
 	settingH_ = my::MyLoadGraph("Data/img/setting.png");
-	questionH_ = my::MyLoadGraph("Data/img/question.png");
+	questionH_ = my::MyLoadGraph("Data/img/information.png");
 	doorH_ = my::MyLoadGraph("Data/img/door.png");
 
 	int backGraph = my::MyLoadGraph("Data/img/game/Gray.png");
