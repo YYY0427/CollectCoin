@@ -7,13 +7,22 @@
 class OptionScene :public Scene
 {
 public:
+	// コンストラクタ
 	OptionScene(SceneManager& manager);
 
+	// デストラクタ
 	~OptionScene() {}
+	
+	// 初期化
+	void Init();
 
+	// 更新処理
 	void Update(const InputState& input);
+
+	// 描画処理
 	void Draw();
 private: 
+	// 画像ハンドル
 	int controllerH_;
 	int optionH_;
 	int teachH_;
@@ -26,6 +35,8 @@ private:
 	int cursor2H_;
 	int cursor3H_;
 	int cursor4H_;
+
+	// 選択肢インデックス
 	int currentInputIndex_;
 };
 

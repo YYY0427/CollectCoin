@@ -11,7 +11,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ChangeWindowMode(Game::kWindowMode);
 
 	// 画面サイズの設定
-	SetGraphMode(Game::kScreenWidth, Game::kScreenHeight, Game::kColorDepth);
+	SetGraphMode(Game::SCREEN_WIDTH, Game::SCREEN_HEIGHT, Game::kColorDepth);
 
 	// ウインドウ名設定
 	SetMainWindowText(Game::kTitleText);

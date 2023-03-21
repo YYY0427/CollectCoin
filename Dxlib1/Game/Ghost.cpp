@@ -133,7 +133,7 @@ void Ghost::Draw()
 
 		int imgY = DirectReturnNum(HEIGHT);
 
-		DrawRectRotaGraph(pos_.x, pos_.y - 5,	// 座標
+		DrawRectRotaGraph(static_cast<int>(pos_.x), static_cast<int>(pos_.y - 5),	// 座標
 			imgX, imgY,							// 切り取り左上
 			WIDTH, HEIGHT,						// 幅、高さ
 			SCALE, 0,							// 拡大率、回転角度

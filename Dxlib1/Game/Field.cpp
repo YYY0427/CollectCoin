@@ -268,12 +268,12 @@ void Field::Draw()
 		}
 	}
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
-	DrawFormatStringToHandle(Game::kScreenWidth / 2 - 225 + 2, Game::kScreenHeight - 50 + 2, 0x000000, stringH_, "%d / %d\n", getCoinNum_, coinTotalNum_, true);
+	DrawFormatStringToHandle(Game::SCREEN_WIDTH / 2 - 225 + 2, Game::SCREEN_HEIGHT - 50 + 2, 0x000000, stringH_, "%d / %d\n", getCoinNum_, coinTotalNum_, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	// écÇËÇÃÉRÉCÉìÇÃñáêî
-	DrawRectRotaGraph(Game::kScreenWidth / 2 - 260, Game::kScreenHeight - 35, 0, 0, 8, 8, 3.7f, 0.0f, coinH_, true);
-	DrawFormatStringToHandle(Game::kScreenWidth / 2 - 225, Game::kScreenHeight - 50, 0xffffff, stringH_, "%d / %d\n", getCoinNum_, coinTotalNum_);
+	DrawRectRotaGraph(Game::SCREEN_WIDTH / 2 - 260, Game::SCREEN_HEIGHT - 35, 0, 0, 8, 8, 3.7f, 0.0f, coinH_, true);
+	DrawFormatStringToHandle(Game::SCREEN_WIDTH / 2 - 225, Game::SCREEN_HEIGHT - 50, 0xffffff, stringH_, "%d / %d\n", getCoinNum_, coinTotalNum_);
 }
 
 void Field::SetEnemy(std::shared_ptr<EnemyBase> enemy, int i, int stage)

@@ -9,16 +9,16 @@ BackGround::BackGround(int handle) :
 {
 	GetGraphSizeF(handle_, &size_.x, &size_.y);
 
-	width_ = Game::kScreenWidth / size_.x;
-	height_ = Game::kScreenHeight / size_.y;
+	width_ = static_cast<int>(Game::SCREEN_WIDTH / size_.x);
+	height_ = static_cast<int>(Game::SCREEN_HEIGHT / size_.y);
 }
 
-void BackGround::Update()
+void BackGround::Update(bool getPowerFeed)
 {
-	if (!pPlayer_->GetPowerFeed())
+	if (!getPowerFeed)
 	{
 		scroll_ += 1;
-		if (scroll_ >= Game::kScreenHeight)
+		if (scroll_ >= Game::SCREEN_HEIGHT)
 		{
 			scroll_ = 0;
 		}
@@ -28,7 +28,7 @@ void BackGround::Update()
 		scroll_ -= 2;
 		if (scroll_ <= 0)
 		{
-			scroll_ = Game::kScreenHeight;
+			scroll_ = Game::SCREEN_HEIGHT;
 		}
 	}
 }
@@ -39,8 +39,9 @@ void BackGround::Draw()
 	{
 		for (int x = 0; x < width_ + 1; x++)
 		{
-			DrawRotaGraph(x * size_.x, y * size_.y + scroll_, 1.0f, 0.0f, handle_, true);
-			DrawRotaGraph(x * size_.x, y * size_.y - Game::kScreenHeight + scroll_, 1.0f, 0.0f, handle_, true);
+			DrawRotaGraph(static_cast<int>(x * size_.x), static_cast<int>(y * size_.y + scroll_), 1.0f, 0.0f, handle_, true);
+			DrawRotaGraph(static_cast<int>(x * size_.x), static_cast<int>(y * size_.y - Game::SCREEN_HEIGHT + scroll_), 
+				1.0f, 0.0f, handle_, true);
 		}
 	}
 }

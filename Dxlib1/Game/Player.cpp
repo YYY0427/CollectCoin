@@ -84,8 +84,8 @@ Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int 
 	Init(stage);
 
 	// インデックスの座標から初期座標を求める
-	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosX_);
-	pos_.y=  (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosY_);
+	pos_.x = static_cast<float>(indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosX_);
+	pos_.y=  static_cast<float>((indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosY_));
 
 	speed_ = NORMAL_SPEED;
 
@@ -176,7 +176,7 @@ void Player::Update(const InputState& input)
 		wantMoveDirection_ = right;
 	}
 
-	moveInterval_ = Field::CHIP_SIZE / speed_;
+	moveInterval_ = static_cast<int>(Field::CHIP_SIZE / speed_);
 
 	// 移動のインターバル				// 移動する方向に壁がない場合移動
 	if (moveTimer_ % moveInterval_ == 0 && !Colision(moveDirection_))
@@ -289,7 +289,7 @@ void Player::Draw()
 		int imgX = (imgIdX_ / ANIME_FRAME_SPEED) * WIDTH;
 
 		// プレイヤー画像の表示
-		DrawRectRotaGraph(pos_.x, pos_.y - 5,		// 座標
+		DrawRectRotaGraph(static_cast<int>(pos_.x), static_cast<int>(pos_.y - 5),		// 座標
 						imgX, imgY_,				// 切り取り左上
 						WIDTH, HEIGHT,				// 幅、高さ
 						SCALE, 0.0f,				// 拡大率、回転角度
@@ -308,8 +308,8 @@ void Player::Draw()
 		}
 
 		// ゲームオーバー時の画像を表示
-		DrawRectRotaGraph(pos_.x,							// 座標
-						  pos_.y,
+		DrawRectRotaGraph(static_cast<int>(pos_.x),							// 座標
+			static_cast<int>(pos_.y),
 						  imgX, 0,							// 切り取り左上
 						  WIDTH, HEIGHT,					// 幅、高さ
 						  SCALE, 0,							// 拡大率、回転角度
@@ -328,8 +328,8 @@ void Player::Draw()
 		}
 
 		// ゲームオーバー時の画像を表示
-		DrawRectRotaGraph(pos_.x,							// 座標
-			pos_.y,
+		DrawRectRotaGraph(static_cast<int>(pos_.x),							// 座標
+			static_cast<int>(pos_.y),
 			imgX, imgY_,							// 切り取り左上
 			WIDTH, HEIGHT,					// 幅、高さ
 			SCALE, 0,							// 拡大率、回転角度
@@ -507,8 +507,8 @@ void Player::SpeedCalculation()
 void Player::PosCalculation()
 {
 	// インデックス座標から座標を計算
-	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosX_);
-	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosY_);
+	pos_.x = static_cast<float>((indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosX_));
+	pos_.y = static_cast<float>((indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosY_));
 
 	// 向いている方向と移動速度によって座標を計算
 	switch (moveDirection_) 

@@ -13,26 +13,42 @@ class Player;
 class TitleScene : public Scene
 {
 public:
+	// コンストラクタ
 	TitleScene(SceneManager& manager);
+
+	// デストラクタ
 	~TitleScene();
 
+	// 初期化処理
+	void Init();
+
+	// 終了処理
+	void End();
+
+	// 更新処理
 	void Update(const InputState& input);
+
+	// 描画処理
 	void Draw();
+
+	// カーソルの移動処理
+	void CursorMove(int selection);
 private:
+
+	// プレイヤー
+	std::shared_ptr<Player> pPlayer_;
+
+	// 背景
+	std::shared_ptr<BackGround> pBackGround_;
+
+	// 選択肢 
 	enum 
 	{
 		start,
 		option,
 		credit,
-		exsit
+		exit
 	};
-
-	std::shared_ptr<Player> pPlayer_;
-	std::shared_ptr<BackGround> pBackGround_;
-
-	int playerH_;
-	bool isTurnFlag_;
-	bool isEnabled_;
 
 	// 座標
 	Vec2 pos_;
@@ -42,6 +58,7 @@ private:
 	Vec2 cursor4Pos_;
 
 	// 画像ハンドル
+	int playerH_;
 	int sordH_;
 	int nowaponPlayerH_;
 	int waponPlayerH_;
@@ -49,7 +66,7 @@ private:
 	int slimeH_;
 	int ghostH_;
 	int golemH_;
-	int controller_;
+	int controllerH_;
 	int cursor1H_;
 	int cursor2H_;
 	int cursor3H_;
@@ -58,6 +75,7 @@ private:
 	int settingH_;
 	int questionH_;
 	int doorH_;
+	int backGraphH_;
 
 	// 画像インデックス
 	int playerImgIdx_;
@@ -65,20 +83,10 @@ private:
 	int slimeImgIdx_;
 	int ghostImgIdx_;
 	int golemImgIdx_;
-
 	int imgY_;
 
-	// 選択肢の文字ハンドル
-	int normalSelectionH_;
-	int selectionH_;
-
-	int startH_;
-	int optionH_;
-	int exsitH_;
-
-	// タイトル名ハンドル
+	// フォントハンドル
 	int titleH_;
-
 	int teachH_;
 
 	// フェードタイマー
@@ -92,6 +100,12 @@ private:
 
 	// どのインデックスで決定をしたか
 	int decisionIndex_;
+
+	// ターンさせるかどうか
+	bool isTurnFlag_;
+
+	// 存在するかどうか
+	bool isEnabled_;
 
 	// フェードインの時のUpdate関数
 	void FadeInUpdate(const InputState& input);

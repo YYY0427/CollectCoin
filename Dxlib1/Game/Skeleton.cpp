@@ -63,7 +63,7 @@ void Skeleton::Update()
 	kX_ = indexX_;
 	kY_ = indexY_;
 
-	moveInterval_ = Field::CHIP_SIZE / speed_;
+	moveInterval_ = static_cast<int>(Field::CHIP_SIZE / speed_);
 
 	// 移動のインターバル
 	if (moveTimer_ % moveInterval_ == 0)
@@ -132,7 +132,8 @@ void Skeleton::Draw()
 
 		int imgY = DirectReturnNum(HEIGHT);
 
-		DrawRectRotaGraph(pos_.x, pos_.y - 5,		// 座標
+		DrawRectRotaGraph(static_cast<int>(pos_.x), 
+			static_cast<int>(pos_.y - 5),		// 座標
 			imgX, imgY,							// 切り取り左上
 			WIDTH, HEIGHT,						// 幅、高さ
 			SCALE, 0,							// 拡大率、回転角度

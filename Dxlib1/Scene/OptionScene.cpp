@@ -9,25 +9,47 @@
 
 namespace
 {
-	constexpr int pw_width = Game::kScreenWidth;	// 画面の幅
-	constexpr int pw_height = Game::kScreenHeight;	// 画面の高さ
-	constexpr int pw_start_x = 0;					// 画面の左
-	constexpr int pw_start_y = 0;					// 画面の枠上
+	// 影
+	constexpr int WH_WIDTH = Game::SCREEN_WIDTH;	// 画面の幅
+	constexpr int WH_HEIGHT = Game::SCREEN_HEIGHT;	// 画面の高さ
+	constexpr int WH_START_X = 0;					// 画面の左
+	constexpr int WH_START_Y = 0;					// 画面の枠上
 
-	constexpr int PW_WIDTH_1 = 700;												// オプション枠の幅
-	constexpr int PW_HEIGHT_1 = 500;											// オプション枠の高さ
-	constexpr int PW_START_X_1 = (Game::kScreenWidth / 2) - (PW_WIDTH_1 / 2);	// オプション枠の左
-	constexpr int PW_START_Y_1 = (Game::kScreenHeight / 2) - (PW_HEIGHT_1 / 2);	// オプション枠上
+	// オプションウィンドウ
+	constexpr int OW_WIDTH_1 = 700;												// オプション枠の幅
+	constexpr int OW_HEIGHT_1 = 500;											// オプション枠の高さ
+	constexpr int OW_START_X_1 = (Game::SCREEN_WIDTH / 2) - (OW_WIDTH_1 / 2);	// オプション枠の左
+	constexpr int OW_START_Y_1 = (Game::SCREEN_HEIGHT / 2) - (OW_HEIGHT_1 / 2);	// オプション枠上
 
-	constexpr int nameCount = 2;
+	// 選択肢の数
+	constexpr int NAME_COUNT = 2;
 
 	// オプション
 	constexpr const char* const OPTION = "OPTION";
 }
 
 OptionScene::OptionScene(SceneManager& manager):
-	Scene(manager)
+	Scene(manager),
+	controllerH_(-1),
+	noteH_(-1),
+	bigH_(-1),
+	midleH_(-1),
+	noneH_(-1),
+	cursor1H_(-1),
+	cursor2H_(-1),
+	cursor3H_(-1),
+	cursor4H_(-1),
+	teachH_(-1),
+	optionH_(-1),
+	speakerH_(-1),
+	currentInputIndex_(0)
 {
+	
+}
+
+void OptionScene::Init()
+{
+	// 画像のロード
 	controllerH_ = my::MyLoadGraph("Data/img/game/controller.png");
 	noteH_ = my::MyLoadGraph("Data/img/note.png");
 	bigH_ = my::MyLoadGraph("Data/img/speaker.png");
@@ -38,9 +60,11 @@ OptionScene::OptionScene(SceneManager& manager):
 	cursor3H_ = my::MyLoadGraph("Data/img/game/cursor3.png");
 	cursor4H_ = my::MyLoadGraph("Data/img/game/cursor4.png");
 
+	// フォントのロード
 	teachH_ = CreateFontToHandle("PixelMplus10", 25, 0);
 	optionH_ = CreateFontToHandle("PixelMplus10", 40, 0);
 
+	// 初期化
 	speakerH_ = bigH_;
 	currentInputIndex_ = 0;
 }
@@ -51,12 +75,12 @@ void OptionScene::Update(const InputState& input)
 	if (input.IsTriggered(InputType::up))
 	{
 		SoundManager::GetInstance().Play("cursor");
-		currentInputIndex_ = ((currentInputIndex_ - 1) + nameCount) % nameCount;
+		currentInputIndex_ = ((currentInputIndex_ - 1) + NAME_COUNT) % NAME_COUNT;
 	}
 	else if (input.IsTriggered(InputType::down))
 	{
 		SoundManager::GetInstance().Play("cursor");
-		currentInputIndex_ = (currentInputIndex_ + 1) % nameCount;
+		currentInputIndex_ = (currentInputIndex_ + 1) % NAME_COUNT;
 	}
 
 	auto& soundMgr = SoundManager::GetInstance();
@@ -90,77 +114,74 @@ void OptionScene::Draw()
 {
 	// 影の表示
 	SetDrawBlendMode(DX_BLENDMODE_MULA, 150);
-	DrawBox(pw_start_x, pw_start_y, pw_start_x + pw_width, pw_start_y + pw_height, 0x000000, true);
-	DrawBox(PW_START_X_1 + 10, PW_START_Y_1 + 10, PW_START_X_1 + PW_WIDTH_1 + 10, PW_START_Y_1 + PW_HEIGHT_1 + 10, 0x000000, true);
-	DrawBox(0, Game::kScreenHeight - 60, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
+	DrawBox(WH_START_X, WH_START_Y, WH_START_X + WH_WIDTH, WH_START_Y + WH_HEIGHT, 0x000000, true);
+	DrawBox(OW_START_X_1 + 10, OW_START_Y_1 + 10, OW_START_X_1 + OW_WIDTH_1 + 10, OW_START_Y_1 + OW_HEIGHT_1 + 10, 0x000000, true);
+	DrawBox(0, Game::SCREEN_HEIGHT - 60, Game::SCREEN_WIDTH, Game::SCREEN_HEIGHT, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-	DrawBox(PW_START_X_1, PW_START_Y_1, PW_START_X_1 + PW_WIDTH_1, PW_START_Y_1 + PW_HEIGHT_1, GetColor(200, 200, 200), true);
+	DrawBox(OW_START_X_1, OW_START_Y_1, OW_START_X_1 + OW_WIDTH_1, OW_START_Y_1 + OW_HEIGHT_1, GetColor(200, 200, 200), true);
 
 	// オプション
-	int width1 = GetDrawStringWidthToHandle(OPTION, strlen(OPTION), optionH_);
-	DrawStringToHandle((Game::kScreenWidth / 2) - (width1 / 2), PW_START_Y_1 + 50, OPTION, 0x000000, optionH_, false);
+	int width = GetDrawStringWidthToHandle(OPTION, static_cast<int>(strlen(OPTION)), optionH_);
+	DrawStringToHandle((Game::SCREEN_WIDTH / 2) - (width / 2), OW_START_Y_1 + 50, OPTION, 0x000000, optionH_, false);
 
 	// B もどる
-	DrawRectRotaGraph(Game::kScreenWidth / 2 + 570, Game::kScreenHeight - 30, 32, 0, 16, 16, 2.0f, 0.0f, controllerH_, true);
-	DrawStringToHandle(Game::kScreenWidth / 2 + 600, Game::kScreenHeight - 45, "もどる", 0xffffff, teachH_, false);
+	DrawRectRotaGraph(Game::SCREEN_WIDTH / 2 + 570, Game::SCREEN_HEIGHT - 30, 32, 0, 16, 16, 2.0f, 0.0f, controllerH_, true);
+	DrawStringToHandle(Game::SCREEN_WIDTH / 2 + 600, Game::SCREEN_HEIGHT - 45, "もどる", 0xffffff, teachH_, false);
 
 	// ↑↓←→　せんたく
-	DrawRectRotaGraph(Game::kScreenWidth / 2 + 250, Game::kScreenHeight - 30, 128, 0, 16, 16, 2.0f, 0.0f, controllerH_, true);
-	DrawRectRotaGraph(Game::kScreenWidth / 2 + 255 + 32, Game::kScreenHeight - 30, 144, 0, 16, 16, 2.0f, 0.0f, controllerH_, true);
-	DrawRectRotaGraph(Game::kScreenWidth / 2 + 260 + 64, Game::kScreenHeight - 30, 160, 0, 16, 16, 2.0f, 0.0f, controllerH_, true);
-	DrawRectRotaGraph(Game::kScreenWidth / 2 + 265 + 96, Game::kScreenHeight - 30, 176, 0, 16, 16, 2.0f, 0.0f, controllerH_, true);
-	DrawStringToHandle(Game::kScreenWidth / 2 + 270 + 128, Game::kScreenHeight - 45, "せんたく", 0xffffff, teachH_, false);
+	DrawRectRotaGraph(Game::SCREEN_WIDTH / 2 + 250, Game::SCREEN_HEIGHT - 30, 128, 0, 16, 16, 2.0f, 0.0f, controllerH_, true);
+	DrawRectRotaGraph(Game::SCREEN_WIDTH / 2 + 255 + 32, Game::SCREEN_HEIGHT - 30, 144, 0, 16, 16, 2.0f, 0.0f, controllerH_, true);
+	DrawRectRotaGraph(Game::SCREEN_WIDTH / 2 + 260 + 64, Game::SCREEN_HEIGHT - 30, 160, 0, 16, 16, 2.0f, 0.0f, controllerH_, true);
+	DrawRectRotaGraph(Game::SCREEN_WIDTH / 2 + 265 + 96, Game::SCREEN_HEIGHT - 30, 176, 0, 16, 16, 2.0f, 0.0f, controllerH_, true);
+	DrawStringToHandle(Game::SCREEN_WIDTH / 2 + 270 + 128, Game::SCREEN_HEIGHT - 45, "せんたく", 0xffffff, teachH_, false);
 
 	// BGM 
-	DrawRotaGraph(pw_start_x + pw_width / 2 - 230, pw_start_y + pw_height / 2 - 50, 1.0f, 0.0f, noteH_, true);
+	DrawRotaGraph(WH_START_X + WH_WIDTH / 2 - 230, WH_START_Y + WH_HEIGHT / 2 - 50, 1.0f, 0.0f, noteH_, true);
 
 	// SE
-	DrawRotaGraph(pw_start_x + pw_width / 2 - 230, pw_start_y + pw_height / 2 + 100, 1.0f, 0.0f, speakerH_, true);
+	DrawRotaGraph(WH_START_X + WH_WIDTH / 2 - 230, WH_START_Y + WH_HEIGHT / 2 + 100, 1.0f, 0.0f, speakerH_, true);
 
 	// カーソル
 	if (currentInputIndex_ == 0)
 	{
-		DrawRotaGraph(pw_start_x + pw_width / 2 - 230 - 32, pw_start_y + pw_height / 2 - 80, 0.2f, 0.0f, cursor1H_, true);
-		DrawRotaGraph(pw_start_x + pw_width / 2 - 230 + 32, pw_start_y + pw_height / 2 - 80, 0.2f, 0.0f, cursor2H_, true);
-		DrawRotaGraph(pw_start_x + pw_width / 2 - 230 + 32, pw_start_y + pw_height / 2 - 10, 0.2f, 0.0f, cursor3H_, true);
-		DrawRotaGraph(pw_start_x + pw_width / 2 - 230 - 32, pw_start_y + pw_height / 2 - 10, 0.2f, 0.0f, cursor4H_, true);
+		DrawRotaGraph(WH_START_X + WH_WIDTH / 2 - 230 - 32, WH_START_Y + WH_HEIGHT / 2 - 80, 0.2f, 0.0f, cursor1H_, true);
+		DrawRotaGraph(WH_START_X + WH_WIDTH / 2 - 230 + 32, WH_START_Y + WH_HEIGHT / 2 - 80, 0.2f, 0.0f, cursor2H_, true);
+		DrawRotaGraph(WH_START_X + WH_WIDTH / 2 - 230 + 32, WH_START_Y + WH_HEIGHT / 2 - 10, 0.2f, 0.0f, cursor3H_, true);
+		DrawRotaGraph(WH_START_X + WH_WIDTH / 2 - 230 - 32, WH_START_Y + WH_HEIGHT / 2 - 10, 0.2f, 0.0f, cursor4H_, true);
 	}
 	else if (currentInputIndex_ == 1)
 	{
-		DrawRotaGraph(pw_start_x + pw_width / 2 - 230 - 32, pw_start_y + pw_height / 2 + 70, 0.2f, 0.0f, cursor1H_, true);
-		DrawRotaGraph(pw_start_x + pw_width / 2 - 230 + 32, pw_start_y + pw_height / 2 + 70, 0.2f, 0.0f, cursor2H_, true);
-		DrawRotaGraph(pw_start_x + pw_width / 2 - 230 + 32, pw_start_y + pw_height / 2 + 130, 0.2f, 0.0f, cursor3H_, true);
-		DrawRotaGraph(pw_start_x + pw_width / 2 - 230 - 32, pw_start_y + pw_height / 2 + 130, 0.2f, 0.0f, cursor4H_, true);
+		DrawRotaGraph(WH_START_X + WH_WIDTH / 2 - 230 - 32, WH_START_Y + WH_HEIGHT / 2 + 70, 0.2f, 0.0f, cursor1H_, true);
+		DrawRotaGraph(WH_START_X + WH_WIDTH / 2 - 230 + 32, WH_START_Y + WH_HEIGHT / 2 + 70, 0.2f, 0.0f, cursor2H_, true);
+		DrawRotaGraph(WH_START_X + WH_WIDTH / 2 - 230 + 32, WH_START_Y + WH_HEIGHT / 2 + 130, 0.2f, 0.0f, cursor3H_, true);
+		DrawRotaGraph(WH_START_X + WH_WIDTH / 2 - 230 - 32, WH_START_Y + WH_HEIGHT / 2 + 130, 0.2f, 0.0f, cursor4H_, true);
 	}
 
 	auto& soundMgr = SoundManager::GetInstance();
-	// BGMの設定
-//	DrawFormatString(pw_start_x + 20, pw_start_y + 50, 0xffffff, "BGM Volume = %d", soundMgr.GetBGMVolume());
 
-	// SEの設定
-//	DrawFormatString(pw_start_x + 20, pw_start_y + 70, 0xffffff, "SE Volume = %d", soundMgr.GetSEVolume());
-
+	// 音量の数の取得
 	int bgmNum = soundMgr.GetBGMVolume() / 25;
 	int seNum = soundMgr.GetSEVolume() / 25;
 
 	for (int i = 0; i < 10; i++)
 	{
 		int width = i * 40;
+
 		// 枠組み
-		DrawRoundRect(pw_start_x + pw_width / 2 - 100 + width, 370, pw_start_x + pw_width / 2 - 100 + 30 + width, 370 + 80, 5, 5, GetColor(255, 165, 0), false);
-		DrawRoundRect(pw_start_x + pw_width / 2 - 100 + width, 500, pw_start_x + pw_width / 2 - 100 + 30 + width, 500 + 80, 5, 5, GetColor(255, 165, 0), false);
+		DrawRoundRect(WH_START_X + WH_WIDTH / 2 - 100 + width, 370, WH_START_X + WH_WIDTH / 2 - 100 + 30 + width, 370 + 80, 5, 5, GetColor(255, 165, 0), false);
+		DrawRoundRect(WH_START_X + WH_WIDTH / 2 - 100 + width, 500, WH_START_X + WH_WIDTH / 2 - 100 + 30 + width, 500 + 80, 5, 5, GetColor(255, 165, 0), false);
 	}
 
 	// BGM
 	for (int i = 0; i < bgmNum; i++)
 	{
 		int width = i * 40;
-		DrawRoundRect(pw_start_x + pw_width / 2 - 100 + width, 370, pw_start_x + pw_width / 2 - 100 + 30 + width, 370 + 80, 5, 5, GetColor(255, 165, 0), true);
+		DrawRoundRect(WH_START_X + WH_WIDTH / 2 - 100 + width, 370, WH_START_X + WH_WIDTH / 2 - 100 + 30 + width, 370 + 80, 5, 5, GetColor(255, 165, 0), true);
 	}
 	// SE
 	for (int i = 0; i < seNum; i++)
 	{
 		int width = i * 40;
-		DrawRoundRect(pw_start_x + pw_width / 2 - 100 + width, 500, pw_start_x + pw_width / 2 - 100 + 30 + width, 500 + 80, 5, 5, GetColor(255, 165, 0), true);
+		DrawRoundRect(WH_START_X + WH_WIDTH / 2 - 100 + width, 500, WH_START_X + WH_WIDTH / 2 - 100 + 30 + width, 500 + 80, 5, 5, GetColor(255, 165, 0), true);
 	}
 }

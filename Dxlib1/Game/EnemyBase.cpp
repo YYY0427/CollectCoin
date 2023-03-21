@@ -55,6 +55,11 @@ EnemyBase::EnemyBase() :
 	flashingImgY_(0),
 	indexX_(0),
 	indexY_(0),
+	disPlayPosX_(0),
+	disPlayPosY_(0),
+	moveInterval_(0),
+	speed_(0.0f),
+	stage_(0),
 	isMove_(false),
 	isPowerFeed_(false),
 	isEnabled_(true),
@@ -64,8 +69,7 @@ EnemyBase::EnemyBase() :
 	isIntrusion_(true),
 	isDoor_(false)
 {
-	// 画像のサイズの取得
-	GetGraphSizeF(handle_, &size_.x, &size_.y);
+
 }
 
 void EnemyBase::Init(int stage)
@@ -103,8 +107,8 @@ void EnemyBase::Init(int stage)
 
 	speed_ = NORMAL_SPEED;
 
-	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosX_);
-	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosY_);
+	pos_.x = static_cast<float>((indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosX_));
+	pos_.y = static_cast<float>((indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosY_));
 }
 
 bool EnemyBase::Colision(int direction)
@@ -185,8 +189,8 @@ void EnemyBase::SpeedChange()
 void EnemyBase::PosCalculation()
 {
 	// インデックス座標を計算
-	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosX_);
-	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosY_);
+	pos_.x = static_cast<float>((indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosX_));
+	pos_.y = static_cast<float>((indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosY_));
 
 	// 向いている方向によって座標を計算
 	switch (moveDirection_)
@@ -221,8 +225,8 @@ void EnemyBase::SetDeadInit(int stage)
 		indexX_ = 9;
 		indexY_ = 10;
 	}
-	pos_.x = (indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosX_);
-	pos_.y = (indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosY_);
+	pos_.x = static_cast<float>((indexX_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosX_));
+	pos_.y = static_cast<float>((indexY_ * Field::CHIP_SIZE) + (Field::CHIP_SIZE / 2 + disPlayPosY_));
 
 	// 初期化
 	isDead_ = false;

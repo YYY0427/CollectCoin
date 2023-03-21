@@ -61,20 +61,20 @@ namespace
 	constexpr int CHOICE_NUM = 3; 
 
 	// 選択肢の箱座標
-	constexpr int PW_WIDTH_1 = 400;												//枠の幅
-	constexpr int PW_HEIGHT_1 = 100;											//枠の高さ
-	constexpr int PW_START_X_1 = (Game::kScreenWidth / 2) - (PW_WIDTH_1 / 2);	//枠のスタートX座標
-	constexpr int PW_START_Y_1= Game::kScreenHeight / 2;						//枠のスタートY座標
+	constexpr int CB_WIDTH_1 = 400;												//枠の幅
+	constexpr int CB_HEIGHT_1 = 100;											//枠の高さ
+	constexpr int CB_START_X_1 = (Game::SCREEN_WIDTH / 2) - (CB_WIDTH_1 / 2);	//枠のスタートX座標
+	constexpr int CB_START_Y_1= Game::SCREEN_HEIGHT / 2;						//枠のスタートY座標
 
-	constexpr int PW_WIDTH_2 = 400;												
-	constexpr int PW_HEIGHT_2 = 100;											
-	constexpr int PW_START_X_2 = (Game::kScreenWidth / 2) - (PW_WIDTH_1 / 2);	
-	constexpr int PW_START_Y_2 = Game::kScreenHeight / 2 + 115;					
+	constexpr int CB_WIDTH_2 = 400;												
+	constexpr int CB_HEIGHT_2 = 100;											
+	constexpr int CB_START_X_2 = (Game::SCREEN_WIDTH / 2) - (CB_WIDTH_1 / 2);	
+	constexpr int CB_START_Y_2 = Game::SCREEN_HEIGHT / 2 + 115;					
 
-	constexpr int PW_WIDTH_3 = 400;												
-	constexpr int PW_HEIGHT_3 = 100;											
-	constexpr int PW_START_X_3 = (Game::kScreenWidth / 2) - (PW_WIDTH_1 / 2);	
-	constexpr int PW_START_Y_3 = Game::kScreenHeight / 2 + 230;					
+	constexpr int CB_WIDTH_3 = 400;												
+	constexpr int CB_HEIGHT_3 = 100;											
+	constexpr int CB_START_X_3 = (Game::SCREEN_WIDTH / 2) - (CB_WIDTH_1 / 2);	
+	constexpr int CB_START_Y_3 = Game::SCREEN_HEIGHT / 2 + 230;					
 }
 
 GameplayingScene::GameplayingScene(SceneManager& manager) :
@@ -115,11 +115,11 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	gameClearShadowH_ = CreateFontToHandle("PixelMplus10", 102, 30);
 	readyH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 
-	stringWidth_ = GetDrawStringWidthToHandle(GAMECLEAR_STRING, strlen(GAMECLEAR_STRING), gameClearH_);
+	stringWidth_ = GetDrawStringWidthToHandle(GAMECLEAR_STRING, static_cast<int>(strlen(GAMECLEAR_STRING)), gameClearH_);
 	stringHeight_ = GetFontSizeToHandle(gameClearH_);
 
-	gameClearPos_.x = (Game::kScreenWidth / 2) - (stringWidth_ / 2);
-	gameClearPos_.y = (Game::kScreenHeight / 2) - 220;
+	gameClearPos_.x = static_cast<float>((Game::SCREEN_WIDTH / 2) - (stringWidth_ / 2));
+	gameClearPos_.y = static_cast<float>((Game::SCREEN_HEIGHT / 2) - 220);
 
 	// 画像のロード
 	int nowaponPlayerH = my::MyLoadGraph("Data/img/game/nowapon-player.png");
@@ -192,7 +192,8 @@ void GameplayingScene::FadeInUpdate(const InputState& input)
 	}
 
 	pPlayer_->SetEnabled(false);
-	SetVolumeMusic(static_cast<int>(255.0f / 60.0f * static_cast<float>(60 - fadeTimer_)) * (static_cast<float>(SoundManager::GetInstance().GetBGMVolume() / 255.0f)));
+	SetVolumeMusic(static_cast<int>(255.0f / 60.0f * static_cast<float>(60 - fadeTimer_) * 
+		(static_cast<float>(SoundManager::GetInstance().GetBGMVolume() / 255.0f))));
 	fadeValue_ = 255 * (static_cast<int>(fadeTimer_)) / static_cast<int>(fade_interval);
 	if (--fadeTimer_ == 0)
 	{
@@ -220,7 +221,7 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 		faideEnabled_ = false;
 	}
 
-	pBackGround_->Update();
+	pBackGround_->Update(pPlayer_->GetPowerFeed());
 
 	pField_->Updata();
 
@@ -365,20 +366,20 @@ void GameplayingScene::Draw()
 	// 残機の描画
 	for (int i = 0; i < life_; i++)
 	{
-		int x = Game::kScreenWidth / 2 + 250 + (-i * 40);
+		int x = Game::SCREEN_WIDTH / 2 + 250 + (-i * 40);
 
-		DrawRectRotaGraph(x, Game::kScreenHeight - 30, 0, 0, 16, 16, 2.5f, 0.0f, lifeH_, true);
+		DrawRectRotaGraph(x, Game::SCREEN_HEIGHT - 30, 0, 0, 16, 16, 2.5f, 0.0f, lifeH_, true);
 	}
 
 
 	// ゲームオーバー
 	if (isGameOver_)
 	{
-		int stringWidth = GetDrawStringWidthToHandle(GAMEOVER_STRING, strlen(GAMEOVER_STRING), gameOverH_);
+		int stringWidth = GetDrawStringWidthToHandle(GAMEOVER_STRING, static_cast<int>(strlen(GAMEOVER_STRING)), gameOverH_);
 		int stringHeight = GetFontSizeToHandle(gameOverH_);
 
-		int width = (Game::kScreenWidth / 2) - (stringWidth / 2);
-		int height = (Game::kScreenHeight / 2) - (stringHeight / 2);
+		int width = (Game::SCREEN_WIDTH / 2) - (stringWidth / 2);
+		int height = (Game::SCREEN_HEIGHT / 2) - (stringHeight / 2);
 
 		// ゲームオーバー文字の表示
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gameOverFadeValue_);
@@ -393,62 +394,62 @@ void GameplayingScene::Draw()
 	{
 		// ゲームクリア文字の表示
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, (gameClearStringFadeValue_ * 100) / 255);
-		DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
+		DrawBox(0, 0, Game::SCREEN_WIDTH, Game::SCREEN_HEIGHT, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gameClearStringFadeValue_);
-		DrawStringToHandle(gameClearPos_.x - 3, gameClearPos_.y,
+		DrawStringToHandle(static_cast<int>(gameClearPos_.x - 3), static_cast<int>(gameClearPos_.y),
 			GAMECLEAR_STRING, 0x000000, gameClearShadowH_, false);
-		DrawStringToHandle(gameClearPos_.x, gameClearPos_.y,
+		DrawStringToHandle(static_cast<int>(gameClearPos_.x), static_cast<int>(gameClearPos_.y),
 			GAMECLEAR_STRING, 0xffffff, gameClearH_, false);
 
 		// 最後のステージをクリアした場合箱を表示しない
 		if (stage_ != stage_num - 1)
 		{
 			// 選択肢
-			DrawRoundRect(PW_START_X_1 - 3, PW_START_Y_1 - 3, PW_START_X_1 + PW_WIDTH_1 + 3, PW_START_Y_1 + PW_HEIGHT_1 + 3, 5, 5, 0x000000, true);
-			DrawRoundRect(PW_START_X_2 - 3, PW_START_Y_2 - 3, PW_START_X_2 + PW_WIDTH_2 + 3, PW_START_Y_2 + PW_HEIGHT_2 + 3, 5, 5, 0x000000, true);
-			DrawRoundRect(PW_START_X_3 - 3, PW_START_Y_3 - 3, PW_START_X_3 + PW_WIDTH_3 + 3, PW_START_Y_3 + PW_HEIGHT_3 + 3, 5, 5, 0x000000, true);
+			DrawRoundRect(CB_START_X_1 - 3, CB_START_Y_1 - 3, CB_START_X_1 + CB_WIDTH_1 + 3, CB_START_Y_1 + CB_HEIGHT_1 + 3, 5, 5, 0x000000, true);
+			DrawRoundRect(CB_START_X_2 - 3, CB_START_Y_2 - 3, CB_START_X_2 + CB_WIDTH_2 + 3, CB_START_Y_2 + CB_HEIGHT_2 + 3, 5, 5, 0x000000, true);
+			DrawRoundRect(CB_START_X_3 - 3, CB_START_Y_3 - 3, CB_START_X_3 + CB_WIDTH_3 + 3, CB_START_Y_3 + CB_HEIGHT_3 + 3, 5, 5, 0x000000, true);
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
-			DrawRoundRect(PW_START_X_1, PW_START_Y_1, PW_START_X_1 + PW_WIDTH_1, PW_START_Y_1 + PW_HEIGHT_1, 5, 5, 0xffffff, true);
-			DrawRoundRect(PW_START_X_2, PW_START_Y_2, PW_START_X_2 + PW_WIDTH_2, PW_START_Y_2 + PW_HEIGHT_2, 5, 5, 0xffffff, true);
-			DrawRoundRect(PW_START_X_3, PW_START_Y_3, PW_START_X_3 + PW_WIDTH_3, PW_START_Y_3 + PW_HEIGHT_3, 5, 5, 0xffffff, true);
+			DrawRoundRect(CB_START_X_1, CB_START_Y_1, CB_START_X_1 + CB_WIDTH_1, CB_START_Y_1 + CB_HEIGHT_1, 5, 5, 0xffffff, true);
+			DrawRoundRect(CB_START_X_2, CB_START_Y_2, CB_START_X_2 + CB_WIDTH_2, CB_START_Y_2 + CB_HEIGHT_2, 5, 5, 0xffffff, true);
+			DrawRoundRect(CB_START_X_3, CB_START_Y_3, CB_START_X_3 + CB_WIDTH_3, CB_START_Y_3 + CB_HEIGHT_3, 5, 5, 0xffffff, true);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-			DrawRoundRect(PW_START_X_1, PW_START_Y_1, PW_START_X_1 + PW_WIDTH_1, PW_START_Y_1 + PW_HEIGHT_1 - 5, 5, 5, 0xffffff, true);
-			DrawRoundRect(PW_START_X_2, PW_START_Y_2, PW_START_X_2 + PW_WIDTH_2, PW_START_Y_2 + PW_HEIGHT_2 - 5, 5, 5, 0xffffff, true);
-			DrawRoundRect(PW_START_X_3, PW_START_Y_3, PW_START_X_3 + PW_WIDTH_3, PW_START_Y_3 + PW_HEIGHT_3 - 5, 5, 5, 0xffffff, true);
+			DrawRoundRect(CB_START_X_1, CB_START_Y_1, CB_START_X_1 + CB_WIDTH_1, CB_START_Y_1 + CB_HEIGHT_1 - 5, 5, 5, 0xffffff, true);
+			DrawRoundRect(CB_START_X_2, CB_START_Y_2, CB_START_X_2 + CB_WIDTH_2, CB_START_Y_2 + CB_HEIGHT_2 - 5, 5, 5, 0xffffff, true);
+			DrawRoundRect(CB_START_X_3, CB_START_Y_3, CB_START_X_3 + CB_WIDTH_3, CB_START_Y_3 + CB_HEIGHT_3 - 5, 5, 5, 0xffffff, true);
 
 			// カーソル
-			DrawRotaGraph(cursor1Pos_.x, cursor1Pos_.y, 0.2f, 0.0f, cursor1H_, true);
-			DrawRotaGraph(cursor2Pos_.x, cursor2Pos_.y, 0.2f, 0.0f, cursor2H_, true);
-			DrawRotaGraph(cursor3Pos_.x, cursor3Pos_.y, 0.2f, 0.0f, cursor3H_, true);
-			DrawRotaGraph(cursor4Pos_.x, cursor4Pos_.y, 0.2f, 0.0f, cursor4H_, true);
+			DrawRotaGraph(static_cast<int>(cursor1Pos_.x), static_cast<int>(cursor1Pos_.y), 0.2f, 0.0f, cursor1H_, true);
+			DrawRotaGraph(static_cast<int>(cursor2Pos_.x), static_cast<int>(cursor2Pos_.y), 0.2f, 0.0f, cursor2H_, true);
+			DrawRotaGraph(static_cast<int>(cursor3Pos_.x), static_cast<int>(cursor3Pos_.y), 0.2f, 0.0f, cursor3H_, true);
+			DrawRotaGraph(static_cast<int>(cursor4Pos_.x), static_cast<int>(cursor4Pos_.y), 0.2f, 0.0f, cursor4H_, true);
 
 			// アイコン
-			DrawRotaGraph(Game::kScreenWidth / 2, (Game::kScreenHeight / 2) + 50, 1.0f, 0.0f, playH_, true);
-			DrawRotaGraph(Game::kScreenWidth / 2, (Game::kScreenHeight / 2) + 165, 0.8f, 0.0f, retryH_, true);
-			DrawRotaGraph(Game::kScreenWidth / 2, (Game::kScreenHeight / 2) + 280, 1.0f, 0.0f, backH_, true);
+			DrawRotaGraph(Game::SCREEN_WIDTH / 2, (Game::SCREEN_HEIGHT / 2) + 50, 1.0f, 0.0f, playH_, true);
+			DrawRotaGraph(Game::SCREEN_WIDTH / 2, (Game::SCREEN_HEIGHT / 2) + 165, 0.8f, 0.0f, retryH_, true);
+			DrawRotaGraph(Game::SCREEN_WIDTH / 2, (Game::SCREEN_HEIGHT / 2) + 280, 1.0f, 0.0f, backH_, true);
 
 		}
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 	if (preparTimer_ > 0)
 	{
-		int width = GetDrawStringWidthToHandle(REDY_STRING, strlen(REDY_STRING), readyH_);
+		int width = GetDrawStringWidthToHandle(REDY_STRING, static_cast<int>(strlen(REDY_STRING)), readyH_);
 		// 準備中文字の表示
-		DrawStringToHandle((Game::kScreenWidth / 2) - (width / 2), Game::kScreenHeight / 2 + 40,
+		DrawStringToHandle((Game::SCREEN_WIDTH / 2) - (width / 2), Game::SCREEN_HEIGHT / 2 + 40,
 			REDY_STRING, 0xffffff, readyH_, false);
 	}
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
-	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
+	DrawBox(0, 0, Game::SCREEN_WIDTH, Game::SCREEN_HEIGHT, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	SetDrawScreen(DX_SCREEN_BACK);
-	DrawGraph(quakeX_, quakeY_, tempScreenH_, false);
+	DrawGraph(static_cast<int>(quakeX_), static_cast<int>(quakeY_), tempScreenH_, false);
 	if (quakeTimer_ > 0)
 	{
 		GraphFilter(tempScreenH_, DX_GRAPH_FILTER_MONO, 0, 7);
-		DrawGraph(quakeX_, quakeY_, tempScreenH_, false);
+		DrawGraph(static_cast<int>(quakeX_), static_cast<int>(quakeY_), tempScreenH_, false);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 }
@@ -490,30 +491,30 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 		// 最後のステージをクリアした場合
 		if (stage_ == stage_num - 1)
 		{
-			gameClearPos_.x = (Game::kScreenWidth / 2) - (stringWidth_ / 2);
-			gameClearPos_.y = (Game::kScreenHeight / 2) - (stringHeight_ / 2) + 20;
+			gameClearPos_.x = static_cast<float>((Game::SCREEN_WIDTH / 2) - (stringWidth_ / 2));
+			gameClearPos_.y = static_cast<float>((Game::SCREEN_HEIGHT / 2) - (stringHeight_ / 2) + 20);
 		}
 	}
 	
 	// 音楽が鳴っていた場合
 	if (isGameClear_)
 	{
-		gameClearStringFadeValue_ = 255 * (static_cast<float>(gameClearFadeTimer_)) / static_cast<float>(game_clear_fade_interval);
+		gameClearStringFadeValue_ = static_cast<int>(255 * (static_cast<float>(gameClearFadeTimer_)) / static_cast<float>(game_clear_fade_interval));
 
 		if (stage_ != stage_num - 1)
 		{
 			gameClearPos_.y -= 0.5f;
-			if (gameClearPos_.y <= static_cast<float>((Game::kScreenHeight / 2) - 230))
+			if (gameClearPos_.y <= static_cast<float>((Game::SCREEN_HEIGHT / 2) - 230))
 			{
-				gameClearPos_.y = static_cast<float>((Game::kScreenHeight / 2) - 230);
+				gameClearPos_.y = static_cast<float>((Game::SCREEN_HEIGHT / 2) - 230);
 			}
 		}
 		else
 		{
 			gameClearPos_.y -= 0.5f;
-			if (gameClearPos_.y <= static_cast<float>((Game::kScreenHeight / 2) - (stringHeight_ / 2)))
+			if (gameClearPos_.y <= static_cast<float>((Game::SCREEN_HEIGHT / 2) - (stringHeight_ / 2)))
 			{
-				gameClearPos_.y = static_cast<float>((Game::kScreenHeight / 2) - (stringHeight_ / 2));
+				gameClearPos_.y = static_cast<float>((Game::SCREEN_HEIGHT / 2) - (stringHeight_ / 2));
 			}
 		}
 
@@ -544,46 +545,46 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 
 				if (currentInputIndex_ == 0)
 				{
-					cursor1Pos_.x = PW_START_X_1;
-					cursor1Pos_.y = PW_START_Y_1;
+					cursor1Pos_.x = CB_START_X_1;
+					cursor1Pos_.y = CB_START_Y_1;
 
-					cursor2Pos_.x = PW_START_X_1 + PW_WIDTH_1;
-					cursor2Pos_.y = PW_START_Y_1;
+					cursor2Pos_.x = CB_START_X_1 + CB_WIDTH_1;
+					cursor2Pos_.y = CB_START_Y_1;
 
-					cursor3Pos_.x = PW_START_X_1 + PW_WIDTH_1;
-					cursor3Pos_.y = PW_START_Y_1 + PW_HEIGHT_1;
+					cursor3Pos_.x = CB_START_X_1 + CB_WIDTH_1;
+					cursor3Pos_.y = CB_START_Y_1 + CB_HEIGHT_1;
 
-					cursor4Pos_.x = PW_START_X_1;
-					cursor4Pos_.y = PW_START_Y_1 + PW_HEIGHT_1;
+					cursor4Pos_.x = CB_START_X_1;
+					cursor4Pos_.y = CB_START_Y_1 + CB_HEIGHT_1;
 				}
 				else if (currentInputIndex_ == 1)
 				{
-					cursor1Pos_.x = PW_START_X_2;
-					cursor1Pos_.y = PW_START_Y_2;
+					cursor1Pos_.x = CB_START_X_2;
+					cursor1Pos_.y = CB_START_Y_2;
 
-					cursor2Pos_.x = PW_START_X_2 + PW_WIDTH_2;
-					cursor2Pos_.y = PW_START_Y_2;
+					cursor2Pos_.x = CB_START_X_2 + CB_WIDTH_2;
+					cursor2Pos_.y = CB_START_Y_2;
 
-					cursor3Pos_.x = PW_START_X_2 + PW_WIDTH_2;
-					cursor3Pos_.y = PW_START_Y_2 + PW_HEIGHT_2;
+					cursor3Pos_.x = CB_START_X_2 + CB_WIDTH_2;
+					cursor3Pos_.y = CB_START_Y_2 + CB_HEIGHT_2;
 
-					cursor4Pos_.x = PW_START_X_2;
-					cursor4Pos_.y = PW_START_Y_2 + PW_HEIGHT_2;
+					cursor4Pos_.x = CB_START_X_2;
+					cursor4Pos_.y = CB_START_Y_2 + CB_HEIGHT_2;
 
 				}
 				else if (currentInputIndex_ == 2)
 				{
-					cursor1Pos_.x = PW_START_X_3;
-					cursor1Pos_.y = PW_START_Y_3;
+					cursor1Pos_.x = CB_START_X_3;
+					cursor1Pos_.y = CB_START_Y_3;
 
-					cursor2Pos_.x = PW_START_X_3 + PW_WIDTH_3;
-					cursor2Pos_.y = PW_START_Y_3;
+					cursor2Pos_.x = CB_START_X_3 + CB_WIDTH_3;
+					cursor2Pos_.y = CB_START_Y_3;
 
-					cursor3Pos_.x = PW_START_X_3 + PW_WIDTH_3;
-					cursor3Pos_.y = PW_START_Y_3 + PW_HEIGHT_3;
+					cursor3Pos_.x = CB_START_X_3 + CB_WIDTH_3;
+					cursor3Pos_.y = CB_START_Y_3 + CB_HEIGHT_3;
 
-					cursor4Pos_.x = PW_START_X_3;
-					cursor4Pos_.y = PW_START_Y_3 + PW_HEIGHT_3;
+					cursor4Pos_.x = CB_START_X_3;
+					cursor4Pos_.y = CB_START_Y_3 + CB_HEIGHT_3;
 				}
 
 				if (input.IsTriggered(InputType::next))
@@ -650,7 +651,7 @@ void GameplayingScene::GameOverUpdate(const InputState& input)
 		}
 		if (isGameOver_)
 		{
-			gameOverFadeValue_ = 255 * (static_cast<float>(gameOverFadeTimer_)) / static_cast<float>(game_over_fade_interval);
+			gameOverFadeValue_ = static_cast<int>(255 * (static_cast<float>(gameOverFadeTimer_)) / static_cast<float>(game_over_fade_interval));
 			if (++gameOverFadeTimer_ >= 255)
 			{
 				gameOverFadeValue_ = 255;
@@ -706,8 +707,8 @@ void GameplayingScene::PlayerDeadUpdate(const InputState& input)
 void GameplayingScene::FadeOutUpdate(const InputState& input)
 {
 	fadeTimer_++;
-	fadeValue_ = 255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval));
-	SetVolumeMusic(static_cast<float>((std::max)(SoundManager::GetInstance().GetBGMVolume() - fadeValue_, 0)));
+	fadeValue_ = static_cast<int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval)));
+	SetVolumeMusic(static_cast<int>((std::max)(SoundManager::GetInstance().GetBGMVolume() - fadeValue_, 0)));
 
 	// ゲームオーバー
 	if (fadeTimer_ > fade_interval && isGameOver_)
@@ -758,11 +759,11 @@ void GameplayingScene::PrepareUpdate(const InputState& input)
 void GameplayingScene::SetInit()
 {
 	pCoin_.clear();
-	stringWidth_ = GetDrawStringWidthToHandle(GAMECLEAR_STRING, strlen(GAMECLEAR_STRING), gameClearH_);
+	stringWidth_ = GetDrawStringWidthToHandle(GAMECLEAR_STRING, static_cast<int>(strlen(GAMECLEAR_STRING)), gameClearH_);
 	stringHeight_ = GetFontSizeToHandle(gameClearH_);
 
-	gameClearPos_.x = (Game::kScreenWidth / 2) - (stringWidth_ / 2);
-	gameClearPos_.y = (Game::kScreenHeight / 2) - 220;
+	gameClearPos_.x = static_cast<float>((Game::SCREEN_WIDTH / 2) - (stringWidth_ / 2));
+	gameClearPos_.y = static_cast<float>((Game::SCREEN_HEIGHT / 2) - 220);
 
 	fadeTimer_ = fade_interval;
 	fadeValue_ = 255;

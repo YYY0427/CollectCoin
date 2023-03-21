@@ -55,7 +55,7 @@ namespace
 
 	};
 
-	constexpr int SCALE = 2.0f;
+	constexpr float SCALE = 2.0f;
 }
 
 Map::Map(int handle, int stage) :

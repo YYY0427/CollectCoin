@@ -10,7 +10,7 @@ public:
 	BackGround(int handle);
 	virtual~BackGround(){};
 
-	void Update();
+	void Update(bool getPowerFeed);
 
 	void Draw();
 
