@@ -10,7 +10,7 @@ namespace Game
 #endif
 
 	// ゲームウィンドウ名
-	const char* const kTitleText = "ＧＡＭＥ";
+	const char* const TITLE_TEXT = "これくとコイン";
 
 	//ウィンドウサイズ
 	constexpr int SCREEN_WIDTH = 1600;
@@ -18,5 +18,4 @@ namespace Game
 
 	//カラーモード
 	constexpr int kColorDepth = 32;   //32 or 16
-
 };

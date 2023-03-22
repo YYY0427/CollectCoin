@@ -11,10 +11,13 @@ public:
 	OptionScene(SceneManager& manager);
 
 	// デストラクタ
-	~OptionScene() {}
+	~OptionScene();
 	
 	// 初期化
 	void Init();
+
+	// 終了処理
+	void End();
 
 	// 更新処理
 	void Update(const InputState& input);

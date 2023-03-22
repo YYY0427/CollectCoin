@@ -44,7 +44,12 @@ OptionScene::OptionScene(SceneManager& manager):
 	speakerH_(-1),
 	currentInputIndex_(0)
 {
-	
+	Init();
+}
+
+OptionScene::~OptionScene()
+{
+	End();
 }
 
 void OptionScene::Init()
@@ -67,6 +72,21 @@ void OptionScene::Init()
 	// èâä˙âª
 	speakerH_ = bigH_;
 	currentInputIndex_ = 0;
+}
+
+void OptionScene::End()
+{
+	DeleteGraph(controllerH_);
+	DeleteGraph(noteH_);
+	DeleteGraph(bigH_);
+	DeleteGraph(midleH_);
+	DeleteGraph(noneH_);
+	DeleteGraph(cursor1H_);
+	DeleteGraph(cursor2H_);
+	DeleteGraph(cursor3H_);
+	DeleteGraph(cursor4H_);
+	DeleteFontToHandle(teachH_);
+	DeleteFontToHandle(optionH_);
 }
 
 void OptionScene::Update(const InputState& input)

@@ -74,21 +74,65 @@ namespace
 	constexpr int CB_WIDTH_3 = 400;												
 	constexpr int CB_HEIGHT_3 = 100;											
 	constexpr int CB_START_X_3 = (Game::SCREEN_WIDTH / 2) - (CB_WIDTH_1 / 2);	
-	constexpr int CB_START_Y_3 = Game::SCREEN_HEIGHT / 2 + 230;					
+	constexpr int CB_START_Y_3 = Game::SCREEN_HEIGHT / 2 + 230;	
+
+	// フェードの速度
+	constexpr int FADE_INTERVAL = 60;
+	constexpr int BGM_FADE_INTERVAL = 60;
+	constexpr int GAMEOVER_FADE_INTERVAL = 60;
+	constexpr int GAMECLEAR_FADE_INTERVAL = 60;
 }
 
 GameplayingScene::GameplayingScene(SceneManager& manager) :
 	Scene(manager),
 	updateFunc_(&GameplayingScene::FadeInUpdate),
-	life_(3),
-	timer_(0),
+	life_(0),
+	waitTimer_(0),
 	gameOverTimer_(0),
 	gameClearTimer_(0),
 	preparTimer_(0),
 	quakeTimer_(0),
 	quakeX_(0.0f),
 	quakeY_(0.0f),
+	stage_(0),
 	currentInputIndex_(0),
+	stringWidth_(0),
+	stringHeight_(0),
+	fadeTimer_(0),
+	fadeValue_(0),
+	bgmFadeTimer_(0),
+	bgmFadeValue_(0),
+	gameOverFadeTimer_(0),
+	gameOverFadeValue_(0),
+	gameClearFadeTimer_(0),
+	gameClearStringFadeValue_(0),
+	tempScreenH_(-1),
+	gameOverH_(-1),
+	gameOverShadowH_(-1),
+	gameClearH_(-1),
+	readyH_(-1),
+	gameClearShadowH_(-1),
+	cursor1H_(-1),
+	cursor2H_(-1),
+	cursor3H_(-1),
+	cursor4H_(-1),
+	playH_(-1),
+	retryH_(-1),
+	backH_(-1),
+	skeletonH_(-1),
+	slimeH_(-1),
+	ghostH_(-1),
+	golemH_(-1),
+	lifeH_(-1),
+	coinH_(-1),
+	nowaponPlayerH_(-1),
+	waponPlayerH_(-1),
+	deadPlayerH_(-1),
+	attackPlayerH_(-1),
+	mapChipH_(-1),
+	backGraphH_(-1),
+	sordH_(-1),
+	doorH_(-1),
 	isGameClear_(false),
 	faideEnabled_(false),
 	playerDeadSound_(false),
@@ -97,16 +141,21 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	isRetry_(false),
 	isCoinEnabled_(false)
 {
-	stage_ = tutorial;
+	Init();
+}
 
-	// 画面幅　画面高　ビット数
-	int sw, sh, bit;
-	// 幅と高さを取得
-	GetScreenState(&sw, &sh, &bit);
-	// 加工用画面を用意
-	tempScreenH_ = MakeScreen(sw, sh);
-	// 作れなっかた場合ここで停止
-	assert(tempScreenH_ >= 0);
+GameplayingScene::~GameplayingScene()
+{
+	End();
+}
+
+void GameplayingScene::Init()
+{
+	// 画面揺らす用の画像の作成
+	int sw, sh, bit;					// 画面幅　画面高　ビット数
+	GetScreenState(&sw, &sh, &bit);		// 幅と高さを取得
+	tempScreenH_ = MakeScreen(sw, sh);	// 加工用画面を用意
+	assert(tempScreenH_ >= 0);			// 作れなっかた場合ここで停止
 
 	// フォントの作成
 	gameOverH_ = CreateFontToHandle("PixelMplus10", 50, 30);
@@ -115,86 +164,145 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	gameClearShadowH_ = CreateFontToHandle("PixelMplus10", 102, 30);
 	readyH_ = CreateFontToHandle("PixelMplus10", 20, 10);
 
+	// 文字の幅、文字の高さの取得
 	stringWidth_ = GetDrawStringWidthToHandle(GAMECLEAR_STRING, static_cast<int>(strlen(GAMECLEAR_STRING)), gameClearH_);
 	stringHeight_ = GetFontSizeToHandle(gameClearH_);
 
+	// ゲームクリア時の文字座標の設定
 	gameClearPos_.x = static_cast<float>((Game::SCREEN_WIDTH / 2) - (stringWidth_ / 2));
 	gameClearPos_.y = static_cast<float>((Game::SCREEN_HEIGHT / 2) - 220);
 
 	// 画像のロード
-	int nowaponPlayerH = my::MyLoadGraph("Data/img/game/nowapon-player.png");
-	int waponPlayerH = my::MyLoadGraph("Data/img/game/wapon-player_gold.png");
-	int deadPlayerH = my::MyLoadGraph("Data/img/game/player-deth1.png");
-	int attackPlayerH = my::MyLoadGraph("Data/img/game/player-attack_gold.png");
-
+	nowaponPlayerH_ = my::MyLoadGraph("Data/img/game/nowapon-player.png");
+	waponPlayerH_ = my::MyLoadGraph("Data/img/game/wapon-player_gold.png");
+	deadPlayerH_ = my::MyLoadGraph("Data/img/game/player-deth1.png");
+	attackPlayerH_ = my::MyLoadGraph("Data/img/game/player-attack_gold.png");
 	cursor1H_ = my::MyLoadGraph("Data/img/game/cursor1.png");
 	cursor2H_ = my::MyLoadGraph("Data/img/game/cursor2.png");
 	cursor3H_ = my::MyLoadGraph("Data/img/game/cursor3.png");
 	cursor4H_ = my::MyLoadGraph("Data/img/game/cursor4.png");
-
 	playH_ = my::MyLoadGraph("Data/img/play.png");
 	retryH_ = my::MyLoadGraph("Data/img/retry.png");
 	backH_ = my::MyLoadGraph("Data/img/back.png");
-
 	skeletonH_ = my::MyLoadGraph("Data/img/game/skeleton_monokuro.png");
- 	slimeH_ = my::MyLoadGraph("Data/img/game/slime_monokuro.png");
+	slimeH_ = my::MyLoadGraph("Data/img/game/slime_monokuro.png");
 	ghostH_ = my::MyLoadGraph("Data/img/game/ghost_monokuro.png");
 	golemH_ = my::MyLoadGraph("Data/img/game/golem_monokuro.png");
-
-	int mapChipH = my::MyLoadGraph("Data/img/game/mapchip1.png");
-	int backGraph = my::MyLoadGraph("Data/img/game/Gray.png");
-
-	int sordH_ =  my::MyLoadGraph("Data/img/game/sord_gold.png");
-	int doorH_ =  my::MyLoadGraph("Data/img/game/door.png");
+	mapChipH_ = my::MyLoadGraph("Data/img/game/mapchip1.png");
+	backGraphH_ = my::MyLoadGraph("Data/img/game/Gray.png");
+	sordH_ = my::MyLoadGraph("Data/img/game/sord_gold.png");
+	doorH_ = my::MyLoadGraph("Data/img/game/door.png");
 	lifeH_ = my::MyLoadGraph("Data/img/game/hart.png");
 	coinH_ = my::MyLoadGraph("Data/img/game/coin.png");
 
-	StageCheck(stage_);
+	// 初期化
+	fadeTimer_ = FADE_INTERVAL;
+	fadeValue_ = 255;
+	bgmFadeTimer_ = FADE_INTERVAL;
+	bgmFadeValue_ = 255;
+	gameOverFadeTimer_ = 0;
+	gameOverFadeValue_ = 0;
+	gameClearFadeTimer_ = 0;
+	gameClearStringFadeValue_ = 0;
+	life_ = 3;
+	waitTimer_ = 0;
+	gameOverTimer_ = 0;
+	gameClearTimer_ = 0;
+	preparTimer_ = 0;
+	quakeTimer_ = 0;
+	quakeX_ = 0.0f;
+	quakeY_ = 0.0f;
+	currentInputIndex_ = 0;
+	isGameClear_ = false;
+	faideEnabled_ = false;
+	playerDeadSound_ = false;
+	isNextStage_ = false;
+	isTitile_ = false;
+	isRetry_ = false;
+	isCoinEnabled_ = false;
 
-	pPlayer_ = std::make_shared<Player>(nowaponPlayerH, waponPlayerH, deadPlayerH, attackPlayerH, playerStartPosX_, playerStartPosY_, stage_);
+	// ステージ
+	stage_ = tutorial;		// どのステージ
+	StageCheck(stage_);		// ステージによって座標の変更
+
+	// メモリの確保
+	pPlayer_ = std::make_shared<Player>(nowaponPlayerH_, waponPlayerH_, deadPlayerH_, attackPlayerH_, playerStartPosX_, playerStartPosY_, stage_);
 	pField_ = std::make_shared<Field>(sordH_, doorH_, coinH_, stage_);
-	pMap_ = std::make_shared<Map>(mapChipH, stage_);
-	pBackGround_ = std::make_shared<BackGround>(backGraph);
+	pMap_ = std::make_shared<Map>(mapChipH_, stage_);
+	pBackGround_ = std::make_shared<BackGround>(backGraphH_);
 
+	// ポインタの設定
+	pBackGround_->SetPlayer(pPlayer_);
+	pPlayer_->SetField(pField_);
+	pField_->SetPlayer(pPlayer_);
+	pMap_->SetField(pField_);
+	pField_->StageCheck(stage_);
 	for (auto& enemy : pEnemy_)
 	{
 		enemy->SetPlayer(pPlayer_);
 		enemy->SetField(pField_);
 		enemy->Init(stage_);
 	}
-	
-	pBackGround_->SetPlayer(pPlayer_);
-	pPlayer_->SetField(pField_);
-	pField_->SetPlayer(pPlayer_);
-	pMap_->SetField(pField_);
-	pField_->StageCheck(stage_);
 
+	// ステージによって敵の数を変更
 	for (int i = 0; i < enemyNum_; i++)
 	{
 		pPlayer_->SetEnemy(pEnemy_[i], i, stage_);
-		pField_->SetEnemy(pEnemy_[i], i, stage_);
+		pField_->SetEnemy(pEnemy_[i], i);
 	}
 
+	// BGMを鳴らす
 	SoundManager::GetInstance().PlayMusic("Data/sound/BGM/game.mp3");
 	SetVolumeMusic(0);
 }
 
-GameplayingScene::~GameplayingScene()
+void GameplayingScene::End()
 {
-
+	DeleteFontToHandle(gameOverH_);
+	DeleteFontToHandle(gameOverShadowH_);
+	DeleteFontToHandle(gameClearH_);
+	DeleteFontToHandle(gameClearShadowH_);
+	DeleteFontToHandle(readyH_);
+	DeleteGraph(lifeH_);
+	DeleteGraph(coinH_);
+	DeleteGraph(tempScreenH_);
+	DeleteGraph(skeletonH_);
+	DeleteGraph(slimeH_);
+	DeleteGraph(ghostH_);
+	DeleteGraph(golemH_);
+	DeleteGraph(playH_);
+	DeleteGraph(retryH_);
+	DeleteGraph(backH_);
+	DeleteGraph(cursor1H_);
+	DeleteGraph(cursor2H_);
+	DeleteGraph(cursor3H_);
+	DeleteGraph(cursor4H_);
+	DeleteGraph(nowaponPlayerH_);
+	DeleteGraph(waponPlayerH_);
+	DeleteGraph(deadPlayerH_);
+	DeleteGraph(attackPlayerH_);
+	DeleteGraph(mapChipH_);
+	DeleteGraph(backGraphH_);
+	DeleteGraph(sordH_);
+	DeleteGraph(doorH_);
 }
 
 void GameplayingScene::FadeInUpdate(const InputState& input)
 {
+	// フェード中はキャラクターを表示しない
+	pPlayer_->SetEnabled(false);
 	for (auto& enemy : pEnemy_)
 	{
 		enemy->SetEnabled(false);
 	}
 
-	pPlayer_->SetEnabled(false);
+	// BGMのフェード処理
 	SetVolumeMusic(static_cast<int>(255.0f / 60.0f * static_cast<float>(60 - fadeTimer_) * 
 		(static_cast<float>(SoundManager::GetInstance().GetBGMVolume() / 255.0f))));
-	fadeValue_ = 255 * (static_cast<int>(fadeTimer_)) / static_cast<int>(fade_interval);
+
+	// 画面のフェード処理
+	fadeValue_ = 255 * (static_cast<int>(fadeTimer_)) / static_cast<int>(FADE_INTERVAL);
+
 	if (--fadeTimer_ == 0)
 	{
 		faideEnabled_ = true;
@@ -209,6 +317,7 @@ void GameplayingScene::FadeInUpdate(const InputState& input)
 
 void GameplayingScene::NormalUpdate(const InputState& input)
 {	
+	// フェードが終わったのでキャラクターを表示
 	if (faideEnabled_)
 	{
 		for (auto& enemy : pEnemy_)
@@ -221,12 +330,16 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 		faideEnabled_ = false;
 	}
 
+	// 背景の更新処理
 	pBackGround_->Update(pPlayer_->GetPowerFeed());
 
+	// フィールドの更新処理
 	pField_->Updata();
 
+	// プレイヤーの更新処理
 	pPlayer_->Update(input);
 
+	// 敵の更新処理
 	for (auto& enemy : pEnemy_)
 	{
 		enemy->Update();
@@ -254,6 +367,7 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 					quakeY_ = 20.0f;
 					quakeTimer_ = 80;
 				}
+				// 残機がある場合は少し揺らす
 				else
 				{
 					quakeX_ = 20.0f;
@@ -263,15 +377,16 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 				// プレイヤーの死亡フラグを立てる
 				pPlayer_->SetDead(true);
 
-				fadeColor_ = 0xff0000;
-
+				// SEを鳴らす
 				SoundManager::GetInstance().Play("enemyAttack");
 
+				// ジングルを鳴らすフラグを立てる
 				playerDeadSound_ = true;
 
 				// 残機がなかった場合
 				if (life_ <= 0)
 				{
+					// ゲームオーバー演出に移行
 					updateFunc_ = &GameplayingScene::GameOverUpdate;
 				}
 				else if (life_ > 0)
@@ -286,8 +401,10 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 				// 敵の死亡フラグを立てる
 				enemy->SetDead(true);
 
+				// SEを鳴らす
 				SoundManager::GetInstance().Play("kill");
 
+				// 敵死亡演出に移行
 				updateFunc_ = &GameplayingScene::EnemyDeadUpdate;
 			}
 		}
@@ -370,7 +487,6 @@ void GameplayingScene::Draw()
 
 		DrawRectRotaGraph(x, Game::SCREEN_HEIGHT - 30, 0, 0, 16, 16, 2.5f, 0.0f, lifeH_, true);
 	}
-
 
 	// ゲームオーバー
 	if (isGameOver_)
@@ -456,7 +572,7 @@ void GameplayingScene::Draw()
 
 void GameplayingScene::GameClearUpdate(const InputState& input)
 {
-	// ゲームクリア時のコインの演出
+	// ゲームクリア時のコインを増やす
 	isCoinEnabled_ = true;
 	if (gameClearTimer_ % 1 == 0)
 	{
@@ -471,7 +587,7 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 		});
 	pCoin_.erase(coin, pCoin_.end());
 
-	// コインの演出処理
+	// コインの演出の更新処理
 	for (auto& coin : pCoin_)
 	{
 		coin->Update();
@@ -488,7 +604,7 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 		gameClearTimer_ = 0;
 		isGameClear_ = true;
 
-		// 最後のステージをクリアした場合
+		// 最後のステージをクリアした場合クリアの文字列の位置の変更
 		if (stage_ == stage_num - 1)
 		{
 			gameClearPos_.x = static_cast<float>((Game::SCREEN_WIDTH / 2) - (stringWidth_ / 2));
@@ -499,8 +615,10 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 	// 音楽が鳴っていた場合
 	if (isGameClear_)
 	{
-		gameClearStringFadeValue_ = static_cast<int>(255 * (static_cast<float>(gameClearFadeTimer_)) / static_cast<float>(game_clear_fade_interval));
+		// 文字のフェード
+		gameClearStringFadeValue_ = static_cast<int>(255 * (static_cast<float>(gameClearFadeTimer_)) / static_cast<float>(GAMECLEAR_FADE_INTERVAL));
 
+		// 最後のステージではない場合
 		if (stage_ != stage_num - 1)
 		{
 			gameClearPos_.y -= 0.5f;
@@ -543,54 +661,19 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 					currentInputIndex_ = (currentInputIndex_ + 1) % CHOICE_NUM;
 				}
 
-				if (currentInputIndex_ == 0)
-				{
-					cursor1Pos_.x = CB_START_X_1;
-					cursor1Pos_.y = CB_START_Y_1;
+				// カーソルの移動
+				CursorMove();
 
-					cursor2Pos_.x = CB_START_X_1 + CB_WIDTH_1;
-					cursor2Pos_.y = CB_START_Y_1;
-
-					cursor3Pos_.x = CB_START_X_1 + CB_WIDTH_1;
-					cursor3Pos_.y = CB_START_Y_1 + CB_HEIGHT_1;
-
-					cursor4Pos_.x = CB_START_X_1;
-					cursor4Pos_.y = CB_START_Y_1 + CB_HEIGHT_1;
-				}
-				else if (currentInputIndex_ == 1)
-				{
-					cursor1Pos_.x = CB_START_X_2;
-					cursor1Pos_.y = CB_START_Y_2;
-
-					cursor2Pos_.x = CB_START_X_2 + CB_WIDTH_2;
-					cursor2Pos_.y = CB_START_Y_2;
-
-					cursor3Pos_.x = CB_START_X_2 + CB_WIDTH_2;
-					cursor3Pos_.y = CB_START_Y_2 + CB_HEIGHT_2;
-
-					cursor4Pos_.x = CB_START_X_2;
-					cursor4Pos_.y = CB_START_Y_2 + CB_HEIGHT_2;
-
-				}
-				else if (currentInputIndex_ == 2)
-				{
-					cursor1Pos_.x = CB_START_X_3;
-					cursor1Pos_.y = CB_START_Y_3;
-
-					cursor2Pos_.x = CB_START_X_3 + CB_WIDTH_3;
-					cursor2Pos_.y = CB_START_Y_3;
-
-					cursor3Pos_.x = CB_START_X_3 + CB_WIDTH_3;
-					cursor3Pos_.y = CB_START_Y_3 + CB_HEIGHT_3;
-
-					cursor4Pos_.x = CB_START_X_3;
-					cursor4Pos_.y = CB_START_Y_3 + CB_HEIGHT_3;
-				}
-
+				// 決定ボタンが押されたとき
 				if (input.IsTriggered(InputType::next))
 				{
+					// SEを鳴らす
 					SoundManager::GetInstance().Play("decision");
+
+					// 初期化
 					gameClearTimer_ = 0;
+
+					// 選択された選択肢のフラグを立てる
 					if (currentInputIndex_ == 0)
 					{
 						isNextStage_ = true;
@@ -603,6 +686,8 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 					{
 						isTitile_ = true;
 					}
+
+					// フェードアウトに移行
 					updateFunc_ = &GameplayingScene::FadeOutUpdate;
 				}
 			}
@@ -612,22 +697,11 @@ void GameplayingScene::GameClearUpdate(const InputState& input)
 
 void GameplayingScene::GameOverUpdate(const InputState& input)
 {
-	if (quakeTimer_ > 0)
-	{
-		quakeX_ = -quakeX_;
-		quakeX_ *= 0.95f;
-		quakeY_ = -quakeY_;
-		quakeY_ *= 0.95f;
+	// 画面を揺らす
+	Quake();
 
-		--quakeTimer_;
-	}
-	else
-	{
-		quakeX_ = 0.0f;
-		quakeY_ = 0.0f;
-	}
-
-	if (timer_++ > 120)
+	// 2秒待つ
+	if (waitTimer_++ > 120)
 	{
 		// すべての敵を消す
 		for (auto& enemy : pEnemy_)
@@ -637,10 +711,12 @@ void GameplayingScene::GameOverUpdate(const InputState& input)
 
 		if (!pPlayer_->GetAnimeEnd())
 		{
+			// プレイヤーの死亡演出
 			pPlayer_->DeadUpdate();
 
 			if (playerDeadSound_)
 			{
+				// ジングルを鳴らす
 				SoundManager::GetInstance().PlayJingle("Data/sound/BGM/gameOver.wav");
 				playerDeadSound_ = false;
 			}
@@ -651,7 +727,7 @@ void GameplayingScene::GameOverUpdate(const InputState& input)
 		}
 		if (isGameOver_)
 		{
-			gameOverFadeValue_ = static_cast<int>(255 * (static_cast<float>(gameOverFadeTimer_)) / static_cast<float>(game_over_fade_interval));
+			gameOverFadeValue_ = static_cast<int>(255 * (static_cast<float>(gameOverFadeTimer_)) / static_cast<float>(GAMEOVER_FADE_INTERVAL));
 			if (++gameOverFadeTimer_ >= 255)
 			{
 				gameOverFadeValue_ = 255;
@@ -665,20 +741,76 @@ void GameplayingScene::GameOverUpdate(const InputState& input)
 	}
 }
 
-void GameplayingScene::PlayerDeadUpdate(const InputState& input)
+void GameplayingScene::Quake()
 {
 	if (quakeTimer_ > 0)
 	{
 		quakeX_ = -quakeX_;
 		quakeX_ *= 0.95f;
+		quakeY_ = -quakeY_;
+		quakeY_ *= 0.95f;
 		--quakeTimer_;
 	}
 	else
 	{
 		quakeX_ = 0.0f;
+		quakeY_ = 0.0f;
 	}
+}
 
-	if (timer_++ > 60)
+void GameplayingScene::CursorMove()
+{
+	if (currentInputIndex_ == 0)
+	{
+		cursor1Pos_.x = CB_START_X_1;
+		cursor1Pos_.y = CB_START_Y_1;
+
+		cursor2Pos_.x = CB_START_X_1 + CB_WIDTH_1;
+		cursor2Pos_.y = CB_START_Y_1;
+
+		cursor3Pos_.x = CB_START_X_1 + CB_WIDTH_1;
+		cursor3Pos_.y = CB_START_Y_1 + CB_HEIGHT_1;
+
+		cursor4Pos_.x = CB_START_X_1;
+		cursor4Pos_.y = CB_START_Y_1 + CB_HEIGHT_1;
+	}
+	else if (currentInputIndex_ == 1)
+	{
+		cursor1Pos_.x = CB_START_X_2;
+		cursor1Pos_.y = CB_START_Y_2;
+
+		cursor2Pos_.x = CB_START_X_2 + CB_WIDTH_2;
+		cursor2Pos_.y = CB_START_Y_2;
+
+		cursor3Pos_.x = CB_START_X_2 + CB_WIDTH_2;
+		cursor3Pos_.y = CB_START_Y_2 + CB_HEIGHT_2;
+
+		cursor4Pos_.x = CB_START_X_2;
+		cursor4Pos_.y = CB_START_Y_2 + CB_HEIGHT_2;
+
+	}
+	else if (currentInputIndex_ == 2)
+	{
+		cursor1Pos_.x = CB_START_X_3;
+		cursor1Pos_.y = CB_START_Y_3;
+
+		cursor2Pos_.x = CB_START_X_3 + CB_WIDTH_3;
+		cursor2Pos_.y = CB_START_Y_3;
+
+		cursor3Pos_.x = CB_START_X_3 + CB_WIDTH_3;
+		cursor3Pos_.y = CB_START_Y_3 + CB_HEIGHT_3;
+
+		cursor4Pos_.x = CB_START_X_3;
+		cursor4Pos_.y = CB_START_Y_3 + CB_HEIGHT_3;
+	}
+}
+
+void GameplayingScene::PlayerDeadUpdate(const InputState& input)
+{
+	// 画面を揺らす
+	Quake();
+
+	if (waitTimer_++ > 60)
 	{
 		// すべての敵を消す
 		for (auto& enemy : pEnemy_)
@@ -686,18 +818,22 @@ void GameplayingScene::PlayerDeadUpdate(const InputState& input)
 			enemy->SetEnabled(false);
 		}
 		
+		// ジングルを１回だけ鳴らす
 		if (playerDeadSound_)
 		{
 			SoundManager::GetInstance().PlayJingle("Data/sound/BGM/playerDead.wav");
 			playerDeadSound_ = false;
 		}
 
+		// プレイヤーの死亡演出の実行
 		if (!pPlayer_->GetAnimeEnd())
 		{
 			pPlayer_->DeadUpdate();
 		}
 	}
 
+	// プレイヤーの死亡演出が終わり、
+	// ジングルが鳴り終わったらフェードアウトに移行
 	if (pPlayer_->GetAnimeEnd() && !CheckMusic())
 	{
 		updateFunc_ = &GameplayingScene::FadeOutUpdate;
@@ -706,18 +842,21 @@ void GameplayingScene::PlayerDeadUpdate(const InputState& input)
 
 void GameplayingScene::FadeOutUpdate(const InputState& input)
 {
+	// 画面のフェード処理
 	fadeTimer_++;
-	fadeValue_ = static_cast<int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(fade_interval)));
+	fadeValue_ = static_cast<int>(255 * (static_cast<float>(fadeTimer_) / static_cast<float>(FADE_INTERVAL)));
+
+	// 音楽のフェード処理
 	SetVolumeMusic(static_cast<int>((std::max)(SoundManager::GetInstance().GetBGMVolume() - fadeValue_, 0)));
 
 	// ゲームオーバー
-	if (fadeTimer_ > fade_interval && isGameOver_)
+	if (fadeTimer_ > FADE_INTERVAL && isGameOver_)
 	{
 		manager_.ChangeScene(new TitleScene(manager_));
 		return;
 	}
 	// 次のステージへ
-	else if (fadeTimer_ > fade_interval && isNextStage_)
+	else if (fadeTimer_ > FADE_INTERVAL && isNextStage_)
 	{
 		isNextStage_ = false;
 		stage_ += 1;
@@ -726,20 +865,20 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 		return;
 	}
 	// タイトル画面に戻る
-	else if (fadeTimer_ > fade_interval && isTitile_)
+	else if (fadeTimer_ > FADE_INTERVAL && isTitile_)
 	{
 		isTitile_ = false;
 		manager_.ChangeScene(new TitleScene(manager_));
 		return;
 	}
 	// リトライ
-	else if (fadeTimer_ > fade_interval && isRetry_)
+	else if (fadeTimer_ > FADE_INTERVAL && isRetry_)
 	{
 		SetInit();
 		updateFunc_ = &GameplayingScene::FadeInUpdate;
 	}
 	// 残機が１減った
-	else if (fadeTimer_ > fade_interval && life_ > 0)
+	else if (fadeTimer_ > FADE_INTERVAL && life_ > 0)
 	{
 		SetDeadInit();
 		updateFunc_ = &GameplayingScene::FadeInUpdate;
@@ -748,6 +887,7 @@ void GameplayingScene::FadeOutUpdate(const InputState& input)
 
 void GameplayingScene::PrepareUpdate(const InputState& input)
 {
+	// 2秒間止める
 	preparTimer_--;
 	if (preparTimer_ <= 0)
 	{
@@ -758,49 +898,71 @@ void GameplayingScene::PrepareUpdate(const InputState& input)
 
 void GameplayingScene::SetInit()
 {
+	// コインの削除
 	pCoin_.clear();
-	stringWidth_ = GetDrawStringWidthToHandle(GAMECLEAR_STRING, static_cast<int>(strlen(GAMECLEAR_STRING)), gameClearH_);
-	stringHeight_ = GetFontSizeToHandle(gameClearH_);
 
+	//ゲームクリアの文字列の初期化
 	gameClearPos_.x = static_cast<float>((Game::SCREEN_WIDTH / 2) - (stringWidth_ / 2));
 	gameClearPos_.y = static_cast<float>((Game::SCREEN_HEIGHT / 2) - 220);
 
-	fadeTimer_ = fade_interval;
+	// フェード関係の初期化
+	fadeTimer_ = FADE_INTERVAL;
 	fadeValue_ = 255;
-	timer_ = 0;
+	gameClearFadeTimer_ = 0;
+	gameClearStringFadeValue_ = 0;
+	gameOverFadeTimer_ = 0;
+	gameOverFadeValue_ = 0;
+
+	// タイマーの初期化
+	waitTimer_ = 0;
+
+	// フラグの初期化 
 	isTitile_ = false;
 	isCoinEnabled_ = false;
 	isNextStage_ = false;
 	isRetry_ = false;
 	isGameClear_ = false;
 	isGameOver_ = false;
-	pPlayer_->Init(stage_);
+
+	// 現在のステージの確認
 	StageCheck(stage_);
+
+	// プレイヤーの初期化
+	pPlayer_->Init(stage_);
+
+	// 集めたコインの枚数の初期化
 	pField_->SetCoinNum(0);
-	gameClearFadeTimer_ = 0;
-	gameClearStringFadeValue_ = 0;
+
+	// 敵の初期化
 	for (auto& enemy : pEnemy_)
 	{
-		enemy->Init(stage_);
-		enemy->SetInit(stage_);
+		enemy->Init(stage_);	// 敵全体の初期化
+		enemy->SetInit(stage_);	// ステージによって敵それぞれを初期化
 	}
+
+	// ステージによってサイズを変更
+	pMap_->StageCheck(stage_);
+
+	// フィールドの初期化
+	pField_->StageCheck(stage_);
+
+	// ポインタの設定
 	for (auto& enemy : pEnemy_)
 	{
 		enemy->SetPlayer(pPlayer_);
 		enemy->SetField(pField_);
 	}
-	pBackGround_->SetPlayer(pPlayer_);
-	pPlayer_->SetField(pField_);
-	pField_->SetPlayer(pPlayer_);
-	pMap_->SetField(pField_);
-	pMap_->StageCheck(stage_);
-	pField_->StageCheck(stage_);
-
 	for (int i = 0; i < enemyNum_; i++)
 	{
 		pPlayer_->SetEnemy(pEnemy_[i], i, stage_);
-		pField_->SetEnemy(pEnemy_[i], i, stage_);
+		pField_->SetEnemy(pEnemy_[i], i);
 	}
+	pBackGround_->SetPlayer(pPlayer_);
+	pField_->SetPlayer(pPlayer_);
+	pPlayer_->SetField(pField_);
+	pMap_->SetField(pField_);
+
+	// BGMを鳴らす
 	SetVolumeMusic(0);
 	SoundManager::GetInstance().PlayMusic("Data/sound/BGM/game.mp3");
 	pPlayer_->StartMusic();
@@ -808,21 +970,30 @@ void GameplayingScene::SetInit()
 
 void GameplayingScene::SetDeadInit()
 {
-	fadeTimer_ = fade_interval;
+	// フェード関係の初期化
+	fadeTimer_ = FADE_INTERVAL;
 	fadeValue_ = 255;
-	timer_ = 0;
+	waitTimer_ = 0;
+	
+	// フラグの初期化
 	isTitile_ = false;
 	isCoinEnabled_ = false;
 	isNextStage_ = false;
 	isRetry_ = false;
 	isGameClear_ = false;
 	isGameOver_ = false;
+
+	// プレイヤーの初期化
 	pPlayer_->Init(stage_);
+
+	// 敵の初期化
 	for (auto& enemy : pEnemy_)
 	{
 		enemy->Init(stage_);
 		enemy->SetInit(stage_);
 	}
+
+	// BGMを鳴らす
 	SetVolumeMusic(0);
 	SoundManager::GetInstance().PlayMusic("Data/sound/BGM/game.mp3");
 	pPlayer_->StartMusic();

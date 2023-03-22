@@ -276,11 +276,6 @@ void Field::Draw()
 	DrawFormatStringToHandle(Game::SCREEN_WIDTH / 2 - 225, Game::SCREEN_HEIGHT - 50, 0xffffff, stringH_, "%d / %d\n", getCoinNum_, coinTotalNum_);
 }
 
-void Field::SetEnemy(std::shared_ptr<EnemyBase> enemy, int i, int stage)
-{
-	pEnemy_[i] = enemy;
-}
-
 int Field::LestCoin()
 {
 	int coin = 0;

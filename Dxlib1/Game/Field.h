@@ -39,7 +39,7 @@ public:
 	void Draw();
 	
 	// ポインタの設定
-	void SetEnemy(std::shared_ptr<EnemyBase>enemy, int i, int stage);
+	void SetEnemy(std::shared_ptr<EnemyBase>enemy, int i){ pEnemy_[i] = enemy; }
 	void SetPlayer(std::shared_ptr<Player>player) { pPlayer_ = player; }
 
 	// コインの枚数の設定

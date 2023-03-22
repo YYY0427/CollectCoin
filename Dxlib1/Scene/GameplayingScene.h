@@ -22,13 +22,22 @@ class Particle;
 class GameplayingScene : public Scene
 {
 public:
+	// コンストラクタ
 	GameplayingScene(SceneManager& manager);
-	~GameplayingScene();
 
-	// 更新
+	// デストラクタ
+	~GameplayingScene();
+	
+	// 初期化処理
+	void Init();
+
+	// 終了処理
+	void End();
+
+	// 更新処理
 	void Update(const InputState& input);
 
-	// 描画
+	// 描画処理
 	void Draw();
 
 	// ステージ変更時初期化
@@ -77,24 +86,20 @@ private:
 	unsigned int  fadeColor_ = 0x000000; 
 
 	// フェード設定
-	static constexpr int fade_interval = 60;
-	int fadeTimer_ = fade_interval;
-	int fadeValue_ = 255;
+	int fadeTimer_;
+	int fadeValue_;
 
 	// BGMのフェード設定
-	static constexpr int bgm_fade_interval = 60;
-	int bgmFadeTimer_ = fade_interval;
-	int bgmFadeValue_ = 255;
-
+	int bgmFadeTimer_ ;
+	int bgmFadeValue_ ;
+					  
 	// ゲームオーバー文字のフェード設定
-	static constexpr int game_over_fade_interval = 60;
-	int gameOverFadeTimer_ = 0;
-	int gameOverFadeValue_ = 0;
+	int gameOverFadeTimer_;
+	int gameOverFadeValue_;
 
 	// ゲームクリア文字のフェード設定
-	static constexpr int game_clear_fade_interval = 60;
-	int gameClearFadeTimer_ = 0;
-	int gameClearStringFadeValue_ = 0;
+	int gameClearFadeTimer_;
+	int gameClearStringFadeValue_;
 
 	// 文字座標
 	Vec2 gameClearPos_;
@@ -121,6 +126,14 @@ private:
 	int cursor2H_;
 	int cursor3H_;
 	int cursor4H_;
+	int nowaponPlayerH_;
+	int waponPlayerH_;
+	int deadPlayerH_;
+	int attackPlayerH_;
+	int mapChipH_;
+	int backGraphH_;
+	int sordH_;
+	int doorH_;
 
 	// 初期座標
 	int playerStartPosX_;
@@ -178,7 +191,7 @@ private:
 	int currentInputIndex_;
 
 	// タイマー
-	int timer_;
+	int waitTimer_;
 	int preparTimer_;
 	int gameOverTimer_;
 	int gameClearTimer_;
@@ -203,6 +216,7 @@ private:
 	// フェイドアウト
 	void FadeOutUpdate(const InputState& input);
 
+	// REDY表示用アップデート
 	void PrepareUpdate(const InputState& input);
 
 	// プレイヤー死亡時の演出
@@ -217,6 +231,13 @@ private:
 	// ゲームオーバー演出
 	void GameOverUpdate(const InputState& input);
 
+	// 画面を揺らす
+	void Quake();
+
+	// カーソルの移動
+	void CursorMove();
+
+	// メンバ関数ポインタ
 	using UpdateFunc_t = void (GameplayingScene::*) (const InputState& input);
 	UpdateFunc_t updateFunc_ = nullptr;
 };

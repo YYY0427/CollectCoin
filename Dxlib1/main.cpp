@@ -14,7 +14,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	SetGraphMode(Game::SCREEN_WIDTH, Game::SCREEN_HEIGHT, Game::kColorDepth);
 
 	// ウインドウ名設定
-	SetMainWindowText(Game::kTitleText);
+	SetMainWindowText(Game::TITLE_TEXT);
 
 	// 初期化
 	if (DxLib_Init() == -1) 
