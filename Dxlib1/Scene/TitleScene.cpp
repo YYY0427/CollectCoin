@@ -12,7 +12,7 @@
 #include "../Game/Player.h"
 #include "../SoundManager.h"
 #include "../Game/BackGround.h"
-#include "Credit.h"
+#include "Information.h"
 #include <DxLib.h>
 
 namespace
@@ -196,7 +196,7 @@ void TitleScene::NormalUpdate(const InputState& input)
 		}
 		else if (currentInputIndex_ == credit)
 		{
-			manager_.PushScene(new Credit(manager_));
+			manager_.PushScene(new Information(manager_));
 			return;
 		}
 		else if (currentInputIndex_ == exit)

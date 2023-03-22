@@ -102,7 +102,7 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	bgmFadeTimer_(0),
 	bgmFadeValue_(0),
 	gameOverFadeTimer_(0),
-	gameOverFadeValue_(0),
+	gameOverStringFadeValue_(0),
 	gameClearFadeTimer_(0),
 	gameClearStringFadeValue_(0),
 	tempScreenH_(-1),
@@ -157,11 +157,11 @@ void GameplayingScene::Init()
 	assert(tempScreenH_ >= 0);			// 作れなっかた場合ここで停止
 
 	// フォントの作成
-	gameOverH_ = CreateFontToHandle("PixelMplus10", 50, 30);
-	gameOverShadowH_ = CreateFontToHandle("PixelMplus10", 51, 30);
-	gameClearH_ = CreateFontToHandle("PixelMplus10", 100, 30);
-	gameClearShadowH_ = CreateFontToHandle("PixelMplus10", 102, 30);
-	readyH_ = CreateFontToHandle("PixelMplus10", 20, 10);
+	gameOverH_ = CreateFontToHandle("PixelMplus10", 100, 9);
+	gameOverShadowH_ = CreateFontToHandle("PixelMplus10", 102, 9);
+	gameClearH_ = CreateFontToHandle("PixelMplus10", 100, 9);
+	gameClearShadowH_ = CreateFontToHandle("PixelMplus10", 102, 9);
+	readyH_ = CreateFontToHandle("PixelMplus10", 100, 9);
 
 	// 文字の幅、文字の高さの取得
 	stringWidth_ = GetDrawStringWidthToHandle(GAMECLEAR_STRING, static_cast<int>(strlen(GAMECLEAR_STRING)), gameClearH_);
@@ -200,10 +200,10 @@ void GameplayingScene::Init()
 	bgmFadeTimer_ = FADE_INTERVAL;
 	bgmFadeValue_ = 255;
 	gameOverFadeTimer_ = 0;
-	gameOverFadeValue_ = 0;
+	gameOverStringFadeValue_ = 0;
 	gameClearFadeTimer_ = 0;
 	gameClearStringFadeValue_ = 0;
-	life_ = 3;
+	life_ = 0;
 	waitTimer_ = 0;
 	gameOverTimer_ = 0;
 	gameClearTimer_ = 0;
@@ -499,10 +499,13 @@ void GameplayingScene::Draw()
 		int height = (Game::SCREEN_HEIGHT / 2) - (stringHeight / 2);
 
 		// ゲームオーバー文字の表示
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gameOverFadeValue_);
-		DrawStringToHandle(width - 3, height,
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, (gameOverStringFadeValue_ * 100) / 255);
+		DrawBox(0, 0, Game::SCREEN_WIDTH, Game::SCREEN_HEIGHT, 0x000000, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gameOverStringFadeValue_);
+		DrawStringToHandle(width + 47, height,
 			GAMEOVER_STRING, 0x000000, gameOverShadowH_, false);
-		DrawStringToHandle(width, height,
+		DrawStringToHandle(width + 50, height,
 			GAMEOVER_STRING, 0xffffff, gameOverH_, false);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
@@ -553,9 +556,14 @@ void GameplayingScene::Draw()
 	if (preparTimer_ > 0)
 	{
 		int width = GetDrawStringWidthToHandle(REDY_STRING, static_cast<int>(strlen(REDY_STRING)), readyH_);
+		int height = GetFontSizeToHandle(readyH_);
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+		DrawBox(0, 0, Game::SCREEN_WIDTH, Game::SCREEN_HEIGHT, 0x000000, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 		// 準備中文字の表示
-		DrawStringToHandle((Game::SCREEN_WIDTH / 2) - (width / 2), Game::SCREEN_HEIGHT / 2 + 40,
+		DrawStringToHandle((Game::SCREEN_WIDTH / 2) - (width / 2), (Game::SCREEN_HEIGHT / 2) - (height / 2),
 			REDY_STRING, 0xffffff, readyH_, false);
 	}
 
@@ -730,13 +738,16 @@ void GameplayingScene::GameOverUpdate(const InputState& input)
 		}
 		if (isGameOver_)
 		{
-			gameOverFadeValue_ = static_cast<int>(255 * (static_cast<float>(gameOverFadeTimer_)) / static_cast<float>(GAMEOVER_FADE_INTERVAL));
-			if (++gameOverFadeTimer_ >= 255)
-			{
-				gameOverFadeValue_ = 255;
+			gameOverStringFadeValue_ = static_cast<int>(255 * (static_cast<float>(gameOverFadeTimer_)) / static_cast<float>(GAMEOVER_FADE_INTERVAL));
 
-				if (gameOverTimer_++ % 180 == 0)
+			if (++gameOverFadeTimer_ >= 100)
+			{
+				gameOverFadeTimer_ = 100;
+
+				if (++gameOverTimer_ >= 180)
 				{
+					gameOverTimer_ = 0;
+					waitTimer_ = 0;
 					updateFunc_ = &GameplayingScene::FadeOutUpdate;
 				}
 			}
@@ -914,7 +925,7 @@ void GameplayingScene::SetInit()
 	gameClearFadeTimer_ = 0;
 	gameClearStringFadeValue_ = 0;
 	gameOverFadeTimer_ = 0;
-	gameOverFadeValue_ = 0;
+	gameOverStringFadeValue_ = 0;
 
 	// タイマーの初期化
 	waitTimer_ = 0;

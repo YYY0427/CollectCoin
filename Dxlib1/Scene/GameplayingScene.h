@@ -95,7 +95,7 @@ private:
 					  
 	// ゲームオーバー文字のフェード設定
 	int gameOverFadeTimer_;
-	int gameOverFadeValue_;
+	int gameOverStringFadeValue_;
 
 	// ゲームクリア文字のフェード設定
 	int gameClearFadeTimer_;

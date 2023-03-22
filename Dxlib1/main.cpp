@@ -5,7 +5,8 @@
 #include "InputState.h"
 #include "Game.h"
 
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+//int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
 	// windowモード設定
 	ChangeWindowMode(Game::kWindowMode);
@@ -15,6 +16,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	// ウインドウ名設定
 	SetMainWindowText(Game::TITLE_TEXT);
+
+	// ほかのウィンドウを選択していても動くようにする
+	SetAlwaysRunFlag(true);
+
+	// ウィンドウのサイズを変更可能にする
+	SetWindowSizeChangeEnableFlag(true);
 
 	// 初期化
 	if (DxLib_Init() == -1) 
@@ -33,11 +40,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		MessageBox(NULL, "フォント読込失敗", " ", MB_OK);	// メッセージボックスを使って警告表示
 	}
 
-
 	SetDrawScreen(DX_SCREEN_BACK);
 
 	InputState input;
-
 	SceneManager sceneManager;
 	sceneManager.ChangeScene(new TitleScene(sceneManager));
 
