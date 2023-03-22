@@ -86,6 +86,8 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	Scene(manager),
 	updateFunc_(&GameplayingScene::FadeInUpdate),
 	life_(0),
+	tutorialCoinTimer_(0),
+	tutorialSordTimer_(0),
 	waitTimer_(0),
 	gameOverTimer_(0),
 	gameClearTimer_(0),
@@ -105,6 +107,7 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	gameOverStringFadeValue_(0),
 	gameClearFadeTimer_(0),
 	gameClearStringFadeValue_(0),
+	tutorialTimer_(0),
 	tempScreenH_(-1),
 	gameOverH_(-1),
 	gameOverShadowH_(-1),
@@ -132,13 +135,18 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	backGraphH_(-1),
 	sordH_(-1),
 	doorH_(-1),
+	tutorialStringH_(-1),
+	controllerH_(-1),
 	isGameClear_(false),
 	faideEnabled_(false),
 	playerDeadSound_(false),
 	isNextStage_(false),
 	isTitile_(false),
 	isRetry_(false),
-	isCoinEnabled_(false)
+	isCoinEnabled_(false),
+	isTutorialGetSord_(false),
+	isTutorialGetCoin_(false),
+	isTutorial_(false)
 {
 	Init();
 }
@@ -162,6 +170,7 @@ void GameplayingScene::Init()
 	gameClearH_ = CreateFontToHandle("PixelMplus10", 100, 9);
 	gameClearShadowH_ = CreateFontToHandle("PixelMplus10", 102, 9);
 	readyH_ = CreateFontToHandle("PixelMplus10", 100, 9);
+	tutorialStringH_ = CreateFontToHandle("PixelMplus10", 40, 9);
 
 	// 文字の幅、文字の高さの取得
 	stringWidth_ = GetDrawStringWidthToHandle(GAMECLEAR_STRING, static_cast<int>(strlen(GAMECLEAR_STRING)), gameClearH_);
@@ -193,6 +202,7 @@ void GameplayingScene::Init()
 	doorH_ = my::MyLoadGraph("Data/img/game/door.png");
 	lifeH_ = my::MyLoadGraph("Data/img/game/hart.png");
 	coinH_ = my::MyLoadGraph("Data/img/game/coin.png");
+	controllerH_ = my::MyLoadGraph("Data/img/game/controller.png");
 
 	// 初期化
 	fadeTimer_ = FADE_INTERVAL;
@@ -203,7 +213,9 @@ void GameplayingScene::Init()
 	gameOverStringFadeValue_ = 0;
 	gameClearFadeTimer_ = 0;
 	gameClearStringFadeValue_ = 0;
-	life_ = 0;
+	tutorialCoinTimer_ = 0;
+	tutorialSordTimer_ = 0;
+	life_ = 3;
 	waitTimer_ = 0;
 	gameOverTimer_ = 0;
 	gameClearTimer_ = 0;
@@ -212,6 +224,7 @@ void GameplayingScene::Init()
 	quakeX_ = 0.0f;
 	quakeY_ = 0.0f;
 	currentInputIndex_ = 0;
+	tutorialTimer_ = 0;
 	isGameClear_ = false;
 	faideEnabled_ = false;
 	playerDeadSound_ = false;
@@ -219,6 +232,9 @@ void GameplayingScene::Init()
 	isTitile_ = false;
 	isRetry_ = false;
 	isCoinEnabled_ = false;
+	isTutorialGetSord_ = true;
+	isTutorialGetCoin_ = true;
+	isTutorial_ = true;
 
 	// ステージ
 	stage_ = tutorial;		// どのステージ
@@ -342,6 +358,11 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 	for (auto& enemy : pEnemy_)
 	{
 		enemy->Update();
+	}
+
+	if (stage_ == tutorial)
+	{
+		TutorialUpdate(input);
 	}
 
 	for (auto& enemy : pEnemy_)
@@ -565,6 +586,12 @@ void GameplayingScene::Draw()
 		// 準備中文字の表示
 		DrawStringToHandle((Game::SCREEN_WIDTH / 2) - (width / 2), (Game::SCREEN_HEIGHT / 2) - (height / 2),
 			REDY_STRING, 0xffffff, readyH_, false);
+	}
+
+	// チュートリアル用描画
+	if (stage_ == tutorial)
+	{
+		TutorialDraw();
 	}
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeValue_);
@@ -905,6 +932,11 @@ void GameplayingScene::PrepareUpdate(const InputState& input)
 	preparTimer_--;
 	if (preparTimer_ <= 0)
 	{
+		if (stage_ == tutorial && isTutorial_)
+		{
+			tutorialTimer_ = 300;
+			isTutorial_ = false;
+		}
 		updateFunc_ = &GameplayingScene::NormalUpdate;
 		preparTimer_ = 0;
 	}
@@ -937,6 +969,9 @@ void GameplayingScene::SetInit()
 	isRetry_ = false;
 	isGameClear_ = false;
 	isGameOver_ = false;
+	isTutorialGetSord_ = true;
+	isTutorialGetCoin_ = true;
+	isTutorial_ = true;
 
 	// 現在のステージの確認
 	StageCheck(stage_);
@@ -1011,6 +1046,50 @@ void GameplayingScene::SetDeadInit()
 	SetVolumeMusic(0);
 	SoundManager::GetInstance().PlayMusic("Data/sound/BGM/game.mp3");
 	pPlayer_->StartMusic();
+}
+
+void GameplayingScene::TutorialUpdate(const InputState& input)
+{
+	// コインを取得したときの表示
+	if (pPlayer_->GetPlayerCoin() && isTutorialGetCoin_ && tutorialTimer_ == 0 && tutorialSordTimer_ == 0)
+	{
+		tutorialCoinTimer_ = 400;
+		isTutorialGetCoin_ = false;
+	}
+	// 剣を取得したときの表示
+	if (pPlayer_->GetPowerFeed() && isTutorialGetSord_ && tutorialTimer_ == 0 && tutorialCoinTimer_ == 0)
+	{
+		tutorialSordTimer_ = 400;
+		isTutorialGetSord_ = false;
+	}
+
+}
+
+void GameplayingScene::TutorialDraw()
+{
+	if (tutorialTimer_-- > 0)
+	{
+		DrawRectRotaGraph(600, 170, 128, 0, 16, 16, 3.0f, 0.0f, controllerH_, true);
+		DrawRectRotaGraph(600 + 64, 170, 128 + 16, 0, 16, 16, 3.0f, 0.0f, controllerH_, true);
+		DrawRectRotaGraph(600 + 128, 170, 128 + 32, 0, 16, 16, 3.0f, 0.0f, controllerH_, true);
+		DrawRectRotaGraph(600 + 192, 170, 128 + 48, 0, 16, 16, 3.0f, 0.0f, controllerH_, true);
+		DrawStringToHandle(600 + 192 + 50, 150, "で移動", 0x000000, tutorialStringH_);
+	}
+	tutorialTimer_ = (std::max)(tutorialTimer_, 0);
+
+	if (tutorialSordTimer_-- > 0)
+	{
+		DrawRotaGraph(500, 170, 3.0f, 0.0f, sordH_, true);
+		DrawStringToHandle(500 + 50, 150, "に触れると少しの時間敵を倒せる！", 0x000000, tutorialStringH_);
+	}
+	tutorialSordTimer_ = (std::max)(tutorialSordTimer_, 0);
+
+	if (tutorialCoinTimer_-- > 0)
+	{
+		DrawRectRotaGraph(500, 170, 0, 0, 8, 8, 5.0f, 0.0f, coinH_, true);
+		DrawStringToHandle(500 + 50, 150, "を全部集めたらゲームクリア！！", 0x000000, tutorialStringH_);
+	}
+	tutorialCoinTimer_ = (std::max)(tutorialCoinTimer_, 0);
 }
 
 bool GameplayingScene::Colision(std::shared_ptr<EnemyBase>enemy, int width, int height)

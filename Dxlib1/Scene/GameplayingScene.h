@@ -14,7 +14,6 @@ class EnemyBase;
 class Map;
 class BackGround;
 class Coin;
-class Particle;
 
 /// <summary>
 /// ゲーム中シーン
@@ -45,6 +44,12 @@ public:
 
 	// 死亡時の初期化
 	void SetDeadInit();
+
+	// チュートリアル用描画処理
+	void TutorialUpdate(const InputState& input);
+
+	// チュートリアル用描画処理
+	void TutorialDraw();
 
 	// 敵とプレイヤーの当たり判定
 	bool Colision(std::shared_ptr<EnemyBase>enemy, int width, int height);
@@ -79,9 +84,6 @@ private:
 	// ゲームクリア演出コイン
 	std::list<std::shared_ptr<Coin>> pCoin_;
 
-	// ゲームクリア演出パーティクル
-	std::array<std::shared_ptr<Particle>, 100> pParticle_;
-
 	//フェードの色(デフォ黒)
 	unsigned int  fadeColor_ = 0x000000; 
 
@@ -110,6 +112,7 @@ private:
 	int gameClearH_;
 	int gameClearShadowH_;
 	int readyH_;
+	int tutorialStringH_;
 
 	// 画像のハンドル
 	int lifeH_;
@@ -134,6 +137,7 @@ private:
 	int backGraphH_;
 	int sordH_;
 	int doorH_;
+	int controllerH_;
 
 	// 初期座標
 	int playerStartPosX_;
@@ -156,6 +160,11 @@ private:
 	// ゲームクリア文字の幅と高さ
 	int stringWidth_;
 	int stringHeight_;
+
+	// チュートリアル用タイマー
+	int tutorialTimer_;
+	int tutorialCoinTimer_;
+	int tutorialSordTimer_;
 
 	// ゲームオーバーか
 	bool isGameOver_;
@@ -180,6 +189,15 @@ private:
 
 	// アニメーションが終了したか
 	bool isAnimeEnd_;
+
+	// チュートリアルの描画をしたか(剣)
+	bool isTutorialGetSord_;
+
+	// チュートリアルの描画をしたか(コイン)
+	bool isTutorialGetCoin_;
+
+	// チュートリアルの描画をしたか(十字キー)
+	bool isTutorial_;
 
 	// どのステージか
 	int stage_;

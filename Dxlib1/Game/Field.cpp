@@ -332,7 +332,6 @@ bool Field::IsFeed(int y, int x)
 			return true;
 		}
 	}
-
 	return false;
 }
 

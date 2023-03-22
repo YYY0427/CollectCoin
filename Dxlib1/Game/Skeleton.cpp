@@ -22,7 +22,7 @@ namespace
 	constexpr int DIEAD_MOVE_INTERVAL = 60 * 3;
 
 	// ゲームスタート時から動き始めるまでの時間
-	constexpr int STARET_MOVE_INTEVAL = 60 * 3;
+	constexpr int STARET_MOVE_INTEVAL = 60 * 5;
 }
 
 Skeleton::Skeleton(int handle, int indexX, int indexY, int stage)

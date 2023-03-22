@@ -78,6 +78,7 @@ public:
 	bool GetPowerFeed() const { return isPowerFeed_; }
 	bool GetDead() const { return isDead_; }
 	bool GetAnimeEnd() const { return isAnimeEnd_; }
+	bool GetPlayerCoin() const { return isGetPlayerCoin_; }
 
 	// 外からの値の設定
 	void SetAnimeEnd(bool isAnimeEnd) { isAnimeEnd_ = isAnimeEnd; }
@@ -131,6 +132,8 @@ private:
 
 	bool isTurnFlag_;
 	bool isFlash_;
+	// プレイヤーとコインがあたったか
+	bool isGetPlayerCoin_;
 
 	int timer_;
 	int powerUpBgmH_;

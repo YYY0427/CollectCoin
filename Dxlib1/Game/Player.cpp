@@ -58,6 +58,7 @@ Player::Player(int normalH, int waponH, int deadH, int attackH, int indexX, int 
 	isFlash_(false),
 	enemyKill_(false),
 	soundMin_(false),
+	isGetPlayerCoin_(false),
 	vec_(0.0f, 0.0f)
 {
 	normalBgmVolume_ = SoundManager::GetInstance().GetBGMVolume();
@@ -143,6 +144,7 @@ void Player::Init(int stage)
 	isIntrusion_ = false;
 	isTurnFlag_ = false;
 	isFlash_ = false;
+	isGetPlayerCoin_ = false;
 }
 
 void Player::Update(const InputState& input)
@@ -257,8 +259,7 @@ void Player::Update(const InputState& input)
 	// エサとの当たり判定
 	if (pField_->IsFeed(indexY_, indexX_))
 	{
-		//エサの数のカウント
-		feedGetNum_++;
+		isGetPlayerCoin_ = true;
 	}
 	
 	// パワーエサをとった場合の計算
