@@ -5,7 +5,15 @@
 
 BackGround::BackGround(int handle) :
 	handle_(handle),
-	scroll_(0)
+	scroll_(0),
+	width_(0),
+	height_(0),
+	size_(0.0f, 0.0f)
+{
+	Init();
+}
+
+void BackGround::Init()
 {
 	GetGraphSizeF(handle_, &size_.x, &size_.y);
 

@@ -16,7 +16,6 @@
 #include "../Game/BackGround.h"
 #include "../SoundManager.h"
 #include "../Game/Coin.h"
-#include "../Particle.h"
 #include <DxLib.h>
 #include <cassert>
 
@@ -432,10 +431,12 @@ void GameplayingScene::EnemyDeadUpdate(const InputState& input)
 {
 	pPlayer_->SetKill(true);
 
+	// “G‚Ì€–S‰‰o
 	pPlayer_->EnemyKillUpdate();
 
 	if (pPlayer_->GetAnimeEnd())
 	{
+		// ‰Šú‰»
 		pPlayer_->SetAnimeEnd(false);
 		pPlayer_->SetKill(false);
 		pPlayer_->SetAttackIdx(0);
@@ -548,9 +549,11 @@ void GameplayingScene::Draw()
 		}
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
+
 	if (preparTimer_ > 0)
 	{
 		int width = GetDrawStringWidthToHandle(REDY_STRING, static_cast<int>(strlen(REDY_STRING)), readyH_);
+
 		// €”õ’†•¶š‚Ì•\¦
 		DrawStringToHandle((Game::SCREEN_WIDTH / 2) - (width / 2), Game::SCREEN_HEIGHT / 2 + 40,
 			REDY_STRING, 0xffffff, readyH_, false);

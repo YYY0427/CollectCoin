@@ -5,8 +5,8 @@
 namespace
 {
 	// アニメーション
-	constexpr int COIN_FRAME_NUM = 4;
-	constexpr int COIN_FRAME_SPEED = 15;
+	constexpr int COIN_FRAME_NUM = 4;		// 必要枚数
+	constexpr int COIN_FRAME_SPEED = 15;	// 速度
 }
 
 Coin::Coin(int graph):
@@ -15,6 +15,13 @@ Coin::Coin(int graph):
 	fallSpeed_(GetRand(1) + 2.0f),
 	coinImgIdx_(0)
 {
+}
+
+void Coin::Init()
+{
+	pos_ = { static_cast<float>(GetRand(Game::SCREEN_WIDTH)), 0.0f };
+	fallSpeed_ = GetRand(1) + 2.0f;
+	coinImgIdx_ = 0;
 }
 
 void Coin::Update()

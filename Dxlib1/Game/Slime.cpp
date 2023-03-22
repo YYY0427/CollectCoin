@@ -43,7 +43,7 @@ void Slime::Update()
 		// 敵が死んでいる状態で指定の位置に存在する場合にイジケ状態を解除
 		if (indexX_ == 10 && indexY_ == 10)
 		{
-		//	isIzike_ = false;
+			//	isIzike_ = false;
 			isMove_ = false;
 			isIntrusion_ = true;
 		}
@@ -117,7 +117,7 @@ void Slime::Update()
 	indexX_ = pField_->Warp(kY_, kX_, indexY_, indexX_);
 
 	// アニメーション処理
-	idX_ = (idX_ + 1) % (ANIME_FRAME_SPEED * ANIME_FRAME_NUM);				// 通常処理
+	idX_ = (idX_ + 1) % (ANIME_FRAME_SPEED * ANIME_FRAME_NUM);
 }
 
 void Slime::Draw()
