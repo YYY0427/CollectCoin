@@ -67,7 +67,8 @@ EnemyBase::EnemyBase() :
 	isIzike_(false),
 	isTracking_(false),
 	isIntrusion_(true),
-	isDoor_(false)
+	isDoor_(false),
+	isDeadMove_(false)
 {
 
 }
@@ -259,9 +260,9 @@ void EnemyBase::ModeSwitch()
 	}
 }
 
-void EnemyBase::MoveSwitch(int startInterval, int deadInterval)
+void EnemyBase::MoveSwitch(int startInterval, int deadInterval, bool isDeadMove)
 {
-	if (!isMove_ && !isDead_)
+	if (!isMove_ && !isDeadMove)
 	{
 		moveTimer2_++;
 
@@ -270,11 +271,9 @@ void EnemyBase::MoveSwitch(int startInterval, int deadInterval)
 			moveTimer2_ = 0;
 
 			isMove_ = true;
-
-			isDoor_ = true;
 		}
 	}
-	else if (!isMove_ && isDead_)
+	else if (!isMove_ && isDeadMove)
 	{
 		moveTimer2_++;
 
@@ -283,8 +282,8 @@ void EnemyBase::MoveSwitch(int startInterval, int deadInterval)
 			moveTimer2_ = 0;
 
 			isMove_ = true;
-
-			isDoor_ = true;
+			
+			isDeadMove = false;
 		}
 	}
 }

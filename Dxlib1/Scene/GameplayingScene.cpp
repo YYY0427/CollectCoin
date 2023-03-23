@@ -240,7 +240,7 @@ void GameplayingScene::Init()
 	isTutorial_ = true;
 
 	// ステージ
-	stage_ = tutorial;		// どのステージ
+	stage_ = stage1;		// どのステージ
 	StageCheck(stage_);		// ステージによって座標の変更
 
 	// メモリの確保
@@ -423,6 +423,8 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 			{
 				// 敵の死亡フラグを立てる
 				enemy->SetDead(true);
+
+				enemy->SetMoveDirection(0);
 
 				// SEを鳴らす
 				SoundManager::GetInstance().Play("kill");

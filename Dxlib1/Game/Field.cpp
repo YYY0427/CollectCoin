@@ -451,7 +451,7 @@ void Field::Search(int y, int x, int goalY, int goalX, int pos)
 
 bool Field::SlowPosition(int y, int x)
 {
-	if (y == 9 && x == 9)
+	if (y == 10 && x == 9 || y == 9 && x == 9)
 	{
 		return true;
 	}

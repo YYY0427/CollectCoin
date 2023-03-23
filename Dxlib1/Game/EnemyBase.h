@@ -67,6 +67,7 @@ public:
 	int GetSizeX() const { return WIDTH; }
 	int GetSizeY() const { return HEIGHT; }
 
+	void SetMoveDirection(bool moveDirection) { moveDirection_ = moveDirection; }
 	void SetDoor(bool isDoor) { isDoor_ = isDoor; }
 
 	// 敵の表示を消すか消さないかをセット
@@ -81,7 +82,7 @@ public:
 	// 縄張りモードと追跡モードの切り替え
 	void ModeSwitch();
 	
-	void MoveSwitch(int startInterval, int deadInterval);
+	void MoveSwitch(int startInterval, int deadInterval, bool isDeadMove);
 
 	/// <summary>
 	/// 向いている方向によって値を返す
@@ -182,4 +183,6 @@ protected:
 
 	int disPlayPosX_;
 	int disPlayPosY_;
+	
+	bool isDeadMove_;
 };

@@ -46,12 +46,12 @@ void Skeleton::Update()
 		// 敵が死んでいる状態で指定の位置に存在する場合にイジケ状態を解除
 		if (indexX_ == 9 && indexY_ == 10)
 		{
-		//	isIzike_ = false;
+			isDeadMove_ = true;
 			isIntrusion_ = true;
 		}
 	}
 
-	MoveSwitch(STARET_MOVE_INTEVAL, DIEAD_MOVE_INTERVAL);
+	MoveSwitch(STARET_MOVE_INTEVAL, DIEAD_MOVE_INTERVAL, isDeadMove_);
 
 	// 縄張りモードと追跡モードの切り替え
 	ModeSwitch();
