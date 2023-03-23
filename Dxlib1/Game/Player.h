@@ -86,6 +86,7 @@ public:
 	void SetAttackIdx(int attackImgIdx) { attackImgIdx_ = attackImgIdx; }
 	void SetDead(bool isDead) { isDead_ = isDead; }
 	void SetEnabled(bool isEnabled) { isEnabled_ = isEnabled; }
+	void SetMoveDirect(int moveDirection) { moveDirection_ = moveDirection; }
 
 	// •ûŒü
 	enum Direct

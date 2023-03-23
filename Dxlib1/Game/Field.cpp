@@ -359,12 +359,14 @@ int  Field::Warp(int ky, int kx, int indexY, int indexX)
 		if (ky == 5 && kx == 1 && indexY == 5 && indexX == 0)
 		{
 			SoundManager::GetInstance().Play("warp");
+			pPlayer_->SetMoveDirect(Player::left);
 			indexX = 9;
 
 		}
 		if (ky == 5 && kx == 8 && indexY == 5 && indexX == 9)
 		{
 			SoundManager::GetInstance().Play("warp");
+			pPlayer_->SetMoveDirect(Player::right);
 			indexX = 0;
 		}
 	}
@@ -374,12 +376,14 @@ int  Field::Warp(int ky, int kx, int indexY, int indexX)
 		if (ky == 10 && kx == 1 && indexY == 10 && indexX == 0)
 		{
 			SoundManager::GetInstance().Play("warp");
+			pPlayer_->SetMoveDirect(Player::left);
 			indexX = 18;
 
 		}
 		if (ky == 10 && kx == 17 && indexY == 10 && indexX == 18)
 		{
 			SoundManager::GetInstance().Play("warp");
+			pPlayer_->SetMoveDirect(Player::right);
 			indexX = 0;
 		}
 	}

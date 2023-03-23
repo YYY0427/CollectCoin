@@ -56,6 +56,9 @@ namespace
 	// ゲームオーバー文字列
 	const char* const GAMEOVER_STRING = "GAME OVER...";
 
+	// 残機の数
+	constexpr int LIFE_NUM = 3;
+
 	// 選択肢の数
 	constexpr int CHOICE_NUM = 3; 
 
@@ -215,7 +218,7 @@ void GameplayingScene::Init()
 	gameClearStringFadeValue_ = 0;
 	tutorialCoinTimer_ = 0;
 	tutorialSordTimer_ = 0;
-	life_ = 3;
+	life_ = LIFE_NUM;
 	waitTimer_ = 0;
 	gameOverTimer_ = 0;
 	gameClearTimer_ = 0;
@@ -961,6 +964,9 @@ void GameplayingScene::SetInit()
 
 	// タイマーの初期化
 	waitTimer_ = 0;
+
+	// 残機の初期化
+	life_ = LIFE_NUM;
 
 	// フラグの初期化 
 	isTitile_ = false;
