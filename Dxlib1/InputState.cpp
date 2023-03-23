@@ -11,14 +11,14 @@ InputState::InputState()
 										{InputCategory::pad, PAD_INPUT_B } };		// 戻るボタン
 
 	defaultMapTable_[InputType::pause] = { {InputCategory::keybd, KEY_INPUT_P},
-										{InputCategory::pad, PAD_INPUT_C }};		// ポーズボタン
+										{InputCategory::pad, PAD_INPUT_8 }};		// ポーズボタン
 
 
 	defaultMapTable_[InputType::keyconf] = { {InputCategory::keybd, KEY_INPUT_K},
-										{InputCategory::pad, PAD_INPUT_C } };		//左ショルダー
+										{InputCategory::pad, PAD_INPUT_C } };		// 左ショルダー
 
 	defaultMapTable_[InputType::change] = { {InputCategory::keybd, KEY_INPUT_C},
-										{InputCategory::pad, PAD_INPUT_Z } };		//右ショルダー
+										{InputCategory::pad, PAD_INPUT_Z } };		// 右ショルダー
 
 	defaultMapTable_[InputType::up] = { {InputCategory::keybd, KEY_INPUT_UP},
 										{InputCategory::pad, PAD_INPUT_UP } };		//↑
@@ -33,7 +33,7 @@ InputState::InputState()
 										{InputCategory::pad, PAD_INPUT_LEFT } };	//←
 
 	defaultMapTable_[InputType::shot] = { {InputCategory::keybd, KEY_INPUT_Z},
-										{InputCategory::pad, PAD_INPUT_Z} };	//ショット
+										{InputCategory::pad, PAD_INPUT_Z} };		// ショット
 
 	inputMapTable_ = defaultMapTable_;
 

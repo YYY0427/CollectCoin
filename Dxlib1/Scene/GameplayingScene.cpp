@@ -184,9 +184,9 @@ void GameplayingScene::Init()
 	gameClearPos_.y = static_cast<float>((Game::SCREEN_HEIGHT / 2) - 220);
 
 	// âÊëúÇÃÉçÅ[Éh
-	nowaponPlayerH_ = my::MyLoadGraph("Data/img/game/nowapon-player.png");
+	nowaponPlayerH_ = my::MyLoadGraph("Data/img/game/nowapon-player_gold.png");
 	waponPlayerH_ = my::MyLoadGraph("Data/img/game/wapon-player_gold.png");
-	deadPlayerH_ = my::MyLoadGraph("Data/img/game/player-deth1.png");
+	deadPlayerH_ = my::MyLoadGraph("Data/img/game/player-deth-gold.png");
 	attackPlayerH_ = my::MyLoadGraph("Data/img/game/player-attack_gold.png");
 	cursor1H_ = my::MyLoadGraph("Data/img/game/cursor1.png");
 	cursor2H_ = my::MyLoadGraph("Data/img/game/cursor2.png");

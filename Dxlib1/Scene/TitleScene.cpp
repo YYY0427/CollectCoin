@@ -272,7 +272,7 @@ void TitleScene::Init()
 {
 	// âÊëúÇÃÉçÅ[Éh
 	sordH_ = my::MyLoadGraph("Data/img/game/sord_gold.png");
-	nowaponPlayerH_ = my::MyLoadGraph("Data/img/game/nowapon-player.png");
+	nowaponPlayerH_ = my::MyLoadGraph("Data/img/game/nowapon-player_gold.png");
 	waponPlayerH_ = my::MyLoadGraph("Data/img/game/wapon-player_gold.png");
 	skeletonH_ = my::MyLoadGraph("Data/img/game/skeleton_monokuro.png");
 	slimeH_ = my::MyLoadGraph("Data/img/game/slime_monokuro.png");
