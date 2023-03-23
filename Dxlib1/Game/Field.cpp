@@ -327,6 +327,7 @@ bool Field::IsFeed(int y, int x)
 		if (mapData_[y][x] == 1)
 		{
 			getCoinNum_++;
+			SoundManager::GetInstance().ChangeSEVolume("coin", SoundManager::GetInstance().GetSEVolume() / 2);
 			SoundManager::GetInstance().Play("coin");
 			mapData_[y][x] = 0;
 			return true;

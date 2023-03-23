@@ -73,13 +73,13 @@ public:
 	/// </summary>
 	/// <param name="name">サウンド名</param>
 	/// <returns> true 再生中  false 再生されていない</returns>
-	bool Check(const char* name);
+	bool CheckSE(const char* name);
 
 	/// <summary>
 	/// 指定のサウンドの音量の変更
 	/// </summary>
 	/// <param name="name">サウンド名、音量</param>
-	void ChangeVolume(const char* name, int volume);
+	void ChangeSEVolume(const char* name, int volume);
 
 	/// <summary>
 	/// サウンド情報をセーブ

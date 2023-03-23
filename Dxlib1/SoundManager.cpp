@@ -111,13 +111,13 @@ int SoundManager::GetBGMVolume() const
 	return volumeBGM_;
 }
 
-bool SoundManager::Check(const char* name)
+bool SoundManager::CheckSE(const char* name)
 {
 	bool sound = CheckSoundMem(nameAndHandleTable_[name]);
 	return sound;
 }
 
-void SoundManager::ChangeVolume(const char* name, int volume)
+void SoundManager::ChangeSEVolume(const char* name, int volume)
 {
 	ChangeVolumeSoundMem(volume, nameAndHandleTable_[name]);
 }
