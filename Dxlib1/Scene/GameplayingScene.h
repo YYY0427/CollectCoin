@@ -165,6 +165,7 @@ private:
 	int tutorialTimer_;
 	int tutorialCoinTimer_;
 	int tutorialSordTimer_;
+	int playerOnDamageTimer_;
 
 	// ゲームオーバーか
 	bool isGameOver_;
@@ -198,6 +199,9 @@ private:
 
 	// チュートリアルの描画をしたか(十字キー)
 	bool isTutorial_;
+
+	// チュートリアルの描画をしたか(ダメージを受けた時)
+	bool isTutorialHart_;
 
 	// どのステージか
 	int stage_;

@@ -120,8 +120,6 @@ bool EnemyBase::Colision(int direction)
 		if (pField_->IsBlock(indexY_ - 1, indexX_))	return true;
 		break;
 	case down:
-	/*	if (pField_->IsBlock(indexY_ + 1, indexX_))	return true;
-		break;*/
 		if (pField_->IsBlock(indexY_ + 1, indexX_) ||
 			!pField_->Intrusion(indexY_ + 1, indexX_, isIntrusion_))	return true;
 		break;
@@ -219,7 +217,7 @@ void EnemyBase::SetDeadInit(int stage)
 	if (stage == 0)
 	{
 		indexX_ = 5;
-		indexY_ = 5;
+		indexY_ = 1;
 	}
 	else if (stage == 1)
 	{

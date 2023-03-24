@@ -18,7 +18,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	SetMainWindowText(Game::TITLE_TEXT);
 
 	// ほかのウィンドウを選択していても動くようにする
-	SetAlwaysRunFlag(true);
+	SetAlwaysRunFlag(false);
 
 	// ウィンドウのサイズを変更可能にする
 	SetWindowSizeChangeEnableFlag(true);

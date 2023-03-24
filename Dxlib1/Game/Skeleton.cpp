@@ -148,7 +148,7 @@ void Skeleton::SetInit(int stage)
 	if (stage == 0)
 	{
 		indexX_ = 5;
-		indexY_ = 2;
+		indexY_ = 1;
 	}
 	else if (stage == 1)
 	{

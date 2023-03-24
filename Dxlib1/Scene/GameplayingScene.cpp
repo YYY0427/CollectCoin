@@ -111,6 +111,7 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	gameClearFadeTimer_(0),
 	gameClearStringFadeValue_(0),
 	tutorialTimer_(0),
+	playerOnDamageTimer_(0),
 	tempScreenH_(-1),
 	gameOverH_(-1),
 	gameOverShadowH_(-1),
@@ -149,7 +150,8 @@ GameplayingScene::GameplayingScene(SceneManager& manager) :
 	isCoinEnabled_(false),
 	isTutorialGetSord_(false),
 	isTutorialGetCoin_(false),
-	isTutorial_(false)
+	isTutorial_(false),
+	isTutorialHart_(false)
 {
 	Init();
 }
@@ -218,6 +220,7 @@ void GameplayingScene::Init()
 	gameClearStringFadeValue_ = 0;
 	tutorialCoinTimer_ = 0;
 	tutorialSordTimer_ = 0;
+	playerOnDamageTimer_ = 0;
 	life_ = LIFE_NUM;
 	waitTimer_ = 0;
 	gameOverTimer_ = 0;
@@ -238,9 +241,10 @@ void GameplayingScene::Init()
 	isTutorialGetSord_ = true;
 	isTutorialGetCoin_ = true;
 	isTutorial_ = true;
+	isTutorialHart_ = true;
 
 	// ステージ
-	stage_ = stage1;		// どのステージ
+	stage_ = tutorial;		// どのステージ
 	StageCheck(stage_);		// ステージによって座標の変更
 
 	// メモリの確保
@@ -363,6 +367,7 @@ void GameplayingScene::NormalUpdate(const InputState& input)
 		enemy->Update();
 	}
 
+	// ステージがチュートリアルのときのみ実行
 	if (stage_ == tutorial)
 	{
 		TutorialUpdate(input);
@@ -980,6 +985,7 @@ void GameplayingScene::SetInit()
 	isTutorialGetSord_ = true;
 	isTutorialGetCoin_ = true;
 	isTutorial_ = true;
+	isTutorialHart_ = true;
 
 	// 現在のステージの確認
 	StageCheck(stage_);
@@ -1059,18 +1065,23 @@ void GameplayingScene::SetDeadInit()
 void GameplayingScene::TutorialUpdate(const InputState& input)
 {
 	// コインを取得したときの表示
-	if (pPlayer_->GetPlayerCoin() && isTutorialGetCoin_ && tutorialTimer_ == 0 && tutorialSordTimer_ == 0)
+	if (pPlayer_->GetPlayerCoin() && isTutorialGetCoin_ && tutorialTimer_ == 0 && tutorialSordTimer_ == 0 && playerOnDamageTimer_ == 0)
 	{
 		tutorialCoinTimer_ = 400;
 		isTutorialGetCoin_ = false;
 	}
 	// 剣を取得したときの表示
-	if (pPlayer_->GetPowerFeed() && isTutorialGetSord_ && tutorialTimer_ == 0 && tutorialCoinTimer_ == 0)
+	if (pPlayer_->GetPowerFeed() && isTutorialGetSord_ && tutorialTimer_ == 0 && tutorialCoinTimer_ == 0 && playerOnDamageTimer_ == 0)
 	{
 		tutorialSordTimer_ = 400;
 		isTutorialGetSord_ = false;
 	}
-
+	// 敵から攻撃を受けた時の表示
+	if (life_ <= 2 && tutorialCoinTimer_ == 0 && tutorialSordTimer_ == 0 && isTutorialHart_)
+	{
+		playerOnDamageTimer_ = 400;
+		isTutorialHart_ = false;
+	}
 }
 
 void GameplayingScene::TutorialDraw()
@@ -1094,10 +1105,22 @@ void GameplayingScene::TutorialDraw()
 
 	if (tutorialCoinTimer_-- > 0)
 	{
-		DrawRectRotaGraph(500, 170, 0, 0, 8, 8, 5.0f, 0.0f, coinH_, true);
-		DrawStringToHandle(500 + 50, 150, "を全部集めたらゲームクリア！！", 0x000000, tutorialStringH_);
+		DrawRectRotaGraph(650, 170, 0, 0, 8, 8, 5.0f, 0.0f, coinH_, true);
+		DrawStringToHandle(650 + 50, 150, "を集めよう！", 0x000000, tutorialStringH_);
+		DrawStringToHandle(550, 200, "全部集めたらゲームクリア！！", 0x000000, tutorialStringH_);
 	}
 	tutorialCoinTimer_ = (std::max)(tutorialCoinTimer_, 0);
+
+	if (playerOnDamageTimer_-- > 0)
+	{
+		DrawRotaGraph(400, 170, 3.0f, 0.0f, sordH_, true);
+		DrawStringToHandle(400 + 50, 150, "がないとき敵にあたると", 0x000000, tutorialStringH_);
+		DrawRectRotaGraph(950, 170, 0, 0, 15, 15, 3.0f, 0.0f, lifeH_, true);
+		DrawStringToHandle(950 + 50, 150, "が減るよ！", 0x000000, tutorialStringH_);
+		DrawRectRotaGraph(500, 220, 0, 0, 15, 15, 3.0f, 0.0f, lifeH_, true);
+		DrawStringToHandle(500 + 50, 200, "がなくなるとゲームオーバー...", 0x000000, tutorialStringH_);
+	}
+	playerOnDamageTimer_ = (std::max)(playerOnDamageTimer_, 0);
 }
 
 bool GameplayingScene::Colision(std::shared_ptr<EnemyBase>enemy, int width, int height)
